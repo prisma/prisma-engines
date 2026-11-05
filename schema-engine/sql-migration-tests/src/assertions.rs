@@ -19,6 +19,24 @@ use sql_schema_describer::{
 };
 use test_setup::{BitFlags, Tags};
 
+fn identifiers_match(actual: &str, expected: &str, tags: BitFlags<Tags>) -> bool {
+    actual == expected
+        || (tags.contains(Tags::LowerCasesTableNames)
+            || (tags.contains(Tags::KingbaseOracle)
+                && expected.is_ascii()
+                && !expected.bytes().any(|byte| byte.is_ascii_lowercase())))
+            && actual.eq_ignore_ascii_case(expected)
+}
+
+fn column_names_match<'a>(actual: impl Iterator<Item = &'a str>, expected: &[&str], tags: BitFlags<Tags>) -> bool {
+    let actual = actual.collect::<Vec<_>>();
+    actual.len() == expected.len()
+        && actual
+            .iter()
+            .zip(expected)
+            .all(|(actual, expected)| identifiers_match(actual, expected, tags))
+}
+
 pub struct SchemaAssertion {
     schema: SqlSchema,
     context: Option<&'static str>,
@@ -50,24 +68,16 @@ impl SchemaAssertion {
 
     #[track_caller]
     fn find_view_option<'a>(&'a self, view_name: &str) -> Option<ViewWalker<'a>> {
-        self.schema.view_walkers().find(|v| {
-            if self.tags.contains(Tags::LowerCasesTableNames) {
-                v.name().eq_ignore_ascii_case(view_name)
-            } else {
-                v.name() == view_name
-            }
-        })
+        self.schema
+            .view_walkers()
+            .find(|v| identifiers_match(v.name(), view_name, self.tags))
     }
 
     #[track_caller]
     fn find_table_option<'a>(&'a self, table_name: &str) -> Option<TableWalker<'a>> {
-        self.schema.table_walkers().find(|t| {
-            if self.tags.contains(Tags::LowerCasesTableNames) {
-                t.name().eq_ignore_ascii_case(table_name)
-            } else {
-                t.name() == table_name
-            }
-        })
+        self.schema
+            .table_walkers()
+            .find(|t| identifiers_match(t.name(), table_name, self.tags))
     }
 
     #[track_caller]
@@ -373,7 +383,7 @@ impl<'a> TableAssertion<'a> {
         if let Some(fk) = self
             .table
             .foreign_keys()
-            .find(|fk| fk.constrained_columns().map(|c| c.name()).collect::<Vec<_>>() == columns)
+            .find(|fk| column_names_match(fk.constrained_columns().map(|c| c.name()), columns, self.tags))
         {
             fk_assertions(ForeignKeyAssertion { fk, tags: self.tags });
         } else {
@@ -417,7 +427,11 @@ impl<'a> TableAssertion<'a> {
 
     #[track_caller]
     pub fn assert_has_column(self, column_name: &str) -> Self {
-        match self.table.column(column_name) {
+        match self
+            .table
+            .columns()
+            .find(|column| identifiers_match(column.name(), column_name, self.tags))
+        {
             Some(_) => self,
             None => panic!(
                 "Assertion failed: column {} not found. Existing columns: {:?}",
@@ -432,7 +446,11 @@ impl<'a> TableAssertion<'a> {
         F: FnOnce(ColumnAssertion<'a>) -> ColumnAssertion<'a>,
     {
         let this = self.assert_has_column(column_name);
-        let column = this.table.column(column_name).unwrap();
+        let column = this
+            .table
+            .columns()
+            .find(|column| identifiers_match(column.name(), column_name, self.tags))
+            .unwrap();
 
         column_assertions(ColumnAssertion { column });
         this
@@ -487,7 +505,7 @@ impl<'a> TableAssertion<'a> {
             .table
             .indexes()
             .filter(|idx| !idx.is_primary_key())
-            .find(|idx| idx.column_names().collect::<Vec<_>>() == columns)
+            .find(|idx| column_names_match(idx.column_names(), columns, self.tags))
         {
             index_assertions(IndexAssertion {
                 index: idx,
@@ -797,7 +815,7 @@ pub struct PrimaryKeyAssertion<'a> {
 
 impl PrimaryKeyAssertion<'_> {
     pub fn assert_columns(self, column_names: &[&str]) -> Self {
-        assert_eq!(&self.pk.column_names().collect::<Vec<_>>(), column_names);
+        assert!(column_names_match(self.pk.column_names(), column_names, self.tags));
 
         self
     }
@@ -809,7 +827,7 @@ impl PrimaryKeyAssertion<'_> {
         let col = self
             .pk
             .columns()
-            .find(|c| c.name() == column_name)
+            .find(|c| identifiers_match(c.name(), column_name, self.tags))
             .unwrap_or_else(|| panic!("Could not find column {column_name}"));
 
         f(IndexColumnAssertion {
@@ -880,7 +898,7 @@ impl ForeignKeyAssertion<'_> {
     pub fn assert_references(self, table: &str, columns: &[&str]) -> Self {
         assert!(
             self.is_same_table_name(self.fk.referenced_table().name(), table)
-                && self.fk.referenced_columns().map(|c| c.name()).collect::<Vec<_>>() == columns,
+                && column_names_match(self.fk.referenced_columns().map(|c| c.name()), columns, self.tags),
             r#"Assertion failed. Expected reference to "{table}" ({columns:?})."#,
         );
 
@@ -912,11 +930,7 @@ impl ForeignKeyAssertion<'_> {
     }
 
     fn is_same_table_name(&self, fst: &str, snd: &str) -> bool {
-        if self.tags.contains(Tags::LowerCasesTableNames) {
-            fst.eq_ignore_ascii_case(snd)
-        } else {
-            fst == snd
-        }
+        identifiers_match(fst, snd, self.tags)
     }
 }
 
@@ -992,7 +1006,7 @@ impl IndexAssertion<'_> {
         let col = self
             .index
             .columns()
-            .find(|c| c.as_column().name() == column_name)
+            .find(|c| identifiers_match(c.as_column().name(), column_name, self.tags))
             .unwrap();
 
         let operator_class = if self.tags.contains(Tags::Postgres) {

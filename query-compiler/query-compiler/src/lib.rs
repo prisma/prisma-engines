@@ -27,6 +27,9 @@ pub enum CompileError {
 
     #[error("{0}")]
     TranslateError(#[from] TranslateError),
+
+    #[error("the `{0}` SQL family is not supported by the query compiler")]
+    UnsupportedSqlFamily(&'static str),
 }
 
 pub fn compile(
@@ -37,15 +40,19 @@ pub fn compile(
     let ctx = Context::new(connection_info, None);
     let graph = QueryGraphBuilder::new(query_schema).build(query)?;
 
+    #[allow(unreachable_patterns)]
     let res: Result<Expression, TranslateError> = match connection_info.sql_family() {
         #[cfg(feature = "postgresql")]
         SqlFamily::Postgres => translate(graph, &SqlQueryBuilder::<visitor::Postgres<'_>>::new(ctx)),
         #[cfg(feature = "mysql")]
         SqlFamily::Mysql => translate(graph, &SqlQueryBuilder::<visitor::Mysql<'_>>::new(ctx)),
+        #[cfg(feature = "kingbase-oracle")]
+        SqlFamily::KingbaseOracle => translate(graph, &SqlQueryBuilder::<visitor::KingbaseOracle<'_>>::new(ctx)),
         #[cfg(feature = "sqlite")]
         SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<visitor::Sqlite<'_>>::new(ctx)),
         #[cfg(feature = "mssql")]
         SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<visitor::Mssql<'_>>::new(ctx)),
+        family => return Err(CompileError::UnsupportedSqlFamily(family.as_str())),
     };
 
     res.map_err(CompileError::TranslateError)

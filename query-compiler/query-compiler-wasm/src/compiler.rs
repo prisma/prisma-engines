@@ -19,6 +19,10 @@ const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
     psl::builtin_connectors::POSTGRES,
     #[cfg(feature = "mysql")]
     psl::builtin_connectors::MYSQL,
+    #[cfg(feature = "kingbase-mysql")]
+    psl::builtin_connectors::KINGBASE_MYSQL,
+    #[cfg(feature = "kingbase-oracle")]
+    psl::builtin_connectors::KINGBASE_ORACLE,
     #[cfg(feature = "sqlite")]
     psl::builtin_connectors::SQLITE,
     #[cfg(feature = "mssql")]
@@ -186,6 +190,20 @@ impl JsCompileError {
             code: Some(E::ERROR_CODE.into()),
             meta: serde_json::to_value(&error).ok(),
         }
+    }
+}
+
+#[cfg(all(test, feature = "kingbase-oracle"))]
+mod tests {
+    use super::CONNECTOR_REGISTRY;
+
+    #[test]
+    fn registers_the_kingbase_oracle_connector() {
+        assert!(
+            CONNECTOR_REGISTRY
+                .iter()
+                .any(|connector| connector.provider_name() == "kingbase-oracle")
+        );
     }
 }
 

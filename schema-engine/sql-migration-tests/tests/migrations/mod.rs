@@ -13,6 +13,8 @@ mod id;
 mod indexes;
 mod json;
 mod jsonrpc;
+mod kingbase_mysql;
+mod kingbase_oracle;
 mod mariadb;
 mod mark_migration_applied_tests;
 mod mark_migration_rolled_back_tests;

@@ -1,0 +1,20 @@
+datasource db {
+  provider = "kingbase-oracle"
+}
+
+generator js {
+  provider        = "prisma-client"
+  previewFeatures = ["views"]
+}
+
+view SomeUser {
+  id      Int      @unique
+  profile Profile?
+}
+
+model Profile {
+  id      Int       @id
+  user    SomeUser? @relation(fields: [user_id], references: [id])
+  user_id Int       @unique
+}
+

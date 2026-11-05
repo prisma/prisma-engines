@@ -174,7 +174,7 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
         .send()
         .assert_green();
 
-    let enum_name = if api.is_mysql() {
+    let enum_name = if api.is_mysql() || api.tags().contains(Tags::KingbaseMysql) {
         api.normalize_identifier("Cat_mood")
     } else {
         "CatMood".into()
@@ -201,7 +201,7 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
         }
     "#;
 
-    let warnings: &[Cow<'_, str>] = if api.is_mysql() {
+    let warnings: &[Cow<'_, str>] = if api.is_mysql() || api.tags().contains(Tags::KingbaseMysql) {
         &["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]
     } else if api.is_sqlite() {
         &[]

@@ -15,7 +15,9 @@ test_type!(tinyint(
     Value::int32(i8::MAX)
 ));
 
-test_type!(tinyint1(
+// Kingbase reports TINYINT(1) as Boolean, covered by the dedicated test below.
+#[cfg(feature = "mysql-native")]
+test_type_impl!(tinyint1(
     mysql,
     "tinyint(1)",
     ColumnType::Int32,
@@ -24,7 +26,18 @@ test_type!(tinyint1(
     Value::int32(0)
 ));
 
-test_type!(tinyint_unsigned(
+#[cfg(feature = "kingbase-mysql-native")]
+test_type!(tinyint1_kingbase_bool(
+    kingbase_mysql,
+    "tinyint(1)",
+    ColumnType::Boolean,
+    Value::boolean(false),
+    Value::boolean(true)
+));
+
+// Kingbase's MySQL unsigned TINYINT binding is not supported yet.
+#[cfg(feature = "mysql-native")]
+test_type_impl!(tinyint_unsigned(
     mysql,
     "tinyint(4) unsigned",
     ColumnType::Int32,
@@ -51,7 +64,9 @@ test_type!(smallint(
     Value::int32(i16::MAX)
 ));
 
-test_type!(smallint_unsigned(
+// Kingbase's MySQL unsigned SMALLINT binding is not supported yet.
+#[cfg(feature = "mysql-native")]
+test_type_impl!(smallint_unsigned(
     mysql,
     "smallint unsigned",
     ColumnType::Int32,
@@ -69,7 +84,9 @@ test_type!(mediumint(
     Value::int32(8388607)
 ));
 
-test_type!(mediumint_unsigned(
+// Kingbase's MySQL unsigned MEDIUMINT binding is not supported yet.
+#[cfg(feature = "mysql-native")]
+test_type_impl!(mediumint_unsigned(
     mysql,
     "mediumint unsigned",
     ColumnType::Int64,
@@ -162,6 +179,14 @@ test_type!(bit1(
     (Value::null_bytes(), Value::null_boolean()),
     (Value::int32(0), Value::boolean(false)),
     (Value::int32(1), Value::boolean(true)),
+));
+
+test_type!(bit8(
+    mysql,
+    "bit(8)",
+    ColumnType::Bytes,
+    Value::null_bytes(),
+    Value::bytes(vec![0b1010_0101])
 ));
 
 test_type!(bit64(
@@ -283,12 +308,30 @@ test_type!(enum(
     Value::enum_variant("pollicle_dogs")
 ));
 
+test_type!(set(
+    mysql,
+    "set('red','blue')",
+    ColumnType::Text,
+    Value::null_text(),
+    Value::text("red"),
+    Value::text("red,blue")
+));
+
 test_type!(json(
     mysql,
     "json",
     ColumnType::Json,
     Value::null_json(),
     Value::json(serde_json::json!({"this": "is", "a": "json", "number": 2}))
+));
+
+#[cfg(feature = "kingbase-mysql-native")]
+test_type!(xml_kingbase_mysql(
+    kingbase_mysql,
+    "XML",
+    ColumnType::Xml,
+    Value::null_xml(),
+    Value::xml("<kingbase>金仓 &amp; XML</kingbase>")
 ));
 
 test_type!(date(

@@ -87,7 +87,7 @@ Instead of query execution being implemented in Rust, the query plan interpreter
 To run tests through a driver adapters, you should also configure the following environment variables:
 
 * `DRIVER_ADAPTER`: tells the test executor to use a particular driver adapter. Set to `neon`, `planetscale` or any other supported adapter.
-* `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific. See the [GitHub workflow for driver adapter tests](.github/workflows/query-engine-driver-adapters.yml) for examples on how to configure the driver adapters.
+* `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific. See the [Query Compiler integration workflow](../../.github/workflows/test-query-compiler-template.yml) and the repository's `dev-*-qc` Make targets for the current setup.
 
 Example:
 
@@ -95,7 +95,7 @@ Example:
 export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/libs/driver-adapters/executor/script/testd-qc.sh"
 export DRIVER_ADAPTER=neon
 export DRIVER_ADAPTER_CONFIG='{"proxyUrl":"127.0.0.1:5488/v1"}'
-````
+```
 
 We have provided helpers to run the connector tests with driver adapters; these helpers set all the
 required environment variables for you:
@@ -260,7 +260,7 @@ For this reason, schemas have template strings of the form `#name(args)` embedde
 
 All SQL connectors render these with a standard `SqlDatamodelRenderer`, Mongo uses its own `MongoDbSchemaRenderer`.
 
-Consider using one of the common schemas located in `query-engine-tests/sec/schemas` to write your tests - they are already templated correctly and reducing the number of schemas used overall helps keeping the tests more compact. However, if a test suite requires a specialized schema, it's totally fine to write one yourself, just remember to template it correctly.
+Consider using one of the common schemas located in [query-engine-tests/src/schemas](query-engine-tests/src/schemas) to write your tests - they are already templated correctly and reducing the number of schemas used overall helps keeping the tests more compact. However, if a test suite requires a specialized schema, it's totally fine to write one yourself, just remember to template it correctly.
 
 ## Assertions
 
@@ -358,7 +358,7 @@ Let's say you already have connector tests for MongoDB but right now it runs onl
 4. Make sure this image is available to build and prepare the environment in the `Makefile`. The connector test kit relies on paired `dev-` and `start-` targets.
    - The `start-` target (for example `start-mongo5`) will execute the _data store service_ in docker compose, for example `docker compose -f docker-compose.yml up -d --remove-orphans mongo5`
    - The `dev-` target (for example `dev-mongo5`) will depend on the `start-` target and copy the correct _connector file_, for example `cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)`
-5. Add the new test data store source to the `query-engine/connector-test-kit-rs/query-test-setup/src/connector_tag` file, if it is a completely new data store create the required file, in our case we need to modify `mongodb.rs`
+5. Add the new test data store source under `query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/`; if it is a completely new data store create the required file, in our case we need to modify `mongodb.rs`
    - Add the new version to the version enum (ex. `MongoDbVersion`)
    - Implement or amend the `try_from` function for the version enum
    - Implement or amend the `to_string` function for the version enum

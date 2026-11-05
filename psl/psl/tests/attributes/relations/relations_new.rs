@@ -818,66 +818,66 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
 
 #[test]
 fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() {
-    let dm1 = indoc! {
-        r#"
-        datasource db {
-            provider = "mysql"
+    for (provider, native) in [
+        ("mysql", "Int"),
+        ("kingbase-mysql", "Int"),
+        ("kingbase-oracle", "Number(10,0)"),
+    ] {
+        let dm1 = formatdoc! {r#"
+            datasource db {{
+                provider = "{provider}"
+            }}
+
+            model Blog {{
+                id        Int   @id
+                authorId  Int @db.{native}
+                author    User @relation(fields: [authorId], references: [id])
+            }}
+
+            model User {{
+                id        Int @id
+                blogs     Blog[]
+            }}
+        "#};
+
+        let dm2 = formatdoc! {r#"
+            datasource db {{
+                provider = "{provider}"
+            }}
+
+            model Blog {{
+                id        Int   @id
+                authorId  Int
+                author    User @relation(fields: [authorId], references: [id])
+            }}
+
+            model User {{
+                id        Int @id @db.{native}
+                blogs     Blog[]
+
+            }}
+        "#};
+
+        let dm3 = formatdoc! {r#"
+            datasource db {{
+                provider = "{provider}"
+            }}
+
+            model Blog {{
+                id        Int   @id
+                authorId  Int?   @db.{native}
+                author    User?  @relation(fields: [authorId], references: [id])
+            }}
+
+            model User {{
+                id        Int @id @db.{native}
+                blogs     Blog[]
+            }}
+        "#};
+
+        for dm in &[dm1, dm2, dm3] {
+            assert_valid(dm);
         }
-
-        model Blog {
-            id        Int   @id
-            authorId  Int @db.Int
-            author    User @relation(fields: [authorId], references: [id])
-        }
-
-        model User {
-            id        Int @id
-            blogs     Blog[]
-        }
-        "#
-    };
-
-    let dm2 = indoc! {
-        r#"
-        datasource db {
-            provider = "mysql"
-        }
-
-        model Blog {
-            id        Int   @id
-            authorId  Int
-            author    User @relation(fields: [authorId], references: [id])
-        }
-
-        model User {
-            id        Int @id @db.Int
-            blogs     Blog[]
-
-        }
-        "#
-    };
-
-    let dm3 = indoc! {
-        r#"
-        datasource db {
-            provider = "mysql"
-        }
-
-        model Blog {
-            id        Int   @id
-            authorId  Int?   @db.Int
-            author    User?  @relation(fields: [authorId], references: [id])
-        }
-
-        model User {
-            id        Int @id @db.Int
-            blogs     Blog[]
-        }
-        "#
-    };
-
-    for dm in &[dm1, dm2, dm3] {
-        assert_valid(dm);
     }
 }
 

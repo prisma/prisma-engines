@@ -10,6 +10,8 @@ sqlite = ["psl/sqlite", "quaint/sqlite"]
 sqlite-native = ["sqlite", "quaint/sqlite-native", "quaint/pooled", "quaint/expose-drivers"]
 mysql = ["psl/mysql", "quaint/mysql"]
 mysql-native = ["mysql", "quaint/mysql-native", "quaint/pooled"]
+kingbase-oracle = ["psl/kingbase-oracle", "quaint/kingbase-oracle"]
+kingbase-oracle-native = ["kingbase-oracle", "quaint/kingbase-oracle-native", "quaint/pooled"]
 mssql = ["psl/mssql", "quaint/mssql"]
 mssql-native = ["mssql", "quaint/mssql-native", "quaint/pooled"]
 cockroachdb = ["psl/cockroachdb", "quaint/postgresql"]
@@ -18,6 +20,7 @@ all-native = [
     "postgresql-native",
     "sqlite-native",
     "mysql-native",
+    "kingbase-oracle-native",
     "mssql-native",
     "cockroachdb-native",
 ]

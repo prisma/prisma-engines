@@ -1,0 +1,27 @@
+datasource db {
+  provider = "kingbase-oracle"
+  schemas  = ["A", "B"]
+}
+
+generator js {
+  provider = "prisma-client"
+  previewFeatures = ["views"]
+}
+
+model A {
+  id Int @id
+
+  @@schema("B")
+}
+
+view Mountain {
+  id Int
+}
+// [1;91merror[0m: [1mError validating view "Mountain": This view is missing an `@@schema` attribute.[0m
+//   [1;94m-->[0m  [4mschema.prisma:17[0m
+// [1;94m   | [0m
+// [1;94m16 | [0m
+// [1;94m17 | [0m[1;91mview Mountain {[0m
+// [1;94m18 | [0m  id Int
+// [1;94m19 | [0m}
+// [1;94m   | [0m

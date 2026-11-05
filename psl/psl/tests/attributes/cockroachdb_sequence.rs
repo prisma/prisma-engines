@@ -2,26 +2,30 @@ use crate::common::*;
 
 #[test]
 fn default_sequence_is_not_valid_on_postgres() {
-    let schema = r#"
-        datasource db {
-            provider = "postgresql"
-        }
+    for provider in ["postgresql", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = format!(
+            r#"
+        datasource db {{
+            provider = "{provider}"
+        }}
 
-        model Test {
+        model Test {{
             id Int @id @default(sequence())
-        }
-    "#;
+        }}
+    "#
+        );
 
-    let expected_error = expect![[r#"
-        [1;91merror[0m: [1mUnknown function in @default(): `sequence` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
-          [1;94m-->[0m  [4mschema.prisma:7[0m
-        [1;94m   | [0m
-        [1;94m 6 | [0m        model Test {
-        [1;94m 7 | [0m            id Int @id @default([1;91msequence()[0m)
-        [1;94m   | [0m
-    "#]];
+        let expected_error = expect![[r#"
+            [1;91merror[0m: [1mUnknown function in @default(): `sequence` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
+              [1;94m-->[0m  [4mschema.prisma:7[0m
+            [1;94m   | [0m
+            [1;94m 6 | [0m        model Test {
+            [1;94m 7 | [0m            id Int @id @default([1;91msequence()[0m)
+            [1;94m   | [0m
+        "#]];
 
-    expect_error(schema, &expected_error);
+        expect_error(&schema, &expected_error);
+    }
 }
 
 #[test]

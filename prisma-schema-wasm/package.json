@@ -1,17 +1,20 @@
 {
-  "name": "@prisma/prisma-schema-wasm",
+  "name": "@prisma-kb/prisma-schema-wasm",
   "version": null,
-  "description": "The Wasm package for prisma-fmt",
+  "description": "Wasm schema parser, validator, and formatter for Prisma Kingbase support",
   "main": "src/prisma_schema_build.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/prisma/prisma-engines",
+    "url": "https://github.com/lifeng5210/prisma-engines.git",
     "directory": "prisma-schema-wasm"
   },
-  "author": "Prisma",
+  "author": "lifeng5210",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/prisma/prisma-engines"
+  "homepage": "https://github.com/lifeng5210/prisma-engines",
+  "bugs": {
+    "url": "https://github.com/lifeng5210/prisma-engines/issues"
+  }
 }

@@ -4,6 +4,8 @@
 //! This crate contains constants and utilities that are useful for writing tests across the
 //! engines.
 
+mod kingbase_mysql;
+mod kingbase_oracle;
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;
@@ -78,6 +80,7 @@ pub fn should_skip_test(
     capabilities: BitFlags<Capabilities>,
 ) -> bool {
     let db = test_api_args::db_under_test();
+
     if !capabilities.is_empty() && !db.capabilities.contains(capabilities) {
         println!("Test skipped");
         return true;

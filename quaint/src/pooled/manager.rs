@@ -4,6 +4,10 @@ use async_trait::async_trait;
 use mobc::{Connection as MobcPooled, Manager};
 use tracing_futures::WithSubscriber;
 
+#[cfg(feature = "kingbase-mysql-native")]
+use crate::connector::KingbaseMysqlUrl;
+#[cfg(feature = "kingbase-oracle-native")]
+use crate::connector::KingbaseOracleUrl;
 #[cfg(feature = "mssql-native")]
 use crate::connector::MssqlUrl;
 #[cfg(feature = "mysql-native")]
@@ -93,10 +97,16 @@ impl Queryable for PooledConnection {
 
 #[doc(hidden)]
 pub enum QuaintManager {
-    #[cfg(feature = "mysql")]
+    #[cfg(feature = "mysql-native")]
     Mysql { url: MysqlUrl },
 
-    #[cfg(feature = "postgresql")]
+    #[cfg(feature = "kingbase-mysql-native")]
+    KingbaseMysql { url: KingbaseMysqlUrl },
+
+    #[cfg(feature = "kingbase-oracle-native")]
+    KingbaseOracle { url: KingbaseOracleUrl },
+
+    #[cfg(feature = "postgresql-native")]
     Postgres {
         url: PostgresNativeUrl,
         tls_manager: Box<MakeTlsConnectorManager>,
@@ -130,6 +140,18 @@ impl Manager for QuaintManager {
             QuaintManager::Mysql { url } => {
                 use crate::connector::Mysql;
                 Ok(Box::new(Mysql::new(url.clone()).await?) as Self::Connection)
+            }
+
+            #[cfg(feature = "kingbase-mysql-native")]
+            QuaintManager::KingbaseMysql { url } => {
+                use crate::connector::KingbaseMysql;
+                Ok(Box::new(KingbaseMysql::new(url.clone()).await?) as Self::Connection)
+            }
+
+            #[cfg(feature = "kingbase-oracle-native")]
+            QuaintManager::KingbaseOracle { url } => {
+                use crate::connector::KingbaseOracle;
+                Ok(Box::new(KingbaseOracle::new(url.clone()).await?) as Self::Connection)
             }
 
             #[cfg(feature = "postgresql-native")]
@@ -180,7 +202,7 @@ impl Manager for QuaintManager {
 
     fn validate(&self, conn: &mut Self::Connection) -> bool {
         let single_use_connection = match self {
-            #[cfg(feature = "postgresql")]
+            #[cfg(feature = "postgresql-native")]
             Self::Postgres { url, .. } => url.single_use_connections(),
             _ => false,
         };
@@ -219,6 +241,42 @@ mod tests {
         );
 
         let pool = Quaint::builder(&conn_string).unwrap().build();
+
+        assert_eq!(10, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "kingbase-mysql-native")]
+    async fn kingbase_mysql_default_connection_limit() {
+        let pool = Quaint::builder("kingbase-mysql://localhost/testdb").unwrap().build();
+
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "kingbase-mysql-native")]
+    async fn kingbase_mysql_custom_connection_limit() {
+        let pool = Quaint::builder("kingbase-mysql://localhost/testdb?connection_limit=10")
+            .unwrap()
+            .build();
+
+        assert_eq!(10, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "kingbase-oracle-native")]
+    async fn kingbase_oracle_default_connection_limit() {
+        let pool = Quaint::builder("kingbase-oracle://localhost/testdb").unwrap().build();
+
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "kingbase-oracle-native")]
+    async fn kingbase_oracle_custom_connection_limit() {
+        let pool = Quaint::builder("kingbase-oracle://localhost/testdb?connection_limit=10")
+            .unwrap()
+            .build();
 
         assert_eq!(10, pool.capacity().await as usize);
     }

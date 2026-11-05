@@ -1,0 +1,60 @@
+// tags=KingbaseOracle
+
+datasource db {
+  provider = "kingbase-oracle"
+}
+
+model Account {
+  id    Int    @id
+  code  String @unique @db.VarChar2(64)
+  posts Post[]
+}
+
+model Post {
+  id        Int      @id
+  accountId Int
+  status    Status   @default(DRAFT)
+  amount    Decimal  @db.Number(12, 4)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId], map: "Post_accountId_idx")
+}
+
+enum Status {
+  DRAFT
+  PUBLISHED
+}
+
+// Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+//
+// -- CreateEnum
+// CREATE TYPE "Status" AS ENUM ('DRAFT', 'PUBLISHED');
+//
+// -- CreateTable
+// CREATE TABLE "Account" (
+//     "id" NUMBER(10,0) NOT NULL,
+//     "code" VARCHAR2(64) NOT NULL,
+//     CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
+// );
+//
+// -- CreateTable
+// CREATE TABLE "Post" (
+//     "id" NUMBER(10,0) NOT NULL,
+//     "accountId" NUMBER(10,0) NOT NULL,
+//     "status" "Status" NOT NULL DEFAULT 'DRAFT',
+//     "amount" NUMBER(12,4) NOT NULL,
+//     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+//     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
+// );
+//
+// -- CreateIndex
+// ALTER TABLE "Account" ADD CONSTRAINT "Account_code_key" UNIQUE ("code");
+//
+// -- CreateIndex
+// CREATE INDEX "Post_accountId_idx" ON "Post" ("accountId");
+//
+// -- AddForeignKey
+// ALTER TABLE "Post" ADD CONSTRAINT "Post_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account" ("id") ON DELETE CASCADE ON UPDATE CASCADE;

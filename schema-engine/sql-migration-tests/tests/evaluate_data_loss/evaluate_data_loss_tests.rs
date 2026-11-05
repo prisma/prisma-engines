@@ -139,7 +139,7 @@ fn evaluate_data_loss_with_past_unapplied_migrations_with_destructive_changes_do
     "#,
     );
 
-    let var_name: &[Cow<'_, str>] = if api.is_mysql() {
+    let var_name: &[Cow<'_, str>] = if api.is_mysql() || api.tags().contains(Tags::KingbaseMysql) {
         &["The values [PLAYFUL] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]
     } else if api.is_sqlite() {
         &[]
@@ -277,8 +277,16 @@ fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: TestApi) {
         api.normalize_identifier("Cat")
     );
 
-    let expected_warnings = if api.is_postgres() || api.is_sqlite() { 1 } else { 0 };
-    let expected_unexecutables = if api.is_postgres() { 2 } else { 1 };
+    let expected_warnings = if api.is_postgres() || api.is_sqlite() || api.is_kingbase_oracle() {
+        1
+    } else {
+        0
+    };
+    let expected_unexecutables = if api.is_postgres() || api.is_kingbase_oracle() {
+        2
+    } else {
+        1
+    };
 
     #[allow(clippy::bool_to_int_with_if)]
     api.evaluate_data_loss(&directory, dm2)
@@ -344,8 +352,16 @@ fn evaluate_data_loss_multi_file_maps_warnings_to_the_right_steps(api: TestApi) 
         api.normalize_identifier("Cat")
     );
 
-    let expected_warnings = if api.is_postgres() || api.is_sqlite() { 1 } else { 0 };
-    let expected_unexecutables = if api.is_postgres() { 2 } else { 1 };
+    let expected_warnings = if api.is_postgres() || api.is_sqlite() || api.is_kingbase_oracle() {
+        1
+    } else {
+        0
+    };
+    let expected_unexecutables = if api.is_postgres() || api.is_kingbase_oracle() {
+        2
+    } else {
+        1
+    };
     #[allow(clippy::bool_to_int_with_if)]
     api.evaluate_data_loss_multi_file(&directory, &[("schema_a", &schema_a), ("schema_b", schema_b)])
         .send()

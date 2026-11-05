@@ -204,7 +204,7 @@ pub(crate) trait JoinSelectBuilder {
                 // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
                 // Note: Ideally, this should live in the MySQL select builder, but it's currently the only implementation difference
                 // between MySQL and Postgres, so we keep it here for now to avoid code duplication.
-                Flavour::Mysql if !rs.args.order_by.is_empty() => Some(i64::MAX),
+                Flavour::Mysql | Flavour::KingbaseMysql if !rs.args.order_by.is_empty() => Some(i64::MAX),
                 _ => None,
             };
 

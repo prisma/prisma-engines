@@ -10,7 +10,7 @@ use std::{fmt, sync::Arc};
 #[cfg(feature = "sqlite-native")]
 use std::convert::TryFrom;
 
-#[cfg(native)]
+#[cfg(feature = "sqlite-native")]
 use crate::connector::NativeConnectionInfo;
 
 /// The main entry point and an abstraction over a database connection.
@@ -139,6 +139,7 @@ impl Quaint {
     #[cfg(native)]
     #[allow(unreachable_code)]
     pub async fn new(url_str: &str) -> crate::Result<Self> {
+        #[allow(unused_variables)]
         let inner = match url_str {
             #[cfg(feature = "sqlite-native")]
             s if s.starts_with("file") => {
@@ -153,6 +154,20 @@ impl Quaint {
                 let mysql = connector::Mysql::new(url).await?;
 
                 Arc::new(mysql) as Arc<dyn TransactionCapable>
+            }
+            #[cfg(feature = "kingbase-oracle-native")]
+            s if s.starts_with("kingbase-oracle://") => {
+                let url = connector::KingbaseOracleUrl::new(url::Url::parse(s)?)?;
+                let kingbase = connector::KingbaseOracle::new(url).await?;
+
+                Arc::new(kingbase) as Arc<dyn TransactionCapable>
+            }
+            #[cfg(feature = "kingbase-mysql-native")]
+            s if s.starts_with("kingbase://") || s.starts_with("kingbase-mysql://") => {
+                let url = connector::KingbaseMysqlUrl::new(url::Url::parse(s)?)?;
+                let kingbase = connector::KingbaseMysql::new(url).await?;
+
+                Arc::new(kingbase) as Arc<dyn TransactionCapable>
             }
             #[cfg(feature = "postgresql-native")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {

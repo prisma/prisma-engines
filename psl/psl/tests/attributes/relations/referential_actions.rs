@@ -1,4 +1,5 @@
 mod cycle_detection;
+mod kingbase_mysql;
 
 use crate::common::*;
 use psl::{
@@ -8,57 +9,115 @@ use psl::{
 
 #[test]
 fn on_delete_actions() {
-    let actions = &[Cascade, Restrict, NoAction, SetNull, SetDefault];
+    for provider in [
+        None,
+        Some(crate::Provider::KingbaseMysql),
+        Some(crate::Provider::KingbaseOracle),
+    ] {
+        let actions = &[Cascade, Restrict, NoAction, SetNull, SetDefault];
 
-    for action in actions {
-        let dml = formatdoc!(
-            r#"
-            model A {{
-                id Int @id
-                bs B[]
-            }}
+        for action in actions {
+            let dml = formatdoc!(
+                r#"
+                model A {{
+                    id Int @id
+                    bs B[]
+                }}
 
-            model B {{
-                id  Int  @id
-                aId Int?
-                a   A?   @relation(fields: [aId], references: [id], onDelete: {})
-            }}
-        "#,
-            action
-        );
+                model B {{
+                    id  Int  @id
+                    aId Int?
+                    a   A?   @relation(fields: [aId], references: [id], onDelete: {})
+                }}
+            "#,
+                action
+            );
 
-        parse_schema(&dml)
-            .assert_has_model("B")
-            .assert_has_relation_field("a")
-            .assert_relation_delete_strategy(*action);
+            let dml = match provider {
+                Some(provider) => crate::with_header(&dml, provider, &[]),
+                None => dml,
+            };
+            parse_schema(&dml)
+                .assert_has_model("B")
+                .assert_has_relation_field("a")
+                .assert_relation_delete_strategy(*action);
+        }
+    }
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        for mode in ["", "relationMode = \"foreignKeys\""] {
+            for action in [Cascade, Restrict, NoAction, SetNull] {
+                let source = formatdoc! {r#"
+                    datasource db {{
+                      provider = "{provider}"
+                      {mode}
+                    }}
+                    model Parent {{
+                      id Int @id
+                      children Child[]
+                    }}
+                    model Child {{
+                      id Int @id
+                      parentId Int? @default(1)
+                      parent Parent? @relation(fields: [parentId], references: [id], onDelete: {action}, onUpdate: {action})
+                      @@index([parentId])
+                    }}
+                "#};
+                let schema = psl::validate_without_extensions(source.clone().into());
+                assert!(
+                    schema.diagnostics.errors().is_empty(),
+                    "{source}\n{:?}",
+                    schema.diagnostics
+                );
+                assert!(
+                    schema.diagnostics.warnings().is_empty(),
+                    "{source}\n{:?}",
+                    schema.diagnostics
+                );
+                let relation = schema.assert_has_model("Child").assert_has_relation_field("parent");
+                relation
+                    .assert_relation_delete_strategy(action)
+                    .assert_relation_update_strategy(action);
+            }
+        }
     }
 }
 
 #[test]
 fn on_update_actions() {
-    let actions = &[Cascade, Restrict, NoAction, SetNull, SetDefault];
+    for provider in [
+        None,
+        Some(crate::Provider::KingbaseMysql),
+        Some(crate::Provider::KingbaseOracle),
+    ] {
+        let actions = &[Cascade, Restrict, NoAction, SetNull, SetDefault];
 
-    for action in actions {
-        let dml = formatdoc!(
-            r#"
-            model A {{
-                id Int @id
-                bs B[]
-            }}
+        for action in actions {
+            let dml = formatdoc!(
+                r#"
+                model A {{
+                    id Int @id
+                    bs B[]
+                }}
 
-            model B {{
-                id  Int  @id
-                aId Int?
-                a   A?   @relation(fields: [aId], references: [id], onUpdate: {})
-            }}
-        "#,
-            action
-        );
+                model B {{
+                    id  Int  @id
+                    aId Int?
+                    a   A?   @relation(fields: [aId], references: [id], onUpdate: {})
+                }}
+            "#,
+                action
+            );
 
-        parse_schema(&dml)
-            .assert_has_model("B")
-            .assert_has_relation_field("a")
-            .assert_relation_update_strategy(*action);
+            let dml = match provider {
+                Some(provider) => crate::with_header(&dml, provider, &[]),
+                None => dml,
+            };
+            parse_schema(&dml)
+                .assert_has_model("B")
+                .assert_has_relation_field("a")
+                .assert_relation_update_strategy(*action);
+        }
     }
 }
 
@@ -281,69 +340,98 @@ fn actions_on_sqlite_with_prisma_relation_mode() {
 
 #[test]
 fn on_delete_actions_should_work_on_prisma_relation_mode() {
-    let actions = &[Restrict, SetNull, Cascade, NoAction];
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let actions = &[Restrict, SetNull, Cascade, NoAction];
 
-    for action in actions {
-        let dml = formatdoc!(
-            r#"
-            datasource db {{
-                provider = "mysql"
-                relationMode = "prisma"
-            }}
+        for action in actions {
+            let dml = formatdoc!(
+                r#"
+                datasource db {{
+                    provider = "{provider}"
+                    relationMode = "prisma"
+                }}
 
-            generator client {{
-                provider = "prisma-client"
-            }}
+                generator client {{
+                    provider = "prisma-client"
+                }}
 
-            model A {{
-                id Int @id
-                bs B[]
-            }}
+                model A {{
+                    id Int @id
+                    bs B[]
+                }}
 
-            model B {{
-                id  Int  @id
-                aId Int?
-                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
-            }}
-        "#,
-            action = action
-        );
+                model B {{
+                    id  Int  @id
+                    aId Int?
+                    a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
+                }}
+            "#,
+                action = action
+            );
 
-        parse_schema(&dml)
-            .assert_has_model("B")
-            .assert_has_relation_field("a")
-            .assert_relation_delete_strategy(*action);
+            parse_schema(&dml)
+                .assert_has_model("B")
+                .assert_has_relation_field("a")
+                .assert_relation_delete_strategy(*action);
+        }
     }
 }
 
 #[test]
 fn on_update_no_action_should_work_on_prisma_relation_mode() {
-    let dml = indoc! { r#"
-        datasource db {
-          provider = "mysql"
-          relationMode = "prisma"
-        }
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = formatdoc! { r#"
+            datasource db {{
+              provider = "{provider}"
+              relationMode = "prisma"
+            }}
 
-        generator client {
-          provider = "prisma-client"
-        }
+            generator client {{
+              provider = "prisma-client"
+            }}
 
-        model A {
-          id Int @id
-          bs B[]
-        }
+            model A {{
+              id Int @id
+              bs B[]
+            }}
 
-        model B {
-          id Int @id
-          aId Int
-          a A @relation(fields: [aId], references: [id], onUpdate: NoAction)
-        }
-    "#};
+            model B {{
+              id Int @id
+              aId Int
+              a A @relation(fields: [aId], references: [id], onUpdate: NoAction)
+            }}
+        "#};
 
-    parse_schema(dml)
-        .assert_has_model("B")
-        .assert_has_relation_field("a")
-        .assert_relation_update_strategy(ReferentialAction::NoAction);
+        parse_schema(&dml)
+            .assert_has_model("B")
+            .assert_has_relation_field("a")
+            .assert_relation_update_strategy(ReferentialAction::NoAction);
+
+        for action in [Cascade, Restrict, NoAction, SetNull] {
+            let source = formatdoc! {r#"
+                datasource db {{
+                  provider = "{provider}"
+                  relationMode = "prisma"
+                }}
+                model Parent {{
+                  id Int @id
+                  children Child[]
+                }}
+                model Child {{
+                  id Int @id
+                  parentId Int?
+                  parent Parent? @relation(fields: [parentId], references: [id], onDelete: {action}, onUpdate: {action})
+                  @@index([parentId])
+                }}
+            "#};
+            let schema = parse_schema(&source);
+            schema
+                .assert_has_model("Child")
+                .assert_has_relation_field("parent")
+                .assert_relation_delete_strategy(action)
+                .assert_relation_update_strategy(action);
+        }
+    }
 }
 
 #[test]
@@ -433,7 +521,14 @@ fn mongo_uses_prisma_relation_mode_by_default() {
 
 #[test]
 fn sql_databases_use_foreign_keys_relation_mode_by_default() {
-    for db in ["postgres", "mysql", "sqlserver", "sqlite"] {
+    for db in [
+        "postgres",
+        "mysql",
+        "sqlserver",
+        "sqlite",
+        "kingbase-mysql",
+        "kingbase-oracle",
+    ] {
         let dml = formatdoc! {r#"
             datasource db {{
               provider = "{db}"
@@ -734,40 +829,75 @@ fn actions_should_be_defined_only_from_one_side() {
 
 #[test]
 fn set_default_action_should_not_work_on_prisma_level_relation_mode() {
-    let dml = indoc!(
-        r#"
-            datasource db {
-                provider = "mysql"
-                relationMode = "prisma"
-            }
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        for actions in [
+            "onDelete: SetDefault",
+            "onUpdate: SetDefault",
+            "onDelete: SetDefault, onUpdate: SetDefault",
+        ] {
+            let dml = formatdoc!(
+                r#"
+                datasource db {{
+                    provider = "{provider}"
+                    relationMode = "prisma"
+                }}
 
-            generator client {
-                provider = "prisma-client"
-            }
+                generator client {{
+                    provider = "prisma-client"
+                }}
 
-            model A {{
-                id Int @id @map("_id")
-                bs B[]
-            }
+                model A {{{{
+                    id Int @id @map("_id")
+                    bs B[]
+                }}
 
-            model B {
-                id Int @id @map("_id")
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: SetDefault)
-            }
-        "#,
-    );
+                model B {{
+                    id Int @id @map("_id")
+                    aId Int
+                    a A @relation(fields: [aId], references: [id], onDelete: SetDefault)
+                }}
+            "#,
+            );
 
-    let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
-        [1;94m   | [0m
-        [1;94m17 | [0m    aId Int
-        [1;94m18 | [0m    a A @relation(fields: [aId], references: [id], [1;91monDelete: SetDefault[0m)
-        [1;94m   | [0m
-    "#]];
+            let dml = dml.replace("onDelete: SetDefault", actions);
 
-    expected.assert_eq(&parse_unwrap_err(dml));
+            let expected = match actions {
+                "onDelete: SetDefault" => expect![[r#"
+                    [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+                      [1;94m-->[0m  [4mschema.prisma:18[0m
+                    [1;94m   | [0m
+                    [1;94m17 | [0m    aId Int
+                    [1;94m18 | [0m    a A @relation(fields: [aId], references: [id], [1;91monDelete: SetDefault[0m)
+                    [1;94m   | [0m
+                "#]],
+                "onUpdate: SetDefault" => expect![[r#"
+                    [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+                      [1;94m-->[0m  [4mschema.prisma:18[0m
+                    [1;94m   | [0m
+                    [1;94m17 | [0m    aId Int
+                    [1;94m18 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: SetDefault[0m)
+                    [1;94m   | [0m
+                "#]],
+                "onDelete: SetDefault, onUpdate: SetDefault" => expect![[r#"
+                    [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+                      [1;94m-->[0m  [4mschema.prisma:18[0m
+                    [1;94m   | [0m
+                    [1;94m17 | [0m    aId Int
+                    [1;94m18 | [0m    a A @relation(fields: [aId], references: [id], [1;91monDelete: SetDefault[0m, onUpdate: SetDefault)
+                    [1;94m   | [0m
+                    [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+                      [1;94m-->[0m  [4mschema.prisma:18[0m
+                    [1;94m   | [0m
+                    [1;94m17 | [0m    aId Int
+                    [1;94m18 | [0m    a A @relation(fields: [aId], references: [id], onDelete: SetDefault, [1;91monUpdate: SetDefault[0m)
+                    [1;94m   | [0m
+                "#]],
+                _ => unreachable!(),
+            };
+
+            expected.assert_eq(&parse_unwrap_err(&dml));
+        }
+    }
 }
 
 #[test]
@@ -888,4 +1018,56 @@ fn on_update_cannot_be_defined_on_the_wrong_side_1_1() {
     "#]];
 
     expect.assert_eq(&parse_unwrap_err(dml));
+}
+
+#[test]
+fn set_null_cannot_target_required_relation_fields() {
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        for mode in ["foreignKeys", "prisma"] {
+            for action in ["onDelete", "onUpdate"] {
+                let source = formatdoc! {r#"
+                    datasource db {{
+                      provider = "{provider}"
+                      relationMode = "{mode}"
+                    }}
+                    model Parent {{
+                      id Int @id
+                      children Child[]
+                    }}
+                    model Child {{
+                      id Int @id
+                      parentId Int
+                      parent Parent @relation(fields: [parentId], references: [id], {action}: SetNull)
+                      @@index([parentId])
+                    }}
+                "#};
+                let expect = match action {
+                    "onDelete" => expect![[r#"
+                        [1;91merror[0m: [1mError parsing attribute "@relation": The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+                        Either choose another referential action, or make the referenced fields optional.
+                        [0m
+                          [1;94m-->[0m  [4mschema.prisma:12[0m
+                        [1;94m   | [0m
+                        [1;94m11 | [0m  parentId Int
+                        [1;94m12 | [0m  [1;91mparent Parent @relation(fields: [parentId], references: [id], onDelete: SetNull)[0m
+                        [1;94m13 | [0m  @@index([parentId])
+                        [1;94m   | [0m
+                    "#]],
+                    "onUpdate" => expect![[r#"
+                        [1;91merror[0m: [1mError parsing attribute "@relation": The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+                        Either choose another referential action, or make the referenced fields optional.
+                        [0m
+                          [1;94m-->[0m  [4mschema.prisma:12[0m
+                        [1;94m   | [0m
+                        [1;94m11 | [0m  parentId Int
+                        [1;94m12 | [0m  [1;91mparent Parent @relation(fields: [parentId], references: [id], onUpdate: SetNull)[0m
+                        [1;94m13 | [0m  @@index([parentId])
+                        [1;94m   | [0m
+                    "#]],
+                    _ => unreachable!(),
+                };
+                expect.assert_eq(&parse_unwrap_err(&source));
+            }
+        }
+    }
 }

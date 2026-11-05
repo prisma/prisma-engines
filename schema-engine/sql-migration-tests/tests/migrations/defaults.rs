@@ -17,7 +17,7 @@ fn datetime_defaults_work(api: TestApi) {
 
     let expected_default = if api.is_cockroach() {
         DefaultValue::db_generated("'2018-01-27 08:00:00'::TIMESTAMP")
-    } else if api.is_postgres() {
+    } else if api.is_postgres() || api.is_kingbase_oracle() {
         DefaultValue::db_generated("'2018-01-27 08:00:00'::timestamp without time zone")
     } else if api.is_mssql() {
         let mut df = DefaultValue::db_generated("2018-01-27 08:00:00 +00:00");
@@ -27,6 +27,8 @@ fn datetime_defaults_work(api: TestApi) {
         DefaultValue::db_generated("'2018-01-27T08:00:00+00:00'")
     } else if api.is_mysql_8() || api.is_mysql_5_6() {
         DefaultValue::db_generated("'2018-01-27 08:00:00.000'")
+    } else if api.tags().contains(Tags::KingbaseMysql) {
+        DefaultValue::db_generated("'2018-01-27 16:00:00'::datetime")
     } else {
         DefaultValue::db_generated("'2018-01-27 08:00:00 +00:00'")
     };

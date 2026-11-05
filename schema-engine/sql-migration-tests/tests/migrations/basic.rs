@@ -498,6 +498,12 @@ fn adding_a_primary_key_must_work(api: TestApi) {
 
     api.schema_push_w_datasource(dm2).send().assert_green();
 
+    let expected_name = if api.tags().contains(Tags::KingbaseMysql) {
+        ""
+    } else {
+        "Test_pkey"
+    };
+
     api.assert_schema()
-        .assert_table("Test", |t| t.assert_pk(|pk| pk.assert_constraint_name("Test_pkey")));
+        .assert_table("Test", |t| t.assert_pk(|pk| pk.assert_constraint_name(expected_name)));
 }

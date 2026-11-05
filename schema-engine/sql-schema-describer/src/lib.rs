@@ -3,6 +3,10 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
+#[cfg(feature = "kingbase-mysql")]
+pub mod kingbase_mysql;
+#[cfg(feature = "kingbase-oracle")]
+pub mod kingbase_oracle;
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;

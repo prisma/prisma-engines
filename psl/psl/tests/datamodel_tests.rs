@@ -14,9 +14,12 @@ mod reformat;
 mod types;
 
 #[allow(dead_code)]
+#[derive(Clone, Copy)]
 pub enum Provider {
     Postgres,
     Mysql,
+    KingbaseMysql,
+    KingbaseOracle,
     Sqlite,
     SqlServer,
     Mongo,
@@ -29,6 +32,8 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
         Provider::Postgres => "postgres",
         Provider::Sqlite => "sqlite",
         Provider::Mysql => "mysql",
+        Provider::KingbaseMysql => "kingbase-mysql",
+        Provider::KingbaseOracle => "kingbase-oracle",
         Provider::SqlServer => "sqlserver",
         Provider::Cockroach => "cockroachdb",
     };

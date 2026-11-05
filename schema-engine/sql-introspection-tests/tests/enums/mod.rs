@@ -12,7 +12,7 @@ use test_macros::test_connector;
 async fn a_table_with_enums(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
-    if sql_family.is_postgres() {
+    if sql_family.is_postgres() || sql_family.is_kingbase_oracle() {
         let sql = r#"
             CREATE TYPE "color" AS ENUM ('black', 'white');
             CREATE TYPE "color2" AS ENUM ('black2', 'white2');
@@ -72,7 +72,7 @@ async fn a_table_with_enums(api: &mut TestApi) -> TestResult {
 async fn a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
-    if sql_family.is_postgres() {
+    if sql_family.is_postgres() || sql_family.is_kingbase_oracle() {
         api.database()
             .raw_cmd(r#"CREATE TYPE "color2" AS ENUM ('black2', 'white2')"#)
             .await?;
@@ -134,7 +134,7 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
 async fn a_table_with_enum_default_values(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
-    if sql_family.is_postgres() {
+    if sql_family.is_postgres() || sql_family.is_kingbase_oracle() {
         api.database()
             .raw_cmd(r#"CREATE TYPE "color" AS ENUM ('black', 'white')"#)
             .await?;

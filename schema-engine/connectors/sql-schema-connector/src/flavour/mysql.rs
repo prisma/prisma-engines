@@ -13,7 +13,7 @@ use indoc::indoc;
 use psl::{ValidatedSchema, datamodel_connector, datamodel_connector::Flavour, parser_database::ScalarType};
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
-use renderer::MysqlRenderer;
+pub(crate) use renderer::MysqlRenderer;
 use schema_calculator::MysqlSchemaCalculatorFlavour;
 use schema_connector::{
     BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces, SchemaFilter,

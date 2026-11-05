@@ -30,6 +30,7 @@ tokio.workspace = true
 tracing.workspace = true
 indoc.workspace = true
 expect-test.workspace = true
+strip-ansi-escapes.workspace = true
 url.workspace = true
 quaint = { workspace = true, features = ["all-native"] }
 

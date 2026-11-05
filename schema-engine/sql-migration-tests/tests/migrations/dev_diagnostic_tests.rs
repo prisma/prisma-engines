@@ -102,7 +102,9 @@ fn dev_diagnostic_detects_drift(api: TestApi) {
     assert!(action.as_reset().unwrap().starts_with(expected_start));
 }
 
-#[test_connector(exclude(Postgres, Mssql))]
+// This fixture requires partial DDL to survive a failed script. Oracle rolls
+// back the script like PostgreSQL; its atomic failure is covered separately.
+#[test_connector(exclude(Postgres, Mssql, KingbaseMysql, KingbaseOracle))]
 fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi) {
     let directory = api.create_migrations_directory();
 
@@ -155,7 +157,7 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
         "- The migration `{migration_two_name}` failed.\n- The migration `{migration_two_name}` was modified after it was applied.\n- Drift detected: Your database schema is not in sync with your migration history.\n",
     );
 
-    assert!(action.as_reset().unwrap().starts_with(&expected_message));
+    assert!(action.as_reset().unwrap().starts_with(&expected_message), "{action:?}");
 }
 
 // TODO: fix
@@ -409,7 +411,7 @@ fn dev_diagnostic_with_a_nonexistent_migrations_directory_works(api: TestApi) {
     assert!(action.is_create_migration());
 }
 
-#[test_connector]
+#[test_connector(exclude(KingbaseMysql))]
 fn with_a_failed_migration(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 
@@ -441,6 +443,8 @@ fn with_a_failed_migration(api: TestApi) {
 
     if api.is_mssql() {
         assert!(err.contains("Could not find stored procedure"), "{}", err)
+    } else if api.is_kingbase_oracle() {
+        assert!(err.contains("42601") && err.contains("CREATE_BROKEN"), "{err}");
     } else {
         assert!(&err.contains("syntax"), "{}", err)
     }

@@ -241,8 +241,13 @@ fn get_scalar_field_result_node(
             };
         }
 
-        // MySQL returns bytes as base64 encoded strings.
-        if type_info.typ.id == TypeIdentifier::Bytes && field.dm.schema.connector.flavour() == Flavour::Mysql {
+        // MySQL-compatible databases return bytes as base64 encoded strings.
+        if type_info.typ.id == TypeIdentifier::Bytes
+            && matches!(
+                field.dm.schema.connector.flavour(),
+                Flavour::Mysql | Flavour::KingbaseMysql
+            )
+        {
             let typ = FieldScalarType::Bytes {
                 encoding: ByteArrayEncoding::Base64,
             };
@@ -252,11 +257,11 @@ fn get_scalar_field_result_node(
             };
         }
 
-        // PostgreSQL based databases return bytes as hex encoded strings.
+        // PostgreSQL-wire databases return bytes as hex encoded strings.
         if type_info.typ.id == TypeIdentifier::Bytes
             && matches!(
                 field.dm.schema.connector.flavour(),
-                Flavour::Postgres | Flavour::Cockroach
+                Flavour::Postgres | Flavour::Cockroach | Flavour::KingbaseOracle
             )
         {
             let typ = FieldScalarType::Bytes {

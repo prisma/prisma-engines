@@ -22,7 +22,13 @@ where
     timeout(duration, f, || Error::builder(ErrorKind::SocketTimeout).build()).await
 }
 
-#[cfg(any(feature = "mssql", feature = "postgresql", feature = "mysql"))]
+#[cfg(any(
+    feature = "mssql",
+    feature = "postgresql",
+    feature = "mysql",
+    feature = "kingbase-mysql-native",
+    feature = "kingbase-oracle-native"
+))]
 async fn timeout<T, F, E, EF>(duration: Option<Duration>, f: F, e_f: EF) -> crate::Result<T>
 where
     F: Future<Output = std::result::Result<T, E>>,

@@ -186,23 +186,25 @@ fn allow_complicated_self_relations() {
 
 #[test]
 fn allow_explicit_fk_name_definition() {
-    let dml = indoc! {r#"
-        model User {
-          user_id Int    @id
-          posts   Post[]
-        }
+    for provider in [Provider::Postgres, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model User {
+              user_id Int    @id
+              posts   Post[]
+            }
 
-        model Post {
-          post_id Int    @id
-          user_id Int
-          user    User    @relation(fields: user_id, references: user_id, map: "CustomFKName")
-        }
-    "#};
+            model Post {
+              post_id Int    @id
+              user_id Int
+              user    User    @relation(fields: user_id, references: user_id, map: "CustomFKName")
+            }
+        "#};
 
-    let schema = parse_schema(&with_header(dml, Provider::Postgres, &[]));
+        let schema = parse_schema(&with_header(dml, provider, &[]));
 
-    schema.assert_has_model("User").assert_has_relation_field("posts");
-    schema.assert_has_model("Post").assert_has_relation_field("user");
+        schema.assert_has_model("User").assert_has_relation_field("posts");
+        schema.assert_has_model("Post").assert_has_relation_field("user");
+    }
 }
 
 #[test]
@@ -268,21 +270,23 @@ fn implicit_many_to_many_relations_work_on_postgresql() {
 
 #[test]
 fn implicit_many_to_many_relations_work_on_mysql() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          bs B[] @relation("foo")
-        }
+    for provider in [Provider::Mysql, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              id Int @id
+              bs B[] @relation("foo")
+            }
 
-        model B {
-          id Int @id
-          as A[] @relation("foo")
-        }
-    "#};
+            model B {
+              id Int @id
+              as A[] @relation("foo")
+            }
+        "#};
 
-    let schema = parse_schema(&with_header(dml, Provider::Mysql, &[]));
-    schema.assert_has_model("A").assert_has_relation_field("bs");
-    schema.assert_has_model("B").assert_has_relation_field("as");
+        let schema = parse_schema(&with_header(dml, provider, &[]));
+        schema.assert_has_model("A").assert_has_relation_field("bs");
+        schema.assert_has_model("B").assert_has_relation_field("as");
+    }
 }
 
 #[test]

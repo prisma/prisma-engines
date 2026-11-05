@@ -1,0 +1,12 @@
+mod commenting_out;
+mod constraints;
+mod enums;
+mod named_constraints;
+mod native_types;
+mod re_introspection;
+mod referential_actions;
+mod relations;
+mod relations_with_compound_fk;
+mod remapping_database_names;
+mod tables;
+mod views;

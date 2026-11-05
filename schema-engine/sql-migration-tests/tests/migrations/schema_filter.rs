@@ -156,7 +156,7 @@ fn schema_filter_migration_removing_external_enum(mut api: TestApi) {
     });
 }
 
-#[test_connector(exclude(CockroachDb, Vitess))]
+#[test_connector(exclude(CockroachDb, Vitess, KingbaseMysql))]
 fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
     let schema = api.datamodel_with_provider(
         r#"
@@ -192,6 +192,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
     let dir = api.create_migrations_directory();
 
     let is_postgres = api.is_postgres();
+    let is_kingbase_oracle = api.is_kingbase_oracle();
     let is_mysql = api.is_mysql();
     let is_sqlite = api.is_sqlite();
     let is_mssql = api.is_mssql();
@@ -202,7 +203,20 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
         .assert_migration_directories_count(1)
         .assert_migration("custom", move |migration| {
             // migration contains no create table statements for external tables
-            let expected_script = if is_postgres {
+            let expected_script = if is_kingbase_oracle {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "Cat" (
+                        "id" NUMBER(10,0) NOT NULL,
+                        "name" VARCHAR2(4000) NOT NULL,
+                        "externalTableId" NUMBER(10,0),
+                        CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- AddForeignKey
+                    ALTER TABLE "Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                "#]]
+            } else if is_postgres {
                 expect![[r#"
                     -- CreateTable
                     CREATE TABLE "Cat" (
@@ -277,7 +291,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
         });
 }
 
-#[test_connector(exclude(CockroachDb, Vitess))]
+#[test_connector(exclude(CockroachDb, Vitess, KingbaseMysql))]
 fn schema_filter_migration_removing_external_tables_incl_relations(mut api: TestApi) {
     let schema_1 = api.datamodel_with_provider(
         r#"
@@ -309,6 +323,7 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
     let dir = api.create_migrations_directory();
 
     let is_postgres = api.is_postgres();
+    let is_kingbase_oracle = api.is_kingbase_oracle();
     let is_mysql = api.is_mysql();
     let is_sqlite = api.is_sqlite();
     let is_mssql = api.is_mssql();
@@ -331,7 +346,21 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
         .assert_migration_directories_count(2)
         .assert_migration("remove", move |migration| {
             // migration contains no drop table statements for external tables
-            let expected_script = if is_postgres {
+            let expected_script = if is_kingbase_oracle {
+                expect![[r#"
+                    /*
+                      Warnings:
+
+                      - You are about to drop the column `externalTableId` on the `cat` table. All the data in the column will be lost.
+
+                    */
+                    -- DropForeignKey
+                    ALTER TABLE "public"."cat" DROP CONSTRAINT IF EXISTS "cat_externalTableId_fkey";
+
+                    -- AlterTable
+                    ALTER TABLE "public"."cat" DROP COLUMN "externalTableId";
+                "#]]
+            } else if is_postgres {
                 expect![[r#"
                     /*
                       Warnings:
@@ -421,7 +450,7 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
         });
 }
 
-#[test_connector(exclude(CockroachDb, Vitess))]
+#[test_connector(exclude(CockroachDb, Vitess, KingbaseMysql))]
 fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: TestApi) {
     let schema_1 = api.datamodel_with_provider(
         r#"
@@ -443,6 +472,7 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
     let dir = api.create_migrations_directory();
 
     let is_postgres = api.is_postgres();
+    let is_kingbase_oracle = api.is_kingbase_oracle();
     let is_mysql = api.is_mysql();
     let is_sqlite = api.is_sqlite();
     let is_mssql = api.is_mssql();
@@ -482,7 +512,15 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
         .assert_migration_directories_count(2)
         .assert_migration("modify", move |migration| {
             // migration contains only add foreign key statements on the non external table
-            let expected_script = if is_postgres {
+            let expected_script = if is_kingbase_oracle {
+                expect![[r#"
+                    -- AlterTable
+                    ALTER TABLE "public"."cat" ADD ("externalTableId" NUMBER(10,0));
+
+                    -- AddForeignKey
+                    ALTER TABLE "cat" ADD CONSTRAINT "cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                "#]]
+            } else if is_postgres {
                 expect![[r#"
                     -- AlterTable
                     ALTER TABLE "cat" ADD COLUMN     "externalTableId" INTEGER;
@@ -547,7 +585,7 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
         });
 }
 
-#[test_connector(exclude(CockroachDb, Vitess))]
+#[test_connector(exclude(CockroachDb, Vitess, KingbaseMysql))]
 fn schema_filter_leveraging_init_script(api: TestApi) {
     // Creating the external table through the init script so it exists in the shadow db.
     // Therefore it can be referenced with a foreign key constraint from the Cat model without being created by a Prisma migration itself.
@@ -576,6 +614,7 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
     let dir = api.create_migrations_directory();
 
     let is_postgres = api.is_postgres();
+    let is_kingbase_oracle = api.is_kingbase_oracle();
     let is_mysql = api.is_mysql();
     let is_sqlite = api.is_sqlite();
     let is_mssql = api.is_mssql();
@@ -586,7 +625,20 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
         .assert_migration_directories_count(1)
         .assert_migration("custom", move |migration| {
             // migration contains only add foreign key statements on the non external table
-            let expected_script = if is_postgres {
+            let expected_script = if is_kingbase_oracle {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "Cat" (
+                        "id" NUMBER(10,0) NOT NULL,
+                        "name" VARCHAR2(4000) NOT NULL,
+                        "externalTableId" NUMBER(10,0),
+                        CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- AddForeignKey
+                    ALTER TABLE "Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "external" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                "#]]
+            } else if is_postgres {
                 expect![[r#"
                     -- CreateTable
                     CREATE TABLE "Cat" (
@@ -661,7 +713,7 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
         });
 }
 
-#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
+#[test_connector(tags(Postgres, Mssql, KingbaseOracle), exclude(CockroachDb))]
 fn schema_filter_migration_multi_schema_requires_namespaced_table_names(api: TestApi) {
     let schema = api.datamodel_with_provider_and_features(
         r#"
@@ -686,6 +738,7 @@ fn schema_filter_migration_multi_schema_requires_namespaced_table_names(api: Tes
     let dir = api.create_migrations_directory();
 
     let is_postgres = api.is_postgres();
+    let is_kingbase_oracle = api.is_kingbase_oracle();
     let is_mssql = api.is_mssql();
 
     let filter = SchemaFilter {
@@ -697,7 +750,19 @@ fn schema_filter_migration_multi_schema_requires_namespaced_table_names(api: Tes
         .assert_migration_directories_count(1)
         .assert_migration("custom", move |migration| {
             // migration contains only non external table
-            let expected_script = if is_postgres {
+            let expected_script = if is_kingbase_oracle {
+                expect![[r#"
+                    -- CreateSchema
+                    CREATE SCHEMA IF NOT EXISTS "one";
+
+                    -- CreateTable
+                    CREATE TABLE "one"."Cat" (
+                        "id" NUMBER(10,0) NOT NULL,
+                        "name" VARCHAR2(4000) NOT NULL,
+                        CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                    );
+                "#]]
+            } else if is_postgres {
                 expect![[r#"
                 -- CreateSchema
                 CREATE SCHEMA IF NOT EXISTS "one";
@@ -746,7 +811,7 @@ fn schema_filter_migration_multi_schema_requires_namespaced_table_names(api: Tes
         });
 }
 
-#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
+#[test_connector(tags(Postgres, Mssql, KingbaseOracle), exclude(CockroachDb))]
 fn schema_filter_without_namespaced_table_names_on_pg_and_sql_server(api: TestApi) {
     let schema = api.datamodel_with_provider_and_features(
         r#"
@@ -785,7 +850,7 @@ fn schema_filter_without_namespaced_table_names_on_pg_and_sql_server(api: TestAp
     );
 }
 
-#[test_connector(exclude(Postgres, Mssql, CockroachDb))]
+#[test_connector(exclude(Postgres, Mssql, CockroachDb, KingbaseOracle))]
 fn schema_filter_with_namespaced_table_names_on_other_dialects(api: TestApi) {
     let schema = api.datamodel_with_provider(
         r#"

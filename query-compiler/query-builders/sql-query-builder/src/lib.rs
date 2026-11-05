@@ -21,6 +21,8 @@ use std::{collections::HashMap, iter, marker::PhantomData, sync::atomic::AtomicU
 use itertools::{Either, Itertools};
 use model_extensions::ScalarFieldExt;
 use prisma_value::{Placeholder, PrismaValue};
+#[cfg(feature = "kingbase-mysql")]
+use quaint::visitor::KingbaseMysql;
 use quaint::{
     Value,
     ast::{
@@ -74,6 +76,14 @@ impl<'a, V> SqlQueryBuilder<'a, V> {
     where
         V: Visitor<'a>,
     {
+        #[cfg(feature = "kingbase-mysql")]
+        let template = if self.context.is_kingbase_mysql() {
+            KingbaseMysql::build_template(query)?
+        } else {
+            V::build_template(query)?
+        };
+
+        #[cfg(not(feature = "kingbase-mysql"))]
         let template = V::build_template(query)?;
 
         let (arg_types, args) = template

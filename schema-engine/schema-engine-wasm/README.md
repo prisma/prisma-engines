@@ -1,6 +1,6 @@
 # @prisma/schema-engine-wasm
 
-[![Publish pipeline](https://github.com/prisma/prisma-engines/actions/workflows/publish-prisma-schema-engine-wasm.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/publish-prisma-schema-engine-wasm.yml)
+[![Publish pipeline](https://github.com/prisma/prisma-engines/actions/workflows/publish-schema-engine-wasm.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/publish-schema-engine-wasm.yml)
 [![npm package](https://img.shields.io/npm/v/@prisma/schema-engine-wasm/latest)](https://www.npmjs.com/package/@prisma/schema-engine-wasm)
 [![install size](https://packagephobia.com/badge?p=@prisma/schema-engine-wasm)](https://packagephobia.com/result?p=@prisma/schema-engine-wasm)
 
@@ -10,14 +10,19 @@ The published npm package is internal to Prisma. Its API will break without prio
 
 ## Setup
 
-```
-# Install the latest Rust version with `rustup`
-# or update the latest Rust version with `rustup`
-rustup update
+Use the Rust toolchain pinned in the repository's `rust-toolchain.toml`.
+Run setup commands from the repository root:
+
+```sh
 rustup target add wasm32-unknown-unknown
-cargo install wasm-bindgen
-cargo install wasm-pack
 ```
+
+Install `wasm-bindgen-cli` at the version matching the resolved `wasm-bindgen`
+dependency in `Cargo.lock`, for example
+`cargo install --locked wasm-bindgen-cli --version <matching-version>`.
+The `wasm-bindgen` crate itself is a library, not the CLI package.
+Release/profiling optimization also requires the Binaryen `wasm-opt` used by
+`build.sh`; check that script before selecting the build profile.
 
 ## How to Build
 
@@ -29,7 +34,10 @@ where e.g. `OUT_NPM_VERSION="0.0.1"` is the version you want to publish this pac
 
 From the root of the repository:
 
-- `SCHEMA_WASM_VERSION=$OUT_NPM_VERSION make build-se-wasm`
+- `SCHEMA_ENGINE_WASM_VERSION="$OUT_NPM_VERSION" make build-se-wasm`
+
+`SCHEMA_WASM_VERSION` instead configures `make build-schema-wasm`, the separate
+PSL/schema-tools package. It does not set the version for this Schema Engine package.
 
 By default, the build profile is `dev` in local builds, and `release` in CI builds.
 You can override this by setting the `WASM_BUILD_PROFILE` environment variable.

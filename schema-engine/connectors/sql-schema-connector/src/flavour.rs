@@ -8,6 +8,12 @@ mod mssql;
 #[cfg(feature = "mysql")]
 mod mysql;
 
+#[cfg(feature = "kingbase-mysql")]
+mod kingbase_mysql;
+
+#[cfg(feature = "kingbase-oracle")]
+mod kingbase_oracle;
+
 #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
 mod postgres;
 
@@ -18,7 +24,19 @@ mod sqlite;
 pub(crate) use mssql::{MssqlConnector, MssqlDialect};
 
 #[cfg(feature = "mysql")]
-pub(crate) use mysql::{MysqlConnector, MysqlDialect};
+pub(crate) use mysql::{MysqlConnector, MysqlDialect, MysqlRenderer};
+
+#[cfg(feature = "kingbase-mysql")]
+pub(crate) use kingbase_mysql::KingbaseMysqlDialect;
+
+#[cfg(feature = "kingbase-mysql-native")]
+pub(crate) use kingbase_mysql::KingbaseMysqlConnector;
+
+#[cfg(feature = "kingbase-oracle")]
+pub(crate) use kingbase_oracle::KingbaseOracleDialect;
+
+#[cfg(feature = "kingbase-oracle-native")]
+pub(crate) use kingbase_oracle::KingbaseOracleConnector;
 
 #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
 pub(crate) use postgres::{PostgresConnector, PostgresDialect};
@@ -139,6 +157,8 @@ pub(crate) trait SqlDialect: Send + Sync + 'static {
     #[cfg(any(
         feature = "mssql-native",
         feature = "mysql-native",
+        feature = "kingbase-mysql-native",
+        feature = "kingbase-oracle-native",
         feature = "postgresql-native",
         feature = "sqlite-native"
     ))]
@@ -151,6 +171,8 @@ pub(crate) trait SqlDialect: Send + Sync + 'static {
     #[cfg(not(any(
         feature = "mssql-native",
         feature = "mysql-native",
+        feature = "kingbase-mysql-native",
+        feature = "kingbase-oracle-native",
         feature = "postgresql-native",
         feature = "sqlite-native"
     )))]

@@ -185,7 +185,22 @@ async fn a_one_to_one_relation_referencing_non_id(api: &mut TestApi) -> TestResu
         })
         .await?;
 
-    let expected = expect![[r#"
+    let expected = if api.sql_family().is_kingbase_oracle() {
+        expect![[r#"
+        model Post {
+          id         Int     @id @default(autoincrement())
+          user_email String? @unique @db.VarChar2(10)
+          User       User?   @relation(fields: [user_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
+        }
+
+        model User {
+          id    Int     @id @default(autoincrement())
+          email String? @unique @db.VarChar2(10)
+          Post  Post?
+        }
+    "#]]
+    } else {
+        expect![[r#"
         model Post {
           id         Int     @id @default(autoincrement())
           user_email String? @unique @db.VarChar(10)
@@ -197,7 +212,8 @@ async fn a_one_to_one_relation_referencing_non_id(api: &mut TestApi) -> TestResu
           email String? @unique @db.VarChar(10)
           Post  Post?
         }
-    "#]];
+    "#]]
+    };
 
     expected.assert_eq(&api.introspect_dml().await?);
 

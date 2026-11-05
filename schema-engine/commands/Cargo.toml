@@ -10,6 +10,10 @@ sqlite = ["sql-schema-connector/sqlite"]
 sqlite-native = ["sqlite"]
 mysql = ["sql-schema-connector/mysql"]
 mysql-native = ["mysql"]
+kingbase-mysql = ["psl/kingbase-mysql", "sql-schema-connector/kingbase-mysql"]
+kingbase-mysql-native = ["kingbase-mysql", "sql-schema-connector/kingbase-mysql-native"]
+kingbase-oracle = ["psl/kingbase-oracle", "sql-schema-connector/kingbase-oracle"]
+kingbase-oracle-native = ["kingbase-oracle", "sql-schema-connector/kingbase-oracle-native"]
 mssql = ["sql-schema-connector/mssql"]
 mssql-native = ["mssql"]
 cockroachdb = ["sql-schema-connector/cockroachdb"]
@@ -20,6 +24,8 @@ all-native = [
     "postgresql-native",
     "sqlite-native",
     "mysql-native",
+    "kingbase-mysql-native",
+    "kingbase-oracle-native",
     "mssql-native",
     "cockroachdb-native",
     "mongodb-native",

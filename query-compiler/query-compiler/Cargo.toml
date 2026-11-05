@@ -25,8 +25,8 @@ insta = { workspace = true, features = ["glob"] }
 request-handlers = { workspace = true, features = ["all"] }
 schema.workspace = true
 # pull all connectors for testing
-psl = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql", "cockroachdb"] }
-quaint = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] }
+psl = { workspace = true, features = ["sqlite", "mysql", "kingbase-mysql", "kingbase-oracle", "postgresql", "mssql", "cockroachdb"] }
+quaint = { workspace = true, features = ["sqlite", "mysql", "kingbase-mysql", "kingbase-oracle", "postgresql", "mssql"] }
 sql-query-builder = { workspace = true, features = ["relation_joins"] }
 
 [[example]]
@@ -41,6 +41,8 @@ default = ["all"]
 sqlite = ["quaint/sqlite"]
 postgresql = ["quaint/postgresql"]
 mysql = ["quaint/mysql"]
+kingbase-mysql = ["mysql", "quaint/kingbase-mysql", "sql-query-builder/kingbase-mysql"]
+kingbase-oracle = ["quaint/kingbase-oracle"]
 mssql = ["quaint/mssql"]
 cockroachdb = ["postgresql"]
-all = ["sqlite", "postgresql", "mysql", "mssql", "cockroachdb"]
+all = ["sqlite", "postgresql", "mysql", "kingbase-mysql", "kingbase-oracle", "mssql", "cockroachdb"]

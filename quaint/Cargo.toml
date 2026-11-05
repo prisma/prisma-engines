@@ -30,6 +30,8 @@ expose-drivers = []
 
 all-native = [
   "postgresql-native",
+  "kingbase-mysql-native",
+  "kingbase-oracle-native",
   "mysql-native",
   "mssql-native",
   "sqlite-native",
@@ -37,6 +39,7 @@ all-native = [
 
 vendored-openssl = [
   "postgres-native-tls/vendored-openssl",
+  "kingbase-postgres-native-tls/vendored-openssl",
   "mysql_async/vendored-openssl",
 ]
 
@@ -54,6 +57,32 @@ postgresql-native = [
   "dep:tokio-tungstenite",
 ]
 postgresql = []
+
+kingbase-mysql = ["mysql"]
+kingbase-mysql-native = [
+  "kingbase-mysql",
+  "dep:native-tls",
+  "dep:bytes",
+  "dep:kingbase-tokio-postgres",
+  "dep:kingbase-postgres-native-tls",
+  "dep:kingbase-postgres-types",
+  "dep:kingbase-bigdecimal",
+  "dep:tokio",
+  "dep:bit-vec",
+]
+
+kingbase-oracle = []
+kingbase-oracle-native = [
+  "kingbase-oracle",
+  "dep:native-tls",
+  "dep:bytes",
+  "dep:kingbase-tokio-postgres",
+  "dep:kingbase-postgres-native-tls",
+  "dep:kingbase-postgres-types",
+  "dep:kingbase-bigdecimal",
+  "dep:tokio",
+  "dep:bit-vec",
+]
 
 mssql-native = ["mssql", "dep:tiberius", "dep:tokio-util", "tokio/time", "tokio/net"]
 mssql = []
@@ -173,6 +202,35 @@ features = [
 optional = true
 
 [dependencies.postgres-native-tls]
+workspace = true
+optional = true
+
+[dependencies.kingbase-tokio-postgres]
+workspace = true
+features = [
+  "with-uuid-1",
+  "with-chrono-0_4",
+  "with-serde_json-1",
+  "with-bit-vec-0_6",
+]
+optional = true
+
+[dependencies.kingbase-postgres-native-tls]
+workspace = true
+optional = true
+
+[dependencies.kingbase-postgres-types]
+workspace = true
+features = [
+  "with-uuid-1",
+  "with-chrono-0_4",
+  "with-bigdecimal-0_4",
+  "with-serde_json-1",
+  "with-bit-vec-0_6",
+]
+optional = true
+
+[dependencies.kingbase-bigdecimal]
 workspace = true
 optional = true
 

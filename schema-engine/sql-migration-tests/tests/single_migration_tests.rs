@@ -37,7 +37,11 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
             let mut out = String::with_capacity(text.len() - idx);
             // Skipping the EXPECTATION_TEXT line.
             for line in text[idx..].lines().skip(1) {
-                out.push_str(line.trim_start_matches("// "));
+                out.push_str(if line == "//" {
+                    ""
+                } else {
+                    line.trim_start_matches("// ")
+                });
                 out.push('\n');
             }
             out
@@ -83,6 +87,12 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
         let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
         tok(conn.reset(false, None, &SchemaFilter::default().into())).unwrap();
         test_api_args.database_url().to_owned()
+    } else if tags.contains(Tags::KingbaseOracle) {
+        let (_, connection_string) = tok(test_api_args.create_kingbase_oracle_database());
+        connection_string
+    } else if tags.contains(Tags::KingbaseMysql) {
+        let (_, connection_string) = tok(test_api_args.create_kingbase_mysql_database());
+        connection_string
     } else if tags.contains(Tags::Mysql) {
         let (_, connection_string) = tok(test_api_args.create_mysql_database());
         connection_string

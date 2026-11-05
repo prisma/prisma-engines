@@ -2,77 +2,97 @@ use crate::{Provider, common::*, with_header};
 
 #[test]
 fn sqlite_disallows_compound_unique_length_prefix() {
-    let dml = indoc! {r#"
-        model A {
-          a String
-          b String
-          @@unique([a(length: 10), b(length: 30)])
-        }
-    "#};
+    for provider in [Provider::Sqlite, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              a String
+              b String
+              @@unique([a(length: 10), b(length: 30)])
+            }
+        "#};
 
-    let dml = with_header(dml, Provider::Sqlite, &[]);
-    let error = parse_unwrap_err(&dml);
+        let dml = with_header(dml, provider, &[]);
+        let error = parse_unwrap_err(&dml);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@unique": The length argument is not supported in an index definition with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
-        [1;94m   | [0m
-        [1;94m12 | [0m  b String
-        [1;94m13 | [0m  [1;91m@@unique([a(length: 10), b(length: 30)])[0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@@unique": The length argument is not supported in an index definition with the current connector[0m
+              [1;94m-->[0m  [4mschema.prisma:13[0m
+            [1;94m   | [0m
+            [1;94m12 | [0m  b String
+            [1;94m13 | [0m  [1;91m@@unique([a(length: 10), b(length: 30)])[0m
+            [1;94m   | [0m
+        "#]];
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
 fn sqlite_disallows_index_length_prefix() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
+    for provider in [Provider::Sqlite, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              id Int @id
+              a String
 
-          @@index([a(length: 10)])
-        }
-    "#};
+              @@index([a(length: 10)])
+            }
+        "#};
 
-    let dml = with_header(dml, Provider::Sqlite, &[]);
-    let error = parse_unwrap_err(&dml);
+        let dml = with_header(dml, provider, &[]);
+        let error = parse_unwrap_err(&dml);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is not supported in an index definition with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m
-        [1;94m14 | [0m  [1;91m@@index([a(length: 10)])[0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is not supported in an index definition with the current connector[0m
+              [1;94m-->[0m  [4mschema.prisma:14[0m
+            [1;94m   | [0m
+            [1;94m13 | [0m
+            [1;94m14 | [0m  [1;91m@@index([a(length: 10)])[0m
+            [1;94m   | [0m
+        "#]];
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
 fn mongodb_disallows_unique_length_prefix() {
-    let dml = indoc! {r#"
-        model A {
-          id String @id @map("_id") @test.ObjectId
-          val String @unique(length: 30)
-        }
-    "#};
+    for provider in [Provider::Mongo, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              id String @id @map("_id") @test.ObjectId
+              val String @unique(length: 30)
+            }
+        "#};
 
-    let dml = with_header(dml, Provider::Mongo, &[]);
-    let error = parse_unwrap_err(&dml);
+        let dml = match provider {
+            Provider::KingbaseOracle => dml.replace("@test.ObjectId", "@test.VarChar2(24)"),
+            _ => dml.to_owned(),
+        };
+        let dml = with_header(&dml, provider, &[]);
+        let error = parse_unwrap_err(&dml);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
-        [1;94m   | [0m
-        [1;94m11 | [0m  id String @id @map("_id") @test.ObjectId
-        [1;94m12 | [0m  val String [1;91m@unique(length: 30)[0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = match provider {
+            Provider::KingbaseOracle => expect![[r#"
+                [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
+                  [1;94m-->[0m  [4mschema.prisma:12[0m
+                [1;94m   | [0m
+                [1;94m11 | [0m  id String @id @map("_id") @test.VarChar2(24)
+                [1;94m12 | [0m  val String [1;91m@unique(length: 30)[0m
+                [1;94m   | [0m
+            "#]],
+            _ => expect![[r#"
+                [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
+                  [1;94m-->[0m  [4mschema.prisma:12[0m
+                [1;94m   | [0m
+                [1;94m11 | [0m  id String @id @map("_id") @test.ObjectId
+                [1;94m12 | [0m  val String [1;91m@unique(length: 30)[0m
+                [1;94m   | [0m
+            "#]],
+        };
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
@@ -363,55 +383,113 @@ fn hash_index_doesnt_work_on_sqlserver() {
 
 #[test]
 fn hash_index_doesnt_work_on_mysql() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a  Int
+    for provider in [Provider::Mysql, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        for algorithm in ["Hash", "Gist", "Gin", "SpGist", "Brin"] {
+            let dml = indoc! {r#"
+                model A {
+                  id Int @id
+                  a  Int
 
-          @@index([a], type: Hash)
+                  @@index([a], type: Hash)
+                }
+            "#};
+            let dml = dml.replace("type: Hash", &format!("type: {algorithm}"));
+
+            let schema = with_header(&dml, provider, &[]);
+            let error = parse_unwrap_err(&schema);
+
+            let expectation = match algorithm {
+                "Hash" => expect![[r#"
+                    [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
+                      [1;94m-->[0m  [4mschema.prisma:14[0m
+                    [1;94m   | [0m
+                    [1;94m13 | [0m
+                    [1;94m14 | [0m  @@index([a], [1;91mtype: Hash[0m)
+                    [1;94m   | [0m
+                "#]],
+                "Gist" => expect![[r#"
+                    [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
+                      [1;94m-->[0m  [4mschema.prisma:14[0m
+                    [1;94m   | [0m
+                    [1;94m13 | [0m
+                    [1;94m14 | [0m  @@index([a], [1;91mtype: Gist[0m)
+                    [1;94m   | [0m
+                "#]],
+                "Gin" => expect![[r#"
+                    [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
+                      [1;94m-->[0m  [4mschema.prisma:14[0m
+                    [1;94m   | [0m
+                    [1;94m13 | [0m
+                    [1;94m14 | [0m  @@index([a], [1;91mtype: Gin[0m)
+                    [1;94m   | [0m
+                "#]],
+                "SpGist" => expect![[r#"
+                    [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
+                      [1;94m-->[0m  [4mschema.prisma:14[0m
+                    [1;94m   | [0m
+                    [1;94m13 | [0m
+                    [1;94m14 | [0m  @@index([a], [1;91mtype: SpGist[0m)
+                    [1;94m   | [0m
+                "#]],
+                "Brin" => expect![[r#"
+                    [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
+                      [1;94m-->[0m  [4mschema.prisma:14[0m
+                    [1;94m   | [0m
+                    [1;94m13 | [0m
+                    [1;94m14 | [0m  @@index([a], [1;91mtype: Brin[0m)
+                    [1;94m   | [0m
+                "#]],
+                _ => unreachable!(),
+            };
+
+            expectation.assert_eq(&error)
         }
-    "#};
-
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = parse_unwrap_err(&schema);
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m
-        [1;94m14 | [0m  @@index([a], [1;91mtype: Hash[0m)
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
+    }
 }
 
 #[test]
 fn fulltext_index_length_attribute() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
-          b String
+    for provider in [Provider::Mysql, Provider::KingbaseMysql] {
+        let dml = indoc! {r#"
+            model A {
+              id Int @id
+              a String
+              b String
 
-          @@fulltext([a(length: 30), b])
-        }
-    "#};
+              @@fulltext([a(length: 30), b])
+            }
+        "#};
 
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = parse_unwrap_err(&schema);
+        let schema = with_header(dml, provider, &[]);
+        let error = parse_unwrap_err(&schema);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@fulltext": The length argument is not supported in a @@fulltext attribute.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@fulltext([a(length: 30), b])[0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = match provider {
+            Provider::KingbaseMysql => expect![[r#"
+                [1;91merror[0m: [1mError parsing attribute "@@fulltext": The length argument is not supported in an index definition with the current connector[0m
+                  [1;94m-->[0m  [4mschema.prisma:15[0m
+                [1;94m   | [0m
+                [1;94m14 | [0m
+                [1;94m15 | [0m  [1;91m@@fulltext([a(length: 30), b])[0m
+                [1;94m   | [0m
+                [1;91merror[0m: [1mError parsing attribute "@@fulltext": The length argument is not supported in a @@fulltext attribute.[0m
+                  [1;94m-->[0m  [4mschema.prisma:15[0m
+                [1;94m   | [0m
+                [1;94m14 | [0m
+                [1;94m15 | [0m  [1;91m@@fulltext([a(length: 30), b])[0m
+                [1;94m   | [0m
+            "#]],
+            _ => expect![[r#"
+                [1;91merror[0m: [1mError parsing attribute "@@fulltext": The length argument is not supported in a @@fulltext attribute.[0m
+                  [1;94m-->[0m  [4mschema.prisma:15[0m
+                [1;94m   | [0m
+                [1;94m14 | [0m
+                [1;94m15 | [0m  [1;91m@@fulltext([a(length: 30), b])[0m
+                [1;94m   | [0m
+            "#]],
+        };
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
@@ -442,29 +520,31 @@ fn hash_index_doesnt_work_on_sqlite() {
 
 #[test]
 fn fulltext_index_sort_attribute() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
-          b String
+    for provider in [Provider::Mysql, Provider::KingbaseMysql] {
+        let dml = indoc! {r#"
+            model A {
+              id Int @id
+              a String
+              b String
 
-          @@fulltext([a(sort: Desc), b])
-        }
-    "#};
+              @@fulltext([a(sort: Desc), b])
+            }
+        "#};
 
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = parse_unwrap_err(&schema);
+        let schema = with_header(dml, provider, &[]);
+        let error = parse_unwrap_err(&schema);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@fulltext": The sort argument is not supported in a @@fulltext attribute in the current connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@fulltext([a(sort: Desc), b])[0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@@fulltext": The sort argument is not supported in a @@fulltext attribute in the current connector.[0m
+              [1;94m-->[0m  [4mschema.prisma:15[0m
+            [1;94m   | [0m
+            [1;94m14 | [0m
+            [1;94m15 | [0m  [1;91m@@fulltext([a(sort: Desc), b])[0m
+            [1;94m   | [0m
+        "#]];
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
@@ -495,29 +575,31 @@ fn hash_index_doesnt_work_on_mongo() {
 
 #[test]
 fn fulltext_index_postgres() {
-    let dml = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String
-          b  String
+    for provider in [Provider::Postgres, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              id Int    @id
+              a  String
+              b  String
 
-          @@fulltext([a, b])
-        }
-    "#};
+              @@fulltext([a, b])
+            }
+        "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = parse_unwrap_err(&schema);
+        let schema = with_header(dml, provider, &[]);
+        let error = parse_unwrap_err(&schema);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@fulltext([a, b])[0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+              [1;94m-->[0m  [4mschema.prisma:15[0m
+            [1;94m   | [0m
+            [1;94m14 | [0m
+            [1;94m15 | [0m  [1;91m@@fulltext([a, b])[0m
+            [1;94m   | [0m
+        "#]];
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
@@ -784,4 +866,84 @@ fn duplicate_indices_on_the_same_fields_different_sort_same_name_are_not_allowed
     "#]];
 
     expectation.assert_eq(&error)
+}
+
+#[test]
+fn unsupported_native_types_cannot_be_index_keys() {
+    for (scalar, native) in [("Json", "Json"), ("String", "Xml")] {
+        let source = with_header(
+            &formatdoc! {r#"
+                model Item {{
+                  id Int @id
+                  value {scalar} @test.{native}
+                  @@index([value])
+                }}
+            "#},
+            Provider::KingbaseOracle,
+            &[],
+        );
+        let expect = match native {
+            "Json" => expect![[r#"
+                [1;91merror[0m: [1mYou cannot define an index on fields with native type `Json` of Kingbase Oracle.[0m
+                  [1;94m-->[0m  [4mschema.prisma:13[0m
+                [1;94m   | [0m
+                [1;94m12 | [0m  value Json @test.Json
+                [1;94m13 | [0m  [1;91m@@index([value])[0m
+                [1;94m   | [0m
+            "#]],
+            "Xml" => expect![[r#"
+                [1;91merror[0m: [1mYou cannot define an index on fields with native type `Xml` of Kingbase Oracle.[0m
+                  [1;94m-->[0m  [4mschema.prisma:13[0m
+                [1;94m   | [0m
+                [1;94m12 | [0m  value String @test.Xml
+                [1;94m13 | [0m  [1;91m@@index([value])[0m
+                [1;94m   | [0m
+            "#]],
+            _ => unreachable!(),
+        };
+        expect.assert_eq(&parse_unwrap_err(&source));
+    }
+}
+
+#[test]
+fn index_names_are_limited_to_sixty_three_bytes() {
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        for name in ["a".repeat(63), "\u{754c}".repeat(21)] {
+            let source = formatdoc! {r#"
+                datasource db {{
+                  provider = "{provider}"
+                }}
+                model Item {{
+                  id Int @id
+                  value Int
+                  @@index([value], map: "{name}")
+                }}
+            "#};
+            parse_schema(&source)
+                .assert_has_model("Item")
+                .assert_index_on_fields(&["value"])
+                .assert_mapped_name(&name);
+            let source = source.replace(&name, &format!("{name}a"));
+            let expect = if name.is_ascii() {
+                expect![[r#"
+                    [1;91merror[0m: [1mError validating model "Item": The constraint name 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' specified in the `map` argument for the `@@index` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
+                      [1;94m-->[0m  [4mschema.prisma:7[0m
+                    [1;94m   | [0m
+                    [1;94m 6 | [0m  value Int
+                    [1;94m 7 | [0m  [1;91m@@index([value], map: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")[0m
+                    [1;94m   | [0m
+                "#]]
+            } else {
+                expect![[r#"
+                    [1;91merror[0m: [1mError validating model "Item": The constraint name '界界界界界界界界界界界界界界界界界界界界界a' specified in the `map` argument for the `@@index` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
+                      [1;94m-->[0m  [4mschema.prisma:7[0m
+                    [1;94m   | [0m
+                    [1;94m 6 | [0m  value Int
+                    [1;94m 7 | [0m  [1;91m@@index([value], map: "界界界界界界界界界界界界界界界界界界界界界a")[0m
+                    [1;94m   | [0m
+                "#]]
+            };
+            expect.assert_eq(&parse_unwrap_err(&source));
+        }
+    }
 }

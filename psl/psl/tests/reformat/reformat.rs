@@ -164,21 +164,37 @@ fn commented_models_dont_get_removed() {
 
 #[test]
 fn a_comment_in_datasource_must_not_add_extra_newlines() {
-    let input = indoc! {r#"
-        datasource pg {
-          provider = "postgresql"
-          // a comment
-        }
-    "#};
+    for provider in ["postgresql", "kingbase-mysql", "kingbase-oracle"] {
+        let input = formatdoc! {r#"
+            datasource pg {{
+              provider = "{provider}"
+              // a comment
+            }}
+        "#};
 
-    let expected = expect![[r#"
-        datasource pg {
-          provider = "postgresql"
-          // a comment
-        }
-    "#]];
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-mysql"
+                  // a comment
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-oracle"
+                  // a comment
+                }
+            "#]],
+            _ => expect![[r#"
+                datasource pg {
+                  provider = "postgresql"
+                  // a comment
+                }
+            "#]],
+        };
 
-    expected.assert_eq(&reformat(input));
+        expected.assert_eq(&reformat(&input));
+    }
 }
 
 #[test]
@@ -202,36 +218,64 @@ fn a_comment_in_generator_must_not_add_extra_newlines() {
 
 #[test]
 fn test_reformat_config() {
-    let input = indoc! {r#"
-        datasource pg {
-          provider = "postgresql"
-        }
-    "#};
+    for provider in ["postgresql", "kingbase-mysql", "kingbase-oracle"] {
+        let input = formatdoc! {r#"
+            datasource pg {{
+              provider = "{provider}"
+            }}
+        "#};
 
-    let expected = expect![[r#"
-        datasource pg {
-          provider = "postgresql"
-        }
-    "#]];
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-mysql"
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-oracle"
+                }
+            "#]],
+            _ => expect![[r#"
+                datasource pg {
+                  provider = "postgresql"
+                }
+            "#]],
+        };
 
-    expected.assert_eq(&reformat(input));
+        expected.assert_eq(&reformat(&input));
+    }
 }
 
 #[test]
 fn test_reformat_tabs() {
-    let input = indoc! {r#"
-        datasource pg {
-          provider\t=\t"postgresql"
-        }
-    "#};
+    for provider in ["postgresql", "kingbase-mysql", "kingbase-oracle"] {
+        let input = formatdoc! {r#"
+            datasource pg {{
+              provider\t=\t"{provider}"
+            }}
+        "#};
 
-    let expected = expect![[r#"
-        datasource pg {
-          provider = "postgresql"
-        }
-    "#]];
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-mysql"
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-oracle"
+                }
+            "#]],
+            _ => expect![[r#"
+                datasource pg {
+                  provider = "postgresql"
+                }
+            "#]],
+        };
 
-    expected.assert_eq(&reformat(&input.replace("\\t", "\t")));
+        expected.assert_eq(&reformat(&input.replace("\\t", "\t")));
+    }
 }
 
 #[test]
@@ -328,19 +372,33 @@ fn reformatting_enums_must_work() {
 
 #[test]
 fn reformatting_must_work_when_env_var_is_missing() {
-    let input = indoc! {r#"
-        datasource pg {
-          provider = "postgresql"
-        }
-    "#};
+    for provider in ["postgresql", "kingbase-mysql", "kingbase-oracle"] {
+        let input = formatdoc! {r#"
+            datasource pg {{
+              provider = "{provider}"
+            }}
+        "#};
 
-    let expected = expect![[r#"
-        datasource pg {
-          provider = "postgresql"
-        }
-    "#]];
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-mysql"
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-oracle"
+                }
+            "#]],
+            _ => expect![[r#"
+                datasource pg {
+                  provider = "postgresql"
+                }
+            "#]],
+        };
 
-    expected.assert_eq(&reformat(input));
+        expected.assert_eq(&reformat(&input));
+    }
 }
 
 #[test]
@@ -364,21 +422,37 @@ fn invalid_lines_must_not_break_reformatting() {
 
 #[test]
 fn reformatting_an_invalid_datasource_block_must_work() {
-    let input = indoc! {r#"
-        datasource db {
-          provider = "postgresql"
-          test
-        }
-    "#};
+    for provider in ["postgresql", "kingbase-mysql", "kingbase-oracle"] {
+        let input = formatdoc! {r#"
+            datasource db {{
+              provider = "{provider}"
+              test
+            }}
+        "#};
 
-    let expected = expect![[r#"
-        datasource db {
-          provider = "postgresql"
-          test
-        }
-    "#]];
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                datasource db {
+                  provider = "kingbase-mysql"
+                  test
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                datasource db {
+                  provider = "kingbase-oracle"
+                  test
+                }
+            "#]],
+            _ => expect![[r#"
+                datasource db {
+                  provider = "postgresql"
+                  test
+                }
+            "#]],
+        };
 
-    expected.assert_eq(&reformat(input));
+        expected.assert_eq(&reformat(&input));
+    }
 }
 
 #[test]
@@ -404,31 +478,67 @@ fn reformatting_an_invalid_generator_block_must_work() {
 
 #[test]
 fn reformatting_a_model_with_native_type_definitions_must_work() {
-    let input = indoc! {r#"
-        datasource pg {
-          provider = "postgres"
-        }
+    for provider in ["postgres", "kingbase-mysql", "kingbase-oracle"] {
+        let input = indoc! {r#"
+            datasource pg {
+              provider = "postgres"
+            }
 
-        model Blog {
-          id     Int    @id
-          bigInt Int    @pg.Integer
-          foobar String @pg.VarChar(12)
-        }
-    "#};
+            model Blog {
+              id     Int    @id
+              bigInt Int    @pg.Integer
+              foobar String @pg.VarChar(12)
+            }
+        "#};
+        let input = match provider {
+            "kingbase-mysql" => input
+                .replace("\"postgres\"", "\"kingbase-mysql\"")
+                .replace("Integer", "Int"),
+            "kingbase-oracle" => input
+                .replace("\"postgres\"", "\"kingbase-oracle\"")
+                .replace("Integer", "TinyInt")
+                .replace("VarChar", "VarChar2"),
+            _ => input.to_owned(),
+        };
 
-    let expected = expect![[r#"
-        datasource pg {
-          provider = "postgres"
-        }
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-mysql"
+                }
 
-        model Blog {
-          id     Int    @id
-          bigInt Int    @pg.Integer
-          foobar String @pg.VarChar(12)
-        }
-    "#]];
+                model Blog {
+                  id     Int    @id
+                  bigInt Int    @pg.Int
+                  foobar String @pg.VarChar(12)
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                datasource pg {
+                  provider = "kingbase-oracle"
+                }
 
-    expected.assert_eq(&reformat(input));
+                model Blog {
+                  id     Int    @id
+                  bigInt Int    @pg.TinyInt
+                  foobar String @pg.VarChar2(12)
+                }
+            "#]],
+            _ => expect![[r#"
+                datasource pg {
+                  provider = "postgres"
+                }
+
+                model Blog {
+                  id     Int    @id
+                  bigInt Int    @pg.Integer
+                  foobar String @pg.VarChar(12)
+                }
+            "#]],
+        };
+
+        expected.assert_eq(&reformat(&input));
+    }
 }
 
 #[test]
@@ -926,16 +1036,18 @@ fn reformatting_extended_indexes_works() {
 
 #[test]
 fn reformatting_with_empty_indexes() {
-    let schema = r#"
-        generator js {
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = format!(
+            r#"
+        generator js {{
           provider = "prisma-client"
-        }
+        }}
 
-        datasource db {
-          provider = "mysql"
-        }
+        datasource db {{
+          provider = "{provider}"
+        }}
 
-        model Fulltext {
+        model Fulltext {{
           id      Int    @id
           title   String @db.VarChar(255)
           content String @db.Text
@@ -943,30 +1055,72 @@ fn reformatting_with_empty_indexes() {
           @@fulltext(fields:[], map: "a")
           @@index(fields: [ ], map: "b")
           @@unique(fields: [])
-        }
-    "#;
+        }}
+    "#
+        );
 
-    let expected = expect![[r#"
-        generator js {
-          provider = "prisma-client"
-        }
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                generator js {
+                  provider = "prisma-client"
+                }
 
-        datasource db {
-          provider = "mysql"
-        }
+                datasource db {
+                  provider = "kingbase-mysql"
+                }
 
-        model Fulltext {
-          id      Int    @id
-          title   String @db.VarChar(255)
-          content String @db.Text
+                model Fulltext {
+                  id      Int    @id
+                  title   String @db.VarChar(255)
+                  content String @db.Text
 
-          @@unique(fields: [])
-          @@index(fields: [], map: "b")
-          @@fulltext(fields: [], map: "a")
-        }
-    "#]];
+                  @@unique(fields: [])
+                  @@index(fields: [], map: "b")
+                  @@fulltext(fields: [], map: "a")
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                generator js {
+                  provider = "prisma-client"
+                }
 
-    expected.assert_eq(&reformat(schema));
+                datasource db {
+                  provider = "kingbase-oracle"
+                }
+
+                model Fulltext {
+                  id      Int    @id
+                  title   String @db.VarChar(255)
+                  content String @db.Text
+
+                  @@unique(fields: [])
+                  @@index(fields: [], map: "b")
+                  @@fulltext(fields: [], map: "a")
+                }
+            "#]],
+            _ => expect![[r#"
+                generator js {
+                  provider = "prisma-client"
+                }
+
+                datasource db {
+                  provider = "mysql"
+                }
+
+                model Fulltext {
+                  id      Int    @id
+                  title   String @db.VarChar(255)
+                  content String @db.Text
+
+                  @@unique(fields: [])
+                  @@index(fields: [], map: "b")
+                  @@fulltext(fields: [], map: "a")
+                }
+            "#]],
+        };
+
+        expected.assert_eq(&reformat(&schema));
+    }
 }
 
 #[test]

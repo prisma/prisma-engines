@@ -1,0 +1,18 @@
+// no relation index validation warning on relationMode = "prisma" when a referenced field is already in @@id.
+
+datasource db {
+    provider     = "kingbase-mysql"
+    relationMode = "prisma"
+}
+
+model SomeUser {
+    id      Int      @id
+    profile Profile?
+}
+
+model Profile {
+    id   Int
+    user SomeUser? @relation(fields: [id], references: [id])
+
+    @@id([id])
+}

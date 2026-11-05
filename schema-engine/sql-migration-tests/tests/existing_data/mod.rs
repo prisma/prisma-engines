@@ -1,3 +1,4 @@
+mod kingbase_oracle;
 mod sql_unexecutable_migrations;
 mod sqlite_existing_data_tests;
 mod type_migration_tests;
@@ -150,11 +151,15 @@ fn altering_a_column_with_non_null_values_should_warn(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let insert = Insert::multi_into(api.render_table_name("Test"), vec!["id", "age"])
-        .values(("a", 12))
-        .values(("b", 22));
+    if api.tags().contains(Tags::KingbaseMysql) {
+        api.raw_cmd("INSERT INTO `Test` (`id`, `age`) VALUES ('a', '12'), ('b', '22')");
+    } else {
+        let insert = Insert::multi_into(api.render_table_name("Test"), vec!["id", "age"])
+            .values(("a", 12))
+            .values(("b", 22));
 
-    api.query(insert.into());
+        api.query(insert.into());
+    }
 
     let dm2 = r#"
         model Test {
@@ -177,6 +182,10 @@ fn altering_a_column_with_non_null_values_should_warn(api: TestApi) {
 
                  "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
             }
+        } else if api.tags().contains(Tags::KingbaseMysql) {
+            "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
+        } else if api.is_kingbase_oracle() {
+            "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar2(4000)` to `Number(10,0)`.".into()
         } else {
              "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `String` to `Int`.".into()
 
@@ -352,7 +361,7 @@ fn changing_a_column_from_required_to_optional_should_work(api: TestApi) {
         assert_eq!(data.len(), 2);
         let ages: Vec<i64> = data
             .into_iter()
-            .map(|row| row.get("age").unwrap().as_integer().unwrap())
+            .map(|row| integer_value(row.get("age").unwrap()).unwrap())
             .collect();
 
         assert_eq!(ages, &[12, 22]);
@@ -403,7 +412,7 @@ fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
         assert_eq!(data.len(), 3);
         let ages: Vec<Option<i64>> = data
             .into_iter()
-            .map(|row| row.get("age").unwrap().as_integer())
+            .map(|row| integer_value(row.get("age").unwrap()))
             .collect();
 
         assert_eq!(ages, &[Some(12), Some(22), None]);

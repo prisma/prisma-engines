@@ -388,7 +388,7 @@ impl Quaint {
 
                 Ok(builder)
             }
-            #[cfg(feature = "mysql")]
+            #[cfg(feature = "mysql-native")]
             s if s.starts_with("mysql") => {
                 let mut url = crate::connector::MysqlUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
@@ -421,7 +421,65 @@ impl Quaint {
 
                 Ok(builder)
             }
-            #[cfg(feature = "postgresql")]
+            #[cfg(feature = "kingbase-oracle-native")]
+            s if s.starts_with("kingbase-oracle://") => {
+                let url = crate::connector::KingbaseOracleUrl::new(url::Url::parse(s)?)?;
+                let connection_limit = url.connection_limit();
+                let pool_timeout = url.pool_timeout();
+                let max_connection_lifetime = url.max_connection_lifetime();
+                let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
+
+                let manager = QuaintManager::KingbaseOracle { url };
+                let mut builder = Builder::new(s, manager)?;
+
+                if let Some(limit) = connection_limit {
+                    builder.connection_limit(limit);
+                }
+
+                if let Some(timeout) = pool_timeout {
+                    builder.pool_timeout(timeout);
+                }
+
+                if let Some(max_lifetime) = max_connection_lifetime {
+                    builder.max_lifetime(max_lifetime);
+                }
+
+                if let Some(max_idle_lifetime) = max_idle_connection_lifetime {
+                    builder.max_idle_lifetime(max_idle_lifetime);
+                }
+
+                Ok(builder)
+            }
+            #[cfg(feature = "kingbase-mysql-native")]
+            s if s.starts_with("kingbase://") || s.starts_with("kingbase-mysql://") => {
+                let url = crate::connector::KingbaseMysqlUrl::new(url::Url::parse(s)?)?;
+                let connection_limit = url.connection_limit();
+                let pool_timeout = url.pool_timeout();
+                let max_connection_lifetime = url.max_connection_lifetime();
+                let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
+
+                let manager = QuaintManager::KingbaseMysql { url };
+                let mut builder = Builder::new(s, manager)?;
+
+                if let Some(limit) = connection_limit {
+                    builder.connection_limit(limit);
+                }
+
+                if let Some(timeout) = pool_timeout {
+                    builder.pool_timeout(timeout);
+                }
+
+                if let Some(max_lifetime) = max_connection_lifetime {
+                    builder.max_lifetime(max_lifetime);
+                }
+
+                if let Some(max_idle_lifetime) = max_idle_connection_lifetime {
+                    builder.max_idle_lifetime(max_idle_lifetime);
+                }
+
+                Ok(builder)
+            }
+            #[cfg(feature = "postgresql-native")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
                 let url = crate::connector::PostgresNativeUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
@@ -534,5 +592,18 @@ impl Quaint {
     /// Info about the connection and underlying database.
     pub fn connection_info(&self) -> &ConnectionInfo {
         &self.connection_info
+    }
+}
+
+#[cfg(all(test, feature = "kingbase-oracle-native"))]
+mod tests {
+    use super::Quaint;
+    use crate::connector::SqlFamily;
+
+    #[test]
+    fn kingbase_oracle_url_builds_an_oracle_pool() {
+        let builder = Quaint::builder("kingbase-oracle://user:password@localhost/app").unwrap();
+
+        assert_eq!(builder.connection_info.sql_family(), SqlFamily::KingbaseOracle);
     }
 }

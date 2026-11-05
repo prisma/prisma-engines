@@ -4,18 +4,20 @@ use crate::common::*;
 
 #[test]
 fn missing_native_type_should_still_allow_config_parsing() {
-    let schema = indoc! { r#"
-        datasource db {
-            provider = "postgresql"
-        }
+    for provider in ["postgresql", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = formatdoc! { r#"
+            datasource db {{
+                provider = "{provider}"
+            }}
 
-        model A {
-            id Int @id
-            val Int @db.
-        }
-    "#};
+            model A {{
+                id Int @id
+                val Int @db.
+            }}
+        "#};
 
-    parse_configuration(schema);
+        parse_configuration(&schema);
+    }
 }
 
 #[test]
@@ -97,27 +99,81 @@ fn serialize_builtin_sources_to_dmmf() {
         ]"#]];
 
     expect.assert_eq(&render_datasources(schema));
+
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "kingbase-mysql"
+        }
+    "#};
+    let expect = expect![[r#"
+        [
+          {
+            "name": "db",
+            "provider": "kingbase-mysql",
+            "activeProvider": "kingbase-mysql",
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
+          }
+        ]"#]];
+    expect.assert_eq(&render_datasources(schema));
+
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "kingbase-oracle"
+        }
+    "#};
+    let expect = expect![[r#"
+        [
+          {
+            "name": "db",
+            "provider": "kingbase-oracle",
+            "activeProvider": "kingbase-oracle",
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
+          }
+        ]"#]];
+    expect.assert_eq(&render_datasources(schema));
 }
 
 #[test]
 fn datasource_should_not_allow_arbitrary_parameters() {
-    let schema = indoc! {r#"
-        datasource ds {
-          provider = "mysql"
-          foo = "bar"
-        }
-    "#};
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = formatdoc! {r#"
+            datasource ds {{
+              provider = "{provider}"
+              foo = "bar"
+            }}
+        "#};
 
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mProperty not known: "foo".[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "mysql"
-        [1;94m 3 | [0m  [1;91mfoo = "bar"[0m
-        [1;94m   | [0m
-    "#]];
+        let expect = match provider {
+            "kingbase-mysql" => expect![[r#"
+                [1;91merror[0m: [1mProperty not known: "foo".[0m
+                  [1;94m-->[0m  [4mschema.prisma:3[0m
+                [1;94m   | [0m
+                [1;94m 2 | [0m  provider = "kingbase-mysql"
+                [1;94m 3 | [0m  [1;91mfoo = "bar"[0m
+                [1;94m   | [0m
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                [1;91merror[0m: [1mProperty not known: "foo".[0m
+                  [1;94m-->[0m  [4mschema.prisma:3[0m
+                [1;94m   | [0m
+                [1;94m 2 | [0m  provider = "kingbase-oracle"
+                [1;94m 3 | [0m  [1;91mfoo = "bar"[0m
+                [1;94m   | [0m
+            "#]],
+            _ => expect![[r#"
+                [1;91merror[0m: [1mProperty not known: "foo".[0m
+                  [1;94m-->[0m  [4mschema.prisma:3[0m
+                [1;94m   | [0m
+                [1;94m 2 | [0m  provider = "mysql"
+                [1;94m 3 | [0m  [1;91mfoo = "bar"[0m
+                [1;94m   | [0m
+            "#]],
+        };
 
-    expect.assert_eq(&parse_unwrap_err(schema));
+        expect.assert_eq(&parse_unwrap_err(&schema));
+    }
 }
 
 #[test]
@@ -174,77 +230,121 @@ fn postgresql_extension_parsing() {
 
 #[test]
 fn empty_schema_property_should_error() {
-    let schema = indoc! {r#"
-        generator js {
-          provider        = "prisma-client"
-          previewFeatures = []
-        }
+    for provider in ["postgres", "kingbase-oracle"] {
+        let schema = formatdoc! {r#"
+            generator js {{
+              provider        = "prisma-client"
+              previewFeatures = []
+            }}
 
-        datasource ds {
-          provider   = "postgres"
-          schemas = []
-        }
-    "#};
+            datasource ds {{
+              provider   = "{provider}"
+              schemas = []
+            }}
+        "#};
 
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mIf provided, the schemas array can not be empty.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  provider   = "postgres"
-        [1;94m 8 | [0m  schemas = [1;91m[][0m
-        [1;94m   | [0m
-    "#]];
+        let expect = match provider {
+            "kingbase-oracle" => expect![[r#"
+                [1;91merror[0m: [1mIf provided, the schemas array can not be empty.[0m
+                  [1;94m-->[0m  [4mschema.prisma:8[0m
+                [1;94m   | [0m
+                [1;94m 7 | [0m  provider   = "kingbase-oracle"
+                [1;94m 8 | [0m  schemas = [1;91m[][0m
+                [1;94m   | [0m
+            "#]],
+            _ => expect![[r#"
+                [1;91merror[0m: [1mIf provided, the schemas array can not be empty.[0m
+                  [1;94m-->[0m  [4mschema.prisma:8[0m
+                [1;94m   | [0m
+                [1;94m 7 | [0m  provider   = "postgres"
+                [1;94m 8 | [0m  schemas = [1;91m[][0m
+                [1;94m   | [0m
+            "#]],
+        };
 
-    expect_error(schema, &expect);
+        expect_error(&schema, &expect);
+    }
 }
 
 #[test]
 fn parse_direct_url_should_error() {
-    let schema = indoc! {r#"
-        generator js {
-          provider        = "prisma-client"
-        }
+    for provider in ["postgres", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = formatdoc! {r#"
+            generator js {{
+              provider        = "prisma-client"
+            }}
 
-        datasource ds {
-          provider   = "postgres"
-          directUrl = env("DIRECT_DATABASE_URL")
-        }
-    "#};
+            datasource ds {{
+              provider   = "{provider}"
+              directUrl = env("DIRECT_DATABASE_URL")
+            }}
+        "#};
 
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource[0m
-          [1;94m-->[0m  [4mschema.prisma:7[0m
-        [1;94m   | [0m
-        [1;94m 6 | [0m  provider   = "postgres"
-        [1;94m 7 | [0m  [1;91mdirectUrl = env("DIRECT_DATABASE_URL")[0m
-        [1;94m   | [0m
-    "#]];
+        let expect = match provider {
+            "kingbase-mysql" => expect![[r#"
+                [1;91merror[0m: [1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource[0m
+                  [1;94m-->[0m  [4mschema.prisma:7[0m
+                [1;94m   | [0m
+                [1;94m 6 | [0m  provider   = "kingbase-mysql"
+                [1;94m 7 | [0m  [1;91mdirectUrl = env("DIRECT_DATABASE_URL")[0m
+                [1;94m   | [0m
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                [1;91merror[0m: [1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource[0m
+                  [1;94m-->[0m  [4mschema.prisma:7[0m
+                [1;94m   | [0m
+                [1;94m 6 | [0m  provider   = "kingbase-oracle"
+                [1;94m 7 | [0m  [1;91mdirectUrl = env("DIRECT_DATABASE_URL")[0m
+                [1;94m   | [0m
+            "#]],
+            _ => expect![[r#"
+                [1;91merror[0m: [1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource[0m
+                  [1;94m-->[0m  [4mschema.prisma:7[0m
+                [1;94m   | [0m
+                [1;94m 6 | [0m  provider   = "postgres"
+                [1;94m 7 | [0m  [1;91mdirectUrl = env("DIRECT_DATABASE_URL")[0m
+                [1;94m   | [0m
+            "#]],
+        };
 
-    expect_error(schema, &expect);
+        expect_error(&schema, &expect);
+    }
 }
 
 #[test]
 fn parse_multi_schema_for_unsupported_connector_should_error() {
-    let schema = indoc! {r#"
-        generator js {
-          provider        = "prisma-client"
-        }
+    for provider in ["mysql", "kingbase-mysql"] {
+        let schema = formatdoc! {r#"
+            generator js {{
+              provider        = "prisma-client"
+            }}
 
-        datasource ds {
-          provider   = "mysql"
-          schemas = ["test"]
-        }
-    "#};
+            datasource ds {{
+              provider   = "{provider}"
+              schemas = ["test"]
+            }}
+        "#};
 
-    let actual = parse_config(schema).unwrap_err();
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mThe `schemas` property is not supported on the current connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:7[0m
-        [1;94m   | [0m
-        [1;94m 6 | [0m  provider   = "mysql"
-        [1;94m 7 | [0m  schemas = [1;91m["test"][0m
-        [1;94m   | [0m
-    "#]];
+        let actual = parse_config(&schema).unwrap_err();
+        let expect = match provider {
+            "kingbase-mysql" => expect![[r#"
+                [1;91merror[0m: [1mThe `schemas` property is not supported on the current connector.[0m
+                  [1;94m-->[0m  [4mschema.prisma:7[0m
+                [1;94m   | [0m
+                [1;94m 6 | [0m  provider   = "kingbase-mysql"
+                [1;94m 7 | [0m  schemas = [1;91m["test"][0m
+                [1;94m   | [0m
+            "#]],
+            _ => expect![[r#"
+                [1;91merror[0m: [1mThe `schemas` property is not supported on the current connector.[0m
+                  [1;94m-->[0m  [4mschema.prisma:7[0m
+                [1;94m   | [0m
+                [1;94m 6 | [0m  provider   = "mysql"
+                [1;94m 7 | [0m  schemas = [1;91m["test"][0m
+                [1;94m   | [0m
+            "#]],
+        };
 
-    expect.assert_eq(&actual);
+        expect.assert_eq(&actual);
+    }
 }

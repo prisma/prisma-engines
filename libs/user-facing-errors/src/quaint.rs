@@ -4,6 +4,8 @@ use quaint::connector::NativeConnectionInfo;
 use quaint::error::ErrorKind;
 
 #[cfg(any(
+    feature = "kingbase-mysql-native",
+    feature = "kingbase-oracle-native",
     feature = "mssql-native",
     feature = "mysql-native",
     feature = "postgresql-native",
@@ -116,6 +118,8 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConn
         ErrorKind::ConnectionClosed => Some(KnownError::new(common::ConnectionClosed)),
 
         #[cfg(any(
+            feature = "kingbase-mysql-native",
+            feature = "kingbase-oracle-native",
             feature = "mssql-native",
             feature = "mysql-native",
             feature = "postgresql-native",
@@ -130,6 +134,18 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConn
             }
             #[cfg(feature = "mysql-native")]
             (NativeErrorKind::ConnectionError(_), Some(NativeConnectionInfo::Mysql(url))) => {
+                Some(KnownError::new(common::DatabaseNotReachable {
+                    database_location: format!("{}:{}", url.host(), url.port()),
+                }))
+            }
+            #[cfg(feature = "kingbase-mysql-native")]
+            (NativeErrorKind::ConnectionError(_), Some(NativeConnectionInfo::KingbaseMysql(url))) => {
+                Some(KnownError::new(common::DatabaseNotReachable {
+                    database_location: format!("{}:{}", url.host(), url.port()),
+                }))
+            }
+            #[cfg(feature = "kingbase-oracle-native")]
+            (NativeErrorKind::ConnectionError(_), Some(NativeConnectionInfo::KingbaseOracle(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
                     database_location: format!("{}:{}", url.host(), url.port()),
                 }))
@@ -151,6 +167,18 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConn
             }
             #[cfg(feature = "mysql-native")]
             (NativeErrorKind::ConnectTimeout, Some(NativeConnectionInfo::Mysql(url))) => {
+                Some(KnownError::new(common::DatabaseNotReachable {
+                    database_location: format!("{}:{}", url.host(), url.port()),
+                }))
+            }
+            #[cfg(feature = "kingbase-mysql-native")]
+            (NativeErrorKind::ConnectTimeout, Some(NativeConnectionInfo::KingbaseMysql(url))) => {
+                Some(KnownError::new(common::DatabaseNotReachable {
+                    database_location: format!("{}:{}", url.host(), url.port()),
+                }))
+            }
+            #[cfg(feature = "kingbase-oracle-native")]
+            (NativeErrorKind::ConnectTimeout, Some(NativeConnectionInfo::KingbaseOracle(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
                     database_location: format!("{}:{}", url.host(), url.port()),
                 }))

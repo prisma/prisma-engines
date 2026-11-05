@@ -85,61 +85,102 @@ fn must_error_for_empty_provider_arrays() {
 
 #[test]
 fn new_lines_in_source_must_work() {
-    let schema = indoc! {r#"
-        datasource ds {
-          provider = "postgresql"
+    for provider in ["postgresql", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = formatdoc! {r#"
+            datasource ds {{
+              provider = "{provider}"
 
-        }
-    "#};
+            }}
+        "#};
 
-    let rendered = render_datasources(schema);
+        let rendered = render_datasources(&schema);
 
-    let expected = expect![[r#"
-        [
-          {
-            "name": "ds",
-            "provider": "postgresql",
-            "activeProvider": "postgresql",
-            "schemas": [],
-            "sourceFilePath": "schema.prisma"
-          }
-        ]"#]];
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                [
+                  {
+                    "name": "ds",
+                    "provider": "kingbase-mysql",
+                    "activeProvider": "kingbase-mysql",
+                    "schemas": [],
+                    "sourceFilePath": "schema.prisma"
+                  }
+                ]"#]],
+            "kingbase-oracle" => expect![[r#"
+                [
+                  {
+                    "name": "ds",
+                    "provider": "kingbase-oracle",
+                    "activeProvider": "kingbase-oracle",
+                    "schemas": [],
+                    "sourceFilePath": "schema.prisma"
+                  }
+                ]"#]],
+            _ => expect![[r#"
+                [
+                  {
+                    "name": "ds",
+                    "provider": "postgresql",
+                    "activeProvider": "postgresql",
+                    "schemas": [],
+                    "sourceFilePath": "schema.prisma"
+                  }
+                ]"#]],
+        };
 
-    expected.assert_eq(&rendered);
+        expected.assert_eq(&rendered);
+    }
 }
 
 #[test]
 fn multischema_must_work() {
-    let schema = indoc! {r#"
-      generator client {
-        provider        = "prisma-client"
-        previewFeatures = []
-      }
+    for provider in ["postgresql", "kingbase-oracle"] {
+        let schema = formatdoc! {r#"
+            generator client {{
+              provider        = "prisma-client"
+              previewFeatures = []
+            }}
 
-      datasource ds {
-        provider = "postgresql"
-        schemas = ["transactional", "public"]
-      }
-    "#};
+            datasource ds {{
+              provider = "{provider}"
+              schemas = ["transactional", "public"]
+            }}
+        "#};
 
-    let rendered = render_datasources(schema);
+        let rendered = render_datasources(&schema);
 
-    // schemas are sorted in ascending order
-    let expected = expect![[r#"
-        [
-          {
-            "name": "ds",
-            "provider": "postgresql",
-            "activeProvider": "postgresql",
-            "schemas": [
-              "public",
-              "transactional"
-            ],
-            "sourceFilePath": "schema.prisma"
-          }
-        ]"#]];
+        // schemas are sorted in ascending order
+        let expected = match provider {
+            "kingbase-oracle" => expect![[r#"
+                [
+                  {
+                    "name": "ds",
+                    "provider": "kingbase-oracle",
+                    "activeProvider": "kingbase-oracle",
+                    "schemas": [
+                      "public",
+                      "transactional"
+                    ],
+                    "sourceFilePath": "schema.prisma"
+                  }
+                ]"#]],
+            _ => expect![[r#"
+                [
+                  {
+                    "name": "ds",
+                    "provider": "postgresql",
+                    "activeProvider": "postgresql",
+                    "schemas": [
+                      "public",
+                      "transactional"
+                    ],
+                    "sourceFilePath": "schema.prisma"
+                  }
+                ]"#]],
+        };
 
-    expected.assert_eq(&rendered);
+        expected.assert_eq(&rendered);
+    }
 }
 
 #[test]
@@ -166,25 +207,45 @@ fn fail_to_load_sources_for_invalid_source() {
 
 #[test]
 fn fail_when_preview_features_are_declared() {
-    let dml = indoc! {r#"
-        datasource db {
-          provider = "mysql"
-          previewFeatures = ["foo"]
-        }
-    "#};
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = formatdoc! {r#"
+            datasource db {{
+              provider = "{provider}"
+              previewFeatures = ["foo"]
+            }}
+        "#};
 
-    let error = parse_config(dml).map(drop).unwrap_err();
+        let error = parse_config(&dml).map(drop).unwrap_err();
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mPreview features are only supported in the generator block. Please move this field to the generator block.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "mysql"
-        [1;94m 3 | [0m  [1;91mpreviewFeatures = ["foo"][0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = match provider {
+            "kingbase-mysql" => expect![[r#"
+                [1;91merror[0m: [1mPreview features are only supported in the generator block. Please move this field to the generator block.[0m
+                  [1;94m-->[0m  [4mschema.prisma:3[0m
+                [1;94m   | [0m
+                [1;94m 2 | [0m  provider = "kingbase-mysql"
+                [1;94m 3 | [0m  [1;91mpreviewFeatures = ["foo"][0m
+                [1;94m   | [0m
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                [1;91merror[0m: [1mPreview features are only supported in the generator block. Please move this field to the generator block.[0m
+                  [1;94m-->[0m  [4mschema.prisma:3[0m
+                [1;94m   | [0m
+                [1;94m 2 | [0m  provider = "kingbase-oracle"
+                [1;94m 3 | [0m  [1;91mpreviewFeatures = ["foo"][0m
+                [1;94m   | [0m
+            "#]],
+            _ => expect![[r#"
+                [1;91merror[0m: [1mPreview features are only supported in the generator block. Please move this field to the generator block.[0m
+                  [1;94m-->[0m  [4mschema.prisma:3[0m
+                [1;94m   | [0m
+                [1;94m 2 | [0m  provider = "mysql"
+                [1;94m 3 | [0m  [1;91mpreviewFeatures = ["foo"][0m
+                [1;94m   | [0m
+            "#]],
+        };
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
@@ -211,53 +272,59 @@ fn fail_when_no_source_is_declared() {
 
 #[test]
 fn referential_integrity_works() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-          referentialIntegrity = "prisma"
-        }
+    for provider in ["sqlserver", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = formatdoc! {r#"
+            datasource ps {{
+              provider = "{provider}"
+              referentialIntegrity = "prisma"
+            }}
 
-        generator client {
-          provider = "prisma-client"
-        }
-    "#};
+            generator client {{
+              provider = "prisma-client"
+            }}
+        "#};
 
-    let config = parse_configuration(schema);
+        let config = parse_configuration(&schema);
 
-    assert_eq!(config.relation_mode(), Some(RelationMode::Prisma));
+        assert_eq!(config.relation_mode(), Some(RelationMode::Prisma));
+    }
 }
 
 #[test]
 fn relation_mode_works() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-          relationMode = "prisma"
-        }
+    for provider in ["sqlserver", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = formatdoc! {r#"
+            datasource ps {{
+              provider = "{provider}"
+              relationMode = "prisma"
+            }}
 
-        generator client {
-          provider = "prisma-client"
-        }
-    "#};
+            generator client {{
+              provider = "prisma-client"
+            }}
+        "#};
 
-    let config = parse_configuration(schema);
+        let config = parse_configuration(&schema);
 
-    assert_eq!(config.relation_mode(), Some(RelationMode::Prisma));
+        assert_eq!(config.relation_mode(), Some(RelationMode::Prisma));
+    }
 }
 
 #[test]
 fn relation_mode_default() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-        }
+    for provider in ["sqlserver", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = formatdoc! {r#"
+            datasource ps {{
+              provider = "{provider}"
+            }}
 
-        generator client {
-          provider = "prisma-client"
-        }
-    "#};
+            generator client {{
+              provider = "prisma-client"
+            }}
+        "#};
 
-    let config = parse_configuration(schema);
+        let config = parse_configuration(&schema);
 
-    assert_eq!(config.relation_mode(), Some(RelationMode::ForeignKeys));
+        assert_eq!(config.relation_mode(), Some(RelationMode::ForeignKeys));
+    }
 }

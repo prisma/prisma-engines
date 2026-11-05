@@ -11,9 +11,12 @@ The crate dependency graph is and should remain simple:
 [diagnostics](./diagnostics) →
 [schema-ast](./schema-ast) →
 [parser-database](./parser-database) →
-[psl-core](./psl-core)
-[builtin-connectors](./connectors/builtin-connectors) →
-[psl](./connectors/psl)
+[psl-core](./psl-core) →
+[psl](./psl)
 
-[dml](./connectors/dml) is a separate data structure that can optionally be
-produced ("lifted") from a validated schema.
+The built-in connectors live inside
+[psl-core/src/builtin_connectors](./psl-core/src/builtin_connectors), rather
+than in a separate connector crate. Connector features are forwarded by the public `psl` crate.
+
+Query Compiler's [InternalDataModel](../query-compiler/query-structure/src/internal_data_model.rs)
+wraps a validated PSL schema. There is no separate `psl/connectors/dml` crate.

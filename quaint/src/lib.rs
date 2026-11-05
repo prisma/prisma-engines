@@ -107,8 +107,14 @@
 // TODO: remove once `quaint` is no longer a transitive dependency of `mongodb-schema-connector`.
 #![allow(dead_code)]
 
-#[cfg(not(any(feature = "sqlite", feature = "postgresql", feature = "mysql", feature = "mssql")))]
-compile_error!("one of 'sqlite', 'postgresql', 'mysql' or 'mssql' features must be enabled");
+#[cfg(not(any(
+    feature = "sqlite",
+    feature = "postgresql",
+    feature = "mysql",
+    feature = "kingbase-oracle",
+    feature = "mssql"
+)))]
+compile_error!("one of 'sqlite', 'postgresql', 'mysql', 'kingbase-oracle' or 'mssql' features must be enabled");
 
 #[macro_use]
 mod macros;

@@ -7,10 +7,21 @@ edition.workspace = true
 postgresql = ["psl-core/postgresql"]
 sqlite = ["psl-core/sqlite"]
 mysql = ["psl-core/mysql"]
+kingbase-mysql = ["psl-core/kingbase-mysql"]
+kingbase-oracle = ["psl-core/kingbase-oracle"]
 cockroachdb = ["psl-core/cockroachdb", "postgresql"]
 mssql = ["psl-core/mssql"]
 mongodb = ["psl-core/mongodb"]
-all = ["postgresql", "sqlite", "mysql", "cockroachdb", "mssql", "mongodb"]
+all = [
+  "postgresql",
+  "sqlite",
+  "mysql",
+  "kingbase-mysql",
+  "kingbase-oracle",
+  "cockroachdb",
+  "mssql",
+  "mongodb",
+]
 
 [dependencies]
 psl-core.workspace = true

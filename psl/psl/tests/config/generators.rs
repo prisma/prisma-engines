@@ -2,115 +2,127 @@ use crate::common::*;
 
 #[test]
 fn serialize_generators_to_cmf() {
-    let schema: &str = indoc! {r#"
-        generator js1 {
-          provider = "javascript"
-          output = "../../js"
-          engineType = "binary"
-        }
+    for provider in [None, Some("kingbase-mysql"), Some("kingbase-oracle")] {
+        let schema: &str = indoc! {r#"
+            generator js1 {
+              provider = "javascript"
+              output = "../../js"
+              engineType = "binary"
+            }
 
-        generator go {
-          provider = "go"
-          binaryTargets = ["a", "b"]
-        }
-    "#};
+            generator go {
+              provider = "go"
+              binaryTargets = ["a", "b"]
+            }
+        "#};
+        let schema = match provider {
+            Some(provider) => format!("datasource db {{\n  provider = \"{provider}\"\n}}\n{schema}"),
+            None => schema.to_owned(),
+        };
 
-    let expected = expect![[r#"
-        [
-          {
-            "name": "js1",
-            "provider": {
-              "fromEnvVar": null,
-              "value": "javascript"
-            },
-            "output": {
-              "fromEnvVar": null,
-              "value": "../../js"
-            },
-            "config": {
-              "engineType": "binary"
-            },
-            "binaryTargets": [],
-            "previewFeatures": []
-          },
-          {
-            "name": "go",
-            "provider": {
-              "fromEnvVar": null,
-              "value": "go"
-            },
-            "output": null,
-            "config": {},
-            "binaryTargets": [
+        let expected = expect![[r#"
+            [
               {
-                "fromEnvVar": null,
-                "value": "a"
+                "name": "js1",
+                "provider": {
+                  "fromEnvVar": null,
+                  "value": "javascript"
+                },
+                "output": {
+                  "fromEnvVar": null,
+                  "value": "../../js"
+                },
+                "config": {
+                  "engineType": "binary"
+                },
+                "binaryTargets": [],
+                "previewFeatures": []
               },
               {
-                "fromEnvVar": null,
-                "value": "b"
+                "name": "go",
+                "provider": {
+                  "fromEnvVar": null,
+                  "value": "go"
+                },
+                "output": null,
+                "config": {},
+                "binaryTargets": [
+                  {
+                    "fromEnvVar": null,
+                    "value": "a"
+                  },
+                  {
+                    "fromEnvVar": null,
+                    "value": "b"
+                  }
+                ],
+                "previewFeatures": []
               }
-            ],
-            "previewFeatures": []
-          }
-        ]"#]];
+            ]"#]];
 
-    let config = parse_configuration(schema);
-    let rendered = psl::generators_to_json(&config.generators);
+        let config = parse_configuration(&schema);
+        let rendered = psl::generators_to_json(&config.generators);
 
-    expected.assert_eq(&rendered);
+        expected.assert_eq(&rendered);
+    }
 }
 
 #[test]
 fn preview_features_setting_must_work() {
-    // make sure both single value and array syntax work
-    let schema = indoc! {r#"
-        generator js {
-          provider = "javascript"
-          previewFeatures = "connectOrCreate"
-        }
+    for provider in [None, Some("kingbase-mysql"), Some("kingbase-oracle")] {
+        // make sure both single value and array syntax work
+        let schema = indoc! {r#"
+            generator js {
+              provider = "javascript"
+              previewFeatures = "connectOrCreate"
+            }
 
-        generator go {
-          provider = "go"
-          previewFeatures = ["connectOrCreate", "transactionApi"]
-        }
-    "#};
+            generator go {
+              provider = "go"
+              previewFeatures = ["connectOrCreate", "transactionApi"]
+            }
+        "#};
+        let schema = match provider {
+            Some(provider) => format!("datasource db {{\n  provider = \"{provider}\"\n}}\n{schema}"),
+            None => schema.to_owned(),
+        };
 
-    let expected = expect![[r#"
-        [
-          {
-            "name": "js",
-            "provider": {
-              "fromEnvVar": null,
-              "value": "javascript"
-            },
-            "output": null,
-            "config": {},
-            "binaryTargets": [],
-            "previewFeatures": [
-              "connectOrCreate"
-            ]
-          },
-          {
-            "name": "go",
-            "provider": {
-              "fromEnvVar": null,
-              "value": "go"
-            },
-            "output": null,
-            "config": {},
-            "binaryTargets": [],
-            "previewFeatures": [
-              "connectOrCreate",
-              "transactionApi"
-            ]
-          }
-        ]"#]];
+        let expected = expect![[r#"
+            [
+              {
+                "name": "js",
+                "provider": {
+                  "fromEnvVar": null,
+                  "value": "javascript"
+                },
+                "output": null,
+                "config": {},
+                "binaryTargets": [],
+                "previewFeatures": [
+                  "connectOrCreate"
+                ]
+              },
+              {
+                "name": "go",
+                "provider": {
+                  "fromEnvVar": null,
+                  "value": "go"
+                },
+                "output": null,
+                "config": {},
+                "binaryTargets": [],
+                "previewFeatures": [
+                  "connectOrCreate",
+                  "transactionApi"
+                ]
+              }
+            ]"#]];
 
-    let config = parse_configuration(schema);
-    let rendered = psl::generators_to_json(&config.generators);
+        let config = parse_configuration(&schema);
+        let rendered = psl::generators_to_json(&config.generators);
 
-    expected.assert_eq(&rendered);
+        expected.assert_eq(&rendered);
+    }
 }
 
 #[test]
@@ -383,7 +395,8 @@ fn env_in_preview_features_must_be_rejected() {
 
 #[test]
 fn empty_preview_features_array_should_work() {
-    let schema = r#"
+    for provider in [None, Some("kingbase-mysql"), Some("kingbase-oracle")] {
+        let schema = r#"
         datasource db {
             provider = "postgresql"
         }
@@ -393,14 +406,20 @@ fn empty_preview_features_array_should_work() {
             previewFeatures = []
         }
     "#;
+        let schema = match provider {
+            Some(provider) => schema.replace("\"postgresql\"", &format!("\"{provider}\"")),
+            None => schema.to_owned(),
+        };
 
-    let schema = psl::parse_schema_without_extensions(schema).unwrap();
-    assert!(schema.configuration.preview_features().is_empty());
+        let schema = psl::parse_schema_without_extensions(&schema).unwrap();
+        assert!(schema.configuration.preview_features().is_empty());
+    }
 }
 
 #[test]
 fn empty_preview_features_array_with_empty_space_should_work() {
-    let schema = r#"
+    for provider in [None, Some("kingbase-mysql"), Some("kingbase-oracle")] {
+        let schema = r#"
         datasource db {
             provider = "postgresql"
         }
@@ -410,9 +429,14 @@ fn empty_preview_features_array_with_empty_space_should_work() {
             previewFeatures = [ ]
         }
     "#;
+        let schema = match provider {
+            Some(provider) => schema.replace("\"postgresql\"", &format!("\"{provider}\"")),
+            None => schema.to_owned(),
+        };
 
-    let schema = psl::parse_schema_without_extensions(schema).unwrap();
-    assert!(schema.configuration.preview_features().is_empty());
+        let schema = psl::parse_schema_without_extensions(&schema).unwrap();
+        assert!(schema.configuration.preview_features().is_empty());
+    }
 }
 
 #[test]

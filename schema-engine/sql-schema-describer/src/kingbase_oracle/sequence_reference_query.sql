@@ -1,0 +1,2 @@
+SELECT
+    CAST(CAST(CAST($1 AS TEXT) AS regclass) AS BIGINT) AS oid

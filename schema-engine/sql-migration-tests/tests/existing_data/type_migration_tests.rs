@@ -33,6 +33,8 @@ fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: TestApi) {
             "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `Int8` to `Int4`.".into()
         } else if api.is_postgres() {
             "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Integer`.".into()
+        } else if api.is_kingbase_oracle() {
+            "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `Number(19,0)` to `Number(10,0)`.".into()
         } else if api.lower_cases_table_names() {
             "You are about to alter the column `dogs` on the `user` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Int`.".into()
         } else {
@@ -281,7 +283,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
 
 // of course, 2018-01-18T08:01:02Z gets cast to 20180118080102.0 on MySQL
 // of course, 2018-01-18T08:01:02Z gets cast to 1516262462000.0 (UNIX timestamp) on SQLite and Cockroach
-#[test_connector(exclude(Mysql, Sqlite, CockroachDb))]
+#[test_connector(exclude(Mysql, Sqlite, CockroachDb, KingbaseMysql))]
 fn datetime_to_float_conversions_are_impossible(api: TestApi) {
     let dm1 = r#"
         model Cat {

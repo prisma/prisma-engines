@@ -50,7 +50,12 @@ fn database_level_json_defaults_can_be_defined(api: TestApi) {
                     Some(DefaultValue::value(PrismaValue::String(
                         "[\"sticks\", \"chimken\", 100, \"dog park\"]".into(),
                     )))
-                } else if api.is_mysql() {
+                } else if api.is_kingbase_oracle() {
+                    Some(DefaultValue::value(PrismaValue::Json(
+                        "[\"sticks\",\"chimken\",100,  \"dog park\"]".into(),
+                    )))
+                } else if api.is_mysql() || api.tags().contains(Tags::KingbaseMysql) {
+                    // Both MySQL providers omit JSON defaults from database DDL.
                     None
                 } else if api.is_sqlite() {
                     Some(DefaultValue::value(PrismaValue::String(

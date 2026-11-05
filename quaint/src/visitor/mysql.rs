@@ -15,9 +15,38 @@ pub struct Mysql<'a> {
     query_template: QueryTemplate<Value<'a>>,
     /// The table a deleting or updating query is acting on.
     target_table: Option<Table<'a>>,
+    escape_identifiers: bool,
 }
 
 impl<'a> Mysql<'a> {
+    #[cfg(feature = "kingbase-mysql")]
+    pub(super) fn build_template_for_kingbase<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
+    where
+        Q: Into<Query<'a>>,
+    {
+        Self::build_template_with_identifier_escaping(query, true)
+    }
+
+    fn build_template_with_identifier_escaping<Q>(
+        query: Q,
+        escape_identifiers: bool,
+    ) -> crate::Result<QueryTemplate<Value<'a>>>
+    where
+        Q: Into<Query<'a>>,
+    {
+        let query = query.into();
+        let mut this = Mysql {
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "?",
+                has_numbering: false,
+            }),
+            target_table: get_target_table(&query),
+            escape_identifiers,
+        };
+        Mysql::visit_query(&mut this, query)?;
+        Ok(this.query_template)
+    }
+
     /// Expression that evaluates to the current MySQL version.
     pub const fn version_expr() -> &'static str {
         "version()"
@@ -148,19 +177,15 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     where
         Q: Into<Query<'a>>,
     {
-        let query = query.into();
+        Self::build_template_with_identifier_escaping(query, false)
+    }
 
-        let mut this = Mysql {
-            query_template: QueryTemplate::new(PlaceholderFormat {
-                prefix: "?",
-                has_numbering: false,
-            }),
-            target_table: get_target_table(&query),
-        };
-
-        Mysql::visit_query(&mut this, query)?;
-
-        Ok(this.query_template)
+    fn surround_with_backticks(&mut self, part: &str) -> visitor::Result {
+        if self.escape_identifiers {
+            self.write(format!("`{}`", part.replace('`', "``")))
+        } else {
+            self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |s| s.write(part))
+        }
     }
 
     fn write(&mut self, value: impl fmt::Display) -> visitor::Result {

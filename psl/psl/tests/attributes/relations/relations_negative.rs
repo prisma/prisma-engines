@@ -751,33 +751,35 @@ fn should_fail_on_missing_embed_ids_on_self_relations() {
 
 #[test]
 fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
-    let dml = with_header(
-        indoc! {r#"
-        model User {
-          id Int    @id
-          posts   Post[]
-        }
+    for provider in [Provider::Postgres, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = with_header(
+            indoc! {r#"
+                model User {
+                  id Int    @id
+                  posts   Post[]
+                }
 
-        model Post {
-          post_id Int    @id
-          user_id Int
-          user    User   @relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")
-        }
-    "#},
-        Provider::Postgres,
-        &[],
-    );
+                model Post {
+                  post_id Int    @id
+                  user_id Int
+                  user    User   @relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")
+                }
+            "#},
+            provider,
+            &[],
+        );
 
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating model "Post": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@relation` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
-        [1;94m   | [0m
-        [1;94m17 | [0m  user_id Int
-        [1;94m18 | [0m  user    User   [1;91m@relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
-        [1;94m   | [0m
-    "#]];
+        let expect = expect![[r#"
+            [1;91merror[0m: [1mError validating model "Post": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@relation` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
+              [1;94m-->[0m  [4mschema.prisma:18[0m
+            [1;94m   | [0m
+            [1;94m17 | [0m  user_id Int
+            [1;94m18 | [0m  user    User   [1;91m@relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+            [1;94m   | [0m
+        "#]];
 
-    expect.assert_eq(&parse_unwrap_err(&dml));
+        expect.assert_eq(&parse_unwrap_err(&dml));
+    }
 }
 
 #[test]
@@ -1099,4 +1101,47 @@ fn multiple_relation_validation_errors_do_not_prevent_each_other_across_models()
     "#]];
 
     expect_error(schema, &expected_error)
+}
+
+#[test]
+fn foreign_key_names_are_limited_to_sixty_three_bytes() {
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        for (length, valid) in [(63, true), (64, false)] {
+            let name = "a".repeat(length);
+            let source = formatdoc! {r#"
+                datasource db {{
+                  provider = "{provider}"
+                }}
+                model Parent {{
+                  id Int @id
+                  children Child[]
+                }}
+                model Child {{
+                  id Int @id
+                  parentId Int
+                  parent Parent @relation(fields: [parentId], references: [id], map: "{name}")
+                }}
+            "#};
+            if valid {
+                let schema = parse_schema(&source);
+                assert_eq!(
+                    schema
+                        .assert_has_model("Child")
+                        .assert_has_relation_field("parent")
+                        .mapped_name(),
+                    Some(name.as_str())
+                );
+            } else {
+                let expect = expect![[r#"
+                    [1;91merror[0m: [1mError validating model "Child": The constraint name 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' specified in the `map` argument for the `@relation` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
+                      [1;94m-->[0m  [4mschema.prisma:11[0m
+                    [1;94m   | [0m
+                    [1;94m10 | [0m  parentId Int
+                    [1;94m11 | [0m  parent Parent [1;91m@relation(fields: [parentId], references: [id], map: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")[0m
+                    [1;94m   | [0m
+                "#]];
+                expect.assert_eq(&parse_unwrap_err(&source));
+            }
+        }
+    }
 }

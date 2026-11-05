@@ -1,0 +1,21 @@
+datasource pg {
+  provider = "kingbase-mysql"
+}
+
+model Blog {
+  id     Int     @id @pg.SmallInt
+  posts  Post[]
+  post2s Post2[]
+}
+
+model Post {
+  id     Int   @id @pg.SmallInt
+  blog   Blog? @relation(fields: [blogId], references: [id])
+  blogId Int?  @pg.SmallInt
+}
+
+model Post2 {
+  id     Int  @id @pg.SmallInt
+  blogId Int  @pg.SmallInt
+  Blog   Blog @relation(fields: [blogId], references: [id])
+}

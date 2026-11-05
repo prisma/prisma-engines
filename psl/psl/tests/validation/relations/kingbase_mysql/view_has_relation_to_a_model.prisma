@@ -1,0 +1,19 @@
+datasource db {
+  provider = "kingbase-mysql"
+}
+
+generator js {
+  provider        = "prisma-client"
+  previewFeatures = ["views"]
+}
+
+view SomeUser {
+  id      Int      @unique
+  profile Profile? @relation(fields: [id], references: [id])
+}
+
+model Profile {
+  id   Int       @unique
+  user SomeUser?
+}
+

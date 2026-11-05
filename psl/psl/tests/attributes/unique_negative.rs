@@ -504,3 +504,70 @@ fn duplicate_custom_names_on_same_model_should_error() {
 
     expectation.assert_eq(&error)
 }
+
+#[test]
+fn unsupported_native_types_cannot_be_compound_unique_keys() {
+    for (scalar, native) in [("Json", "Json"), ("String", "Xml")] {
+        let source = with_header(
+            &formatdoc! {r#"
+                model Item {{
+                  id Int @id
+                  first {scalar} @test.{native}
+                  second Int
+                  @@unique([first, second])
+                }}
+            "#},
+            Provider::KingbaseOracle,
+            &[],
+        );
+        let expect = match native {
+            "Json" => expect![[r#"
+                [1;91merror[0m: [1mNative type `Json` cannot be unique in Kingbase Oracle.[0m
+                  [1;94m-->[0m  [4mschema.prisma:14[0m
+                [1;94m   | [0m
+                [1;94m13 | [0m  second Int
+                [1;94m14 | [0m  [1;91m@@unique([first, second])[0m
+                [1;94m   | [0m
+            "#]],
+            "Xml" => expect![[r#"
+                [1;91merror[0m: [1mNative type `Xml` cannot be unique in Kingbase Oracle.[0m
+                  [1;94m-->[0m  [4mschema.prisma:14[0m
+                [1;94m   | [0m
+                [1;94m13 | [0m  second Int
+                [1;94m14 | [0m  [1;91m@@unique([first, second])[0m
+                [1;94m   | [0m
+            "#]],
+            _ => unreachable!(),
+        };
+        expect.assert_eq(&parse_unwrap_err(&source));
+    }
+}
+
+#[test]
+fn unique_names_are_limited_to_sixty_three_bytes() {
+    let valid = "a".repeat(63);
+    let source = with_header(
+        &format!("model Item {{\n id Int @id\n value Int @unique(map: \"{valid}\")\n}}"),
+        Provider::KingbaseOracle,
+        &[],
+    );
+    parse_schema(&source)
+        .assert_has_model("Item")
+        .assert_unique_on_fields(&["value"])
+        .assert_mapped_name(&valid);
+    let invalid = "a".repeat(64);
+    let source = with_header(
+        &format!("model Item {{\n id Int @id\n value Int @unique(map: \"{invalid}\")\n}}"),
+        Provider::KingbaseOracle,
+        &[],
+    );
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating model "Item": The constraint name 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' specified in the `map` argument for the `@unique` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m id Int @id
+        [1;94m12 | [0m value Int [1;91m@unique(map: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")[0m
+        [1;94m   | [0m
+    "#]];
+    expect.assert_eq(&parse_unwrap_err(&source));
+}

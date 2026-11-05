@@ -80,59 +80,89 @@ fn cascading_cycles_cannot_loop_infinitely() {
 
 #[test]
 fn cycles_are_allowed_outside_of_emulation_and_sqlserver() {
-    let dml = indoc! {
-        r#"
-        datasource db {
-            provider = "mysql"
-        }
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = formatdoc! {r#"
+            datasource db {{
+                provider = "{provider}"
+            }}
 
-        generator js1 {
-          provider = "javascript"
-        }
+            generator js1 {{
+              provider = "javascript"
+            }}
 
-        model A {
-            id     Int  @id @default(autoincrement())
-            child  A?   @relation(name: "a_self_relation")
-            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
-            aId    Int? @unique
-        }
-    "#};
+            model A {{
+                id     Int  @id @default(autoincrement())
+                child  A?   @relation(name: "a_self_relation")
+                parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
+                aId    Int? @unique
+            }}
+        "#};
 
-    assert_valid(dml)
+        assert_valid(&dml);
+
+        let source = formatdoc! {r#"
+            datasource db {{
+              provider = "{provider}"
+              relationMode = "prisma"
+            }}
+            model Item {{
+              id Int @id
+              parentId Int? @unique
+              parent Item? @relation("self", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+              child Item? @relation("self")
+            }}
+        "#};
+        assert_valid(&source);
+
+        let source = formatdoc! {r#"
+            datasource db {{
+              provider = "{provider}"
+              relationMode = "foreignKeys"
+            }}
+            model Item {{
+              id Int @id
+              parentId Int? @unique
+              parent Item? @relation("self", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+              child Item? @relation("self")
+            }}
+        "#};
+        assert_valid(&source);
+    }
 }
 
 #[test]
 fn emulated_cascading_on_delete_self_relations() {
-    let dml = indoc! {
-        r#"
-        datasource db {
-            provider = "mysql"
-            relationMode = "prisma"
-        }
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = formatdoc! {r#"
+            datasource db {{
+                provider = "{provider}"
+                relationMode = "prisma"
+            }}
 
-        generator js1 {
-          provider = "javascript"
-        }
+            generator js1 {{
+              provider = "javascript"
+            }}
 
-        model A {
-            id     Int  @id @default(autoincrement())
-            child  A?   @relation(name: "a_self_relation")
-            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
-            aId    Int? @unique
-        }
-    "#};
+            model A {{
+                id     Int  @id @default(autoincrement())
+                child  A?   @relation(name: "a_self_relation")
+                parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
+                aId    Int? @unique
+            }}
+        "#};
 
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
-        [1;94m   | [0m
-        [1;94m12 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m13 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
-        [1;94m14 | [0m    aId    Int? @unique
-        [1;94m   | [0m
-    "#]];
+        let expect = expect![[r#"
+            [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+              [1;94m-->[0m  [4mschema.prisma:13[0m
+            [1;94m   | [0m
+            [1;94m12 | [0m    child  A?   @relation(name: "a_self_relation")
+            [1;94m13 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
+            [1;94m14 | [0m    aId    Int? @unique
+            [1;94m   | [0m
+        "#]];
 
-    expect.assert_eq(&parse_unwrap_err(dml));
+        expect.assert_eq(&parse_unwrap_err(&dml));
+    }
 }
 
 #[test]
@@ -166,36 +196,37 @@ fn cascading_on_update_self_relations() {
 
 #[test]
 fn emulated_cascading_on_update_self_relations() {
-    let dml = indoc! {
-        r#"
-        datasource db {
-            provider = "mysql"
-            relationMode = "prisma"
-        }
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = formatdoc! {r#"
+            datasource db {{
+                provider = "{provider}"
+                relationMode = "prisma"
+            }}
 
-        generator js1 {
-          provider = "javascript"
-        }
+            generator js1 {{
+              provider = "javascript"
+            }}
 
-        model A {
-            id     Int  @id @default(autoincrement())
-            child  A?   @relation(name: "a_self_relation")
-            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
-            aId    Int? @unique
-        }
-    "#};
+            model A {{
+                id     Int  @id @default(autoincrement())
+                child  A?   @relation(name: "a_self_relation")
+                parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
+                aId    Int? @unique
+            }}
+        "#};
 
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
-        [1;94m   | [0m
-        [1;94m12 | [0m    child  A?   @relation(name: "a_self_relation")
-        [1;94m13 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
-        [1;94m14 | [0m    aId    Int? @unique
-        [1;94m   | [0m
-    "#]];
+        let expect = expect![[r#"
+            [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onDelete`: `SetNull`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+              [1;94m-->[0m  [4mschema.prisma:13[0m
+            [1;94m   | [0m
+            [1;94m12 | [0m    child  A?   @relation(name: "a_self_relation")
+            [1;94m13 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
+            [1;94m14 | [0m    aId    Int? @unique
+            [1;94m   | [0m
+        "#]];
 
-    expect.assert_eq(&parse_unwrap_err(dml));
+        expect.assert_eq(&parse_unwrap_err(&dml));
+    }
 }
 
 #[test]

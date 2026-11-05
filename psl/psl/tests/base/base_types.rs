@@ -3,7 +3,12 @@ use psl::parser_database::ScalarType;
 
 #[test]
 fn parse_scalar_types() {
-    let dml = r#"
+    for provider in [
+        None,
+        Some(crate::Provider::KingbaseMysql),
+        Some(crate::Provider::KingbaseOracle),
+    ] {
+        let dml = r#"
     model User {
         id           Int    @id
         firstName    String
@@ -12,25 +17,30 @@ fn parse_scalar_types() {
         averageGrade Float
     }
     "#;
+        let dml = match provider {
+            Some(provider) => crate::with_header(dml, provider, &[]),
+            None => dml.to_owned(),
+        };
 
-    let schema = psl::parse_schema_without_extensions(dml).unwrap();
-    let user_model = schema.assert_has_model("User");
+        let schema = psl::parse_schema_without_extensions(&dml).unwrap();
+        let user_model = schema.assert_has_model("User");
 
-    user_model
-        .assert_has_scalar_field("firstName")
-        .assert_scalar_type(ScalarType::String);
+        user_model
+            .assert_has_scalar_field("firstName")
+            .assert_scalar_type(ScalarType::String);
 
-    user_model
-        .assert_has_scalar_field("age")
-        .assert_scalar_type(ScalarType::Int);
+        user_model
+            .assert_has_scalar_field("age")
+            .assert_scalar_type(ScalarType::Int);
 
-    user_model
-        .assert_has_scalar_field("isPro")
-        .assert_scalar_type(ScalarType::Boolean);
+        user_model
+            .assert_has_scalar_field("isPro")
+            .assert_scalar_type(ScalarType::Boolean);
 
-    user_model
-        .assert_has_scalar_field("averageGrade")
-        .assert_scalar_type(ScalarType::Float);
+        user_model
+            .assert_has_scalar_field("averageGrade")
+            .assert_scalar_type(ScalarType::Float);
+    }
 }
 
 #[test]
@@ -72,6 +82,28 @@ fn parse_field_arity() {
         .assert_has_scalar_field("comments")
         .assert_scalar_type(ScalarType::String)
         .assert_list();
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let dml = dml
+            .replace("\"postgres\"", &format!("\"{provider}\""))
+            .replace("comments String[]", "comments String")
+            .replace("enums    Enum[]", "enums    Enum?");
+        let schema = parse_schema(&dml);
+        let model = schema.assert_has_model("Post");
+        model
+            .assert_has_scalar_field("text")
+            .assert_scalar_type(ScalarType::String)
+            .assert_required();
+        model
+            .assert_has_scalar_field("photo")
+            .assert_scalar_type(ScalarType::String)
+            .assert_optional();
+        model
+            .assert_has_scalar_field("comments")
+            .assert_scalar_type(ScalarType::String)
+            .assert_required();
+        model.assert_has_scalar_field("enums").assert_optional();
+    }
 }
 
 #[test]
@@ -124,46 +156,49 @@ fn scalar_list_types_are_not_supported_by_default() {
 
 #[test]
 fn scalar_list_types_are_not_supported_by_mysql() {
-    let dml = indoc! {r#"
-        datasource mysql {
-          provider = "mysql"
-        }
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = indoc! {r#"
+            datasource mysql {
+              provider = "mysql"
+            }
 
-        model Post {
-          id Int @id
-          text String
-          photo String?
-          comments String[]
-          enums    Enum[]
-        }
+            model Post {
+              id Int @id
+              text String
+              photo String?
+              comments String[]
+              enums    Enum[]
+            }
 
-        enum Enum {
-          A
-          B
-          C
-        }
-    "#};
+            enum Enum {
+              A
+              B
+              C
+            }
+        "#};
+        let dml = dml.replace("\"mysql\"", &format!("\"{provider}\""));
 
-    let error = parse_unwrap_err(dml);
+        let error = parse_unwrap_err(&dml);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mField "comments" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m  photo String?
-        [1;94m 9 | [0m  [1;91mcomments String[][0m
-        [1;94m10 | [0m  enums    Enum[]
-        [1;94m   | [0m
-        [1;91merror[0m: [1mField "enums" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
-        [1;94m   | [0m
-        [1;94m 9 | [0m  comments String[]
-        [1;94m10 | [0m  [1;91menums    Enum[][0m
-        [1;94m11 | [0m}
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mField "comments" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
+              [1;94m-->[0m  [4mschema.prisma:9[0m
+            [1;94m   | [0m
+            [1;94m 8 | [0m  photo String?
+            [1;94m 9 | [0m  [1;91mcomments String[][0m
+            [1;94m10 | [0m  enums    Enum[]
+            [1;94m   | [0m
+            [1;91merror[0m: [1mField "enums" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
+              [1;94m-->[0m  [4mschema.prisma:10[0m
+            [1;94m   | [0m
+            [1;94m 9 | [0m  comments String[]
+            [1;94m10 | [0m  [1;91menums    Enum[][0m
+            [1;94m11 | [0m}
+            [1;94m   | [0m
+        "#]];
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
@@ -209,11 +244,24 @@ fn json_type_must_work_for_some_connectors() {
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_scalar_type(ScalarType::Json);
+
+    for provider in [Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        psl::parse_schema_without_extensions(with_header(dml, provider, &[]))
+            .unwrap()
+            .assert_has_model("User")
+            .assert_has_scalar_field("json")
+            .assert_scalar_type(ScalarType::Json);
+    }
 }
 
 #[test]
 fn resolve_enum_field() {
-    let dml = r#"
+    for provider in [
+        None,
+        Some(crate::Provider::KingbaseMysql),
+        Some(crate::Provider::KingbaseOracle),
+    ] {
+        let dml = r#"
     model User {
         id Int @id
         email String
@@ -226,14 +274,19 @@ fn resolve_enum_field() {
         PRO
     }
     "#;
+        let dml = match provider {
+            Some(provider) => crate::with_header(dml, provider, &[]),
+            None => dml.to_owned(),
+        };
 
-    let schema = psl::parse_schema_without_extensions(dml).unwrap();
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_scalar_field("email");
+        let schema = psl::parse_schema_without_extensions(&dml).unwrap();
+        let user_model = schema.assert_has_model("User");
+        user_model.assert_has_scalar_field("email");
 
-    let role_enum = schema.db.find_enum("Role").unwrap();
-    let value_names: Vec<_> = role_enum.values().map(|v| v.name()).collect();
-    assert_eq!(value_names, &["ADMIN", "USER", "PRO"]);
+        let role_enum = schema.db.find_enum("Role").unwrap();
+        let value_names: Vec<_> = role_enum.values().map(|v| v.name()).collect();
+        assert_eq!(value_names, &["ADMIN", "USER", "PRO"]);
+    }
 }
 
 #[test]
@@ -269,4 +322,25 @@ fn json_list_type_must_work_for_some_connectors() {
         .assert_has_model("User")
         .assert_has_scalar_field("json_list")
         .assert_scalar_type(ScalarType::Json);
+
+    for provider in [Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let schema = with_header(dml, provider, &[]);
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError validating field `json_list` in model `User`: Field `json_list` in model `User` can't be of type Json[]. The current connector does not support the Json List type.[0m
+              [1;94m-->[0m  [4mschema.prisma:12[0m
+            [1;94m   | [0m
+            [1;94m11 | [0m  id   Int    @id
+            [1;94m12 | [0m  [1;91mjson_list Json[][0m
+            [1;94m13 | [0m}
+            [1;94m   | [0m
+            [1;91merror[0m: [1mField "json_list" in model "User" can't be a list. The current connector does not support lists of primitive types.[0m
+              [1;94m-->[0m  [4mschema.prisma:12[0m
+            [1;94m   | [0m
+            [1;94m11 | [0m  id   Int    @id
+            [1;94m12 | [0m  [1;91mjson_list Json[][0m
+            [1;94m13 | [0m}
+            [1;94m   | [0m
+        "#]];
+        expect_error(&schema, &expectation);
+    }
 }

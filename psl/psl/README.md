@@ -14,9 +14,13 @@ and the DMMF JSON format.
 
 Please see [`lib.rs`](src/lib.rs) and the [rustdoc documentation](https://prisma.github.io/prisma-engines/doc/psl/) for the public API.
 
-Main use-case, parsing a string to datamodel:
+For a schema without extension types, parse and validate it with:
 
-```ignore
-let file = std::fs::read_to_string(&args[1]).unwrap();
-let validated_schema = datamodel::parse_schema(&file)?;
+```rust,no_run
+let schema = "model User {\n  id Int @id\n}";
+let validated_schema = psl::parse_schema_without_extensions(schema).unwrap();
 ```
+
+Use `psl::parse_schema(schema, extension_types)` when the caller supplies
+extension types. Enable the connector features needed by datasource providers;
+see this crate's `Cargo.toml` for individual features and the `all` feature.

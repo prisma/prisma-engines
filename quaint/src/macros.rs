@@ -174,7 +174,7 @@ macro_rules! expression {
 
 /// A test-generator to test types in the defined database.
 #[cfg(test)]
-macro_rules! test_type {
+macro_rules! test_type_impl {
     ($name:ident($db:ident, $sql_type:literal, $col_type:expr, $(($input:expr, $output:expr)),+ $(,)?)) => {
         paste::item! {
             #[test]
@@ -247,6 +247,42 @@ macro_rules! test_type {
                 Ok(())
             }
         }
+    };
+}
+
+/// Generate the MySQL type suite for every MySQL-compatible native connector.
+///
+/// Keeping the declarations in `tests/types/mysql.rs` makes the expected
+/// values and SQL definitions identical while still selecting the connector
+/// API that owns the connection.
+#[cfg(test)]
+macro_rules! test_type {
+    ($name:ident(mysql, $sql_type:literal, $col_type:expr, $(($input:expr, $output:expr)),+ $(,)?)) => {
+        #[cfg(feature = "mysql-native")]
+        test_type_impl!($name(mysql, $sql_type, $col_type, $(($input, $output)),+));
+
+        #[cfg(feature = "kingbase-mysql-native")]
+        paste::item! {
+            test_type_impl!([<$name _kingbase_mysql>](kingbase_mysql, $sql_type, $col_type, $(($input, $output)),+));
+        }
+    };
+
+    ($name:ident(mysql, $sql_type:literal, $col_type:expr, $($value:expr),+ $(,)?)) => {
+        #[cfg(feature = "mysql-native")]
+        test_type_impl!($name(mysql, $sql_type, $col_type, $($value),+));
+
+        #[cfg(feature = "kingbase-mysql-native")]
+        paste::item! {
+            test_type_impl!([<$name _kingbase_mysql>](kingbase_mysql, $sql_type, $col_type, $($value),+));
+        }
+    };
+
+    ($name:ident($db:ident, $sql_type:literal, $col_type:expr, $(($input:expr, $output:expr)),+ $(,)?)) => {
+        test_type_impl!($name($db, $sql_type, $col_type, $(($input, $output)),+));
+    };
+
+    ($name:ident($db:ident, $sql_type:literal, $col_type:expr, $($value:expr),+ $(,)?)) => {
+        test_type_impl!($name($db, $sql_type, $col_type, $($value),+));
     };
 }
 
