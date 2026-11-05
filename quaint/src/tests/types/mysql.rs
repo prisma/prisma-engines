@@ -325,6 +325,15 @@ test_type!(json(
     Value::json(serde_json::json!({"this": "is", "a": "json", "number": 2}))
 ));
 
+#[cfg(feature = "kingbase-mysql-native")]
+test_type!(xml_kingbase_mysql(
+    kingbase_mysql,
+    "XML",
+    ColumnType::Xml,
+    Value::null_xml(),
+    Value::xml("<kingbase>金仓 &amp; XML</kingbase>")
+));
+
 test_type!(date(
     mysql,
     "date",

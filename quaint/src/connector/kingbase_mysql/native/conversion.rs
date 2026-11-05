@@ -104,66 +104,6 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<KingbaseType> {
         .collect()
 }
 
-struct XmlString(pub String);
-
-impl<'a> FromSql<'a> for XmlString {
-    fn from_sql(_ty: &KingbaseType, raw: &'a [u8]) -> Result<XmlString, Box<dyn std::error::Error + Sync + Send>> {
-        Ok(XmlString(String::from_utf8(raw.to_owned()).unwrap()))
-    }
-
-    fn accepts(ty: &KingbaseType) -> bool {
-        ty == &KingbaseType::XML
-    }
-}
-
-struct KingbaseBytes(pub Vec<u8>);
-
-impl<'a> FromSql<'a> for KingbaseBytes {
-    fn from_sql(_: &KingbaseType, raw: &'a [u8]) -> Result<Self, Box<dyn StdError + Sync + Send>> {
-        Ok(Self(raw.to_owned()))
-    }
-
-    fn accepts(ty: &KingbaseType) -> bool {
-        matches!(
-            ty,
-            &KingbaseType::MYSQL_BLOB
-                | &KingbaseType::MYSQL_LONGBLOB
-                | &KingbaseType::MYSQL_MEDIUMBLOB
-                | &KingbaseType::MYSQL_TINYBLOB
-        )
-    }
-}
-
-struct KingbaseText(pub String);
-
-impl<'a> FromSql<'a> for KingbaseText {
-    fn from_sql(_: &KingbaseType, raw: &'a [u8]) -> Result<Self, Box<dyn StdError + Sync + Send>> {
-        Ok(Self(std::str::from_utf8(raw)?.to_owned()))
-    }
-
-    fn accepts(ty: &KingbaseType) -> bool {
-        matches!(
-            ty,
-            &KingbaseType::MYSQL_LONGTEXT | &KingbaseType::MYSQL_MEDIUMTEXT | &KingbaseType::MYSQL_TINYTEXT
-        )
-    }
-}
-
-struct KingbaseJson(pub serde_json::Value);
-
-impl<'a> FromSql<'a> for KingbaseJson {
-    fn from_sql(_: &KingbaseType, raw: &'a [u8]) -> Result<Self, Box<dyn StdError + Sync + Send>> {
-        Ok(Self(<serde_json::Value as FromSql>::from_sql(
-            &KingbaseType::JSONB,
-            raw,
-        )?))
-    }
-
-    fn accepts(ty: &KingbaseType) -> bool {
-        ty == &KingbaseType::MYSQL_SYS_JSON
-    }
-}
-
 struct EnumString {
     value: String,
 }
@@ -327,8 +267,8 @@ impl GetRow for KingbaseRow {
                     | KingbaseColumnTypeBytes::MYSQL_LONGBLOB
                     | KingbaseColumnTypeBytes::MYSQL_MEDIUMBLOB
                     | KingbaseColumnTypeBytes::MYSQL_TINYBLOB => {
-                        let val: Option<KingbaseBytes> = row.try_get(i)?;
-                        ValueType::Bytes(v.read(val.map(|value| Cow::Owned(value.0))))
+                        let val: Option<Vec<u8>> = row.try_get(i)?;
+                        ValueType::Bytes(v.read(val.map(Cow::Owned)))
                     }
                 },
                 KingbaseColumnType::Text(ty, v) => match ty {
@@ -347,8 +287,8 @@ impl GetRow for KingbaseRow {
                     KingbaseColumnTypeText::MYSQL_LONGTEXT
                     | KingbaseColumnTypeText::MYSQL_MEDIUMTEXT
                     | KingbaseColumnTypeText::MYSQL_TINYTEXT => {
-                        let val: Option<KingbaseText> = row.try_get(i)?;
-                        ValueType::Text(v.read(val.map(|value| Cow::Owned(value.0))))
+                        let val: Option<String> = row.try_get(i)?;
+                        ValueType::Text(v.read(val.map(Cow::Owned)))
                     }
                     KingbaseColumnTypeText::MYSQL_BPCHARBYTE | KingbaseColumnTypeText::MYSQL_VARCHARBYTE => {
                         let val: Option<&str> = row.try_get(i)?;
@@ -407,19 +347,15 @@ impl GetRow for KingbaseRow {
                     }
                 },
                 KingbaseColumnType::Json(ty, v) => match ty {
-                    KingbaseColumnTypeJson::JSON | KingbaseColumnTypeJson::JSONB => {
-                        ValueType::Json(v.read(row.try_get(i)?))
-                    }
-                    KingbaseColumnTypeJson::MYSQL_SYS_JSON => {
-                        let val: Option<KingbaseJson> = row.try_get(i)?;
-                        ValueType::Json(v.read(val.map(|value| value.0)))
-                    }
+                    KingbaseColumnTypeJson::JSON
+                    | KingbaseColumnTypeJson::JSONB
+                    | KingbaseColumnTypeJson::MYSQL_SYS_JSON => ValueType::Json(v.read(row.try_get(i)?)),
                 },
                 KingbaseColumnType::Xml(ty, v) => match ty {
                     KingbaseColumnTypeXml::XML => {
-                        let val: Option<XmlString> = row.try_get(i)?;
+                        let val: Option<String> = row.try_get(i)?;
 
-                        ValueType::Xml(v.read(val.map(|val| Cow::Owned(val.0))))
+                        ValueType::Xml(v.read(val.map(Cow::Owned)))
                     }
                 },
                 KingbaseColumnType::Uuid(ty, v) => match ty {

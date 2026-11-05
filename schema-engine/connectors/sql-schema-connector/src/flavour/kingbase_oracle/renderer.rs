@@ -518,11 +518,11 @@ fn render_alter_column(
 
     if changes.arity_changed() {
         let nullability = if columns.next.arity().is_required() {
-            "SET NOT NULL"
+            "NOT NULL"
         } else {
-            "DROP NOT NULL"
+            "NULL"
         };
-        statements.push(format!("ALTER TABLE {table} ALTER COLUMN {column_name} {nullability}"));
+        statements.push(format!("ALTER TABLE {table} MODIFY ({column_name} {nullability})"));
     }
 
     if changes.autoincrement_changed() {
@@ -956,7 +956,7 @@ ALTER TABLE "Child" ADD CONSTRAINT "fk""parent" FOREIGN KEY ("parentId") REFEREN
 ALTER TABLE "Pa""rent" ALTER COLUMN "na""me" SET DEFAULT 'changed';
 
 -- AlterTable
-ALTER TABLE "Child" ALTER COLUMN "code" SET NOT NULL;
+ALTER TABLE "Child" MODIFY ("code" NOT NULL);
 "#]].assert_eq(&scripts);
     }
 

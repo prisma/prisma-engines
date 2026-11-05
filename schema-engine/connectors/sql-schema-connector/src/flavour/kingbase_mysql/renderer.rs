@@ -498,16 +498,14 @@ fn render_column_type(column: TableColumnWalker<'_>) -> Cow<'static, str> {
         KingbaseMySqlType::Timestamp(precision) => format!("TIMESTAMP{}", render(*precision)).into(),
         KingbaseMySqlType::Year => "YEAR".into(),
         KingbaseMySqlType::Json => "JSON".into(),
-        // Kingbase exposes unsigned integers as `sys.uint4` and `sys.uint8`.
-        // MySQL mode also accepts INT/BIGINT UNSIGNED, but the tested C010
-        // server rejects TINYINT/SMALLINT/MEDIUMINT UNSIGNED.
-        KingbaseMySqlType::UnsignedInt => "sys.uint4".into(),
+        // Use MySQL DDL syntax; the describer handles the uint4/uint8 catalog names.
+        KingbaseMySqlType::UnsignedInt => "INTEGER UNSIGNED".into(),
         KingbaseMySqlType::UnsignedSmallInt
         | KingbaseMySqlType::UnsignedTinyInt
         | KingbaseMySqlType::UnsignedMediumInt => {
             unreachable!("small unsigned native types are rejected by validation")
         }
-        KingbaseMySqlType::UnsignedBigInt => "sys.uint8".into(),
+        KingbaseMySqlType::UnsignedBigInt => "BIGINT UNSIGNED".into(),
     }
 }
 

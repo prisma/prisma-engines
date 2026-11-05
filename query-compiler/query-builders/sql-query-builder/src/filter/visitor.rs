@@ -1048,69 +1048,91 @@ fn insensitive_scalar_filter(
     is_parent_aggregation: bool,
     ctx: &Context<'_>,
 ) -> ConditionTree<'static> {
-    // Current workaround: We assume we can use ILIKE when we see `mode: insensitive`, because postgres is the only DB that has
-    // insensitive. We need a connector context for filter building that is unexpectedly complicated to integrate.
     let condition = match cond {
         ScalarCondition::Equals(ConditionValue::Value(PrismaValue::Null)) => comparable.is_null(),
         ScalarCondition::Equals(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", prisma_value_to_like_expression(value)),
-            ConditionValue::FieldRef(field_ref) => comparable.compare_raw("ILIKE", field_ref.aliased_col(alias, ctx)),
+            ConditionValue::Value(value) => {
+                insensitive_like(comparable, prisma_value_to_like_expression(value), false, ctx)
+            }
+            ConditionValue::FieldRef(field_ref) => {
+                insensitive_like(comparable, field_ref.aliased_col(alias, ctx).into(), false, ctx)
+            }
         },
         ScalarCondition::NotEquals(ConditionValue::Value(PrismaValue::Null)) => comparable.is_not_null(),
         ScalarCondition::NotEquals(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", prisma_value_to_like_expression(value)),
+            ConditionValue::Value(value) => {
+                insensitive_like(comparable, prisma_value_to_like_expression(value), true, ctx)
+            }
             ConditionValue::FieldRef(field_ref) => {
-                comparable.compare_raw("NOT ILIKE", field_ref.aliased_col(alias, ctx))
+                insensitive_like(comparable, field_ref.aliased_col(alias, ctx).into(), true, ctx)
             }
         },
         ScalarCondition::Contains(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", like_contains_pattern(value)),
-            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
-                "ILIKE",
+            ConditionValue::Value(value) => insensitive_like(comparable, like_contains_pattern(value), false, ctx),
+            ConditionValue::FieldRef(field_ref) => insensitive_like(
+                comparable,
                 concat::<'_, Expression<'_>>(vec![
                     Value::text("%").into(),
                     field_ref.aliased_col(alias, ctx).into(),
                     Value::text("%").into(),
-                ]),
+                ])
+                .into(),
+                false,
+                ctx,
             ),
         },
         ScalarCondition::NotContains(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", like_contains_pattern(value)),
-            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
-                "NOT ILIKE",
+            ConditionValue::Value(value) => insensitive_like(comparable, like_contains_pattern(value), true, ctx),
+            ConditionValue::FieldRef(field_ref) => insensitive_like(
+                comparable,
                 concat::<'_, Expression<'_>>(vec![
                     Value::text("%").into(),
                     field_ref.aliased_col(alias, ctx).into(),
                     Value::text("%").into(),
-                ]),
+                ])
+                .into(),
+                true,
+                ctx,
             ),
         },
         ScalarCondition::StartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", like_starts_with_pattern(value)),
-            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
-                "ILIKE",
-                concat::<'_, Expression<'_>>(vec![field_ref.aliased_col(alias, ctx).into(), Value::text("%").into()]),
+            ConditionValue::Value(value) => insensitive_like(comparable, like_starts_with_pattern(value), false, ctx),
+            ConditionValue::FieldRef(field_ref) => insensitive_like(
+                comparable,
+                concat::<'_, Expression<'_>>(vec![field_ref.aliased_col(alias, ctx).into(), Value::text("%").into()])
+                    .into(),
+                false,
+                ctx,
             ),
         },
         ScalarCondition::NotStartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", like_starts_with_pattern(value)),
-            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
-                "NOT ILIKE",
-                concat::<'_, Expression<'_>>(vec![field_ref.aliased_col(alias, ctx).into(), Value::text("%").into()]),
+            ConditionValue::Value(value) => insensitive_like(comparable, like_starts_with_pattern(value), true, ctx),
+            ConditionValue::FieldRef(field_ref) => insensitive_like(
+                comparable,
+                concat::<'_, Expression<'_>>(vec![field_ref.aliased_col(alias, ctx).into(), Value::text("%").into()])
+                    .into(),
+                true,
+                ctx,
             ),
         },
         ScalarCondition::EndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", like_ends_with_pattern(value)),
-            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
-                "ILIKE",
-                concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.aliased_col(alias, ctx).into()]),
+            ConditionValue::Value(value) => insensitive_like(comparable, like_ends_with_pattern(value), false, ctx),
+            ConditionValue::FieldRef(field_ref) => insensitive_like(
+                comparable,
+                concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.aliased_col(alias, ctx).into()])
+                    .into(),
+                false,
+                ctx,
             ),
         },
         ScalarCondition::NotEndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", like_ends_with_pattern(value)),
-            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
-                "NOT ILIKE",
-                concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.aliased_col(alias, ctx).into()]),
+            ConditionValue::Value(value) => insensitive_like(comparable, like_ends_with_pattern(value), true, ctx),
+            ConditionValue::FieldRef(field_ref) => insensitive_like(
+                comparable,
+                concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.aliased_col(alias, ctx).into()])
+                    .into(),
+                true,
+                ctx,
             ),
         },
         ScalarCondition::LessThan(value) => {
@@ -1230,6 +1252,26 @@ fn insensitive_scalar_filter(
     };
 
     ConditionTree::single(condition)
+}
+
+fn insensitive_like(
+    comparable: Expression<'static>,
+    pattern: Expression<'static>,
+    negated: bool,
+    ctx: &Context<'_>,
+) -> Compare<'static> {
+    if ctx.is_kingbase_oracle() {
+        // Oracle-style filtering folds both operands, including bound patterns and field references.
+        let comparable = Expression::from(lower(comparable));
+        let pattern = lower(pattern);
+        if negated {
+            comparable.not_like(pattern)
+        } else {
+            comparable.like(pattern)
+        }
+    } else {
+        comparable.compare_raw(if negated { "NOT ILIKE" } else { "ILIKE" }, pattern)
+    }
 }
 
 fn lower_if(expr: Expression<'_>, cond: bool) -> Expression<'_> {

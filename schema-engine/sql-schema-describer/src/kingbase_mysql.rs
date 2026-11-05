@@ -3,10 +3,7 @@
 use crate::{getters::Getter, parsers::Parser, *};
 use indexmap::IndexMap;
 use psl::{builtin_connectors::KingbaseMySqlType, datamodel_connector::NativeTypeInstance};
-use quaint::{
-    Value,
-    prelude::{Queryable, ResultRow},
-};
+use quaint::prelude::{Queryable, ResultRow};
 use std::{
     collections::{HashMap, HashSet},
     sync::LazyLock,
@@ -692,7 +689,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                 (&data_type, &full_data_type),
                 precision,
                 arity,
-                default_value,
                 sql_schema,
                 &user_defined_enum_variants,
             );
@@ -939,20 +935,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         (data_type, full_data_type): (&str, &str),
         precision: Precision,
         arity: ColumnArity,
-        default: Option<&Value<'_>>,
         sql_schema: &mut SqlSchema,
         user_defined_enum_variants: &HashMap<String, Vec<String>>,
     ) -> ColumnType {
         static UNSIGNEDNESS_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?i)unsigned$").unwrap());
-        let is_tinyint1 = || Self::extract_precision(full_data_type) == Some(1);
-        let invalid_bool_default = || {
-            default
-                .and_then(|default| default.to_string())
-                .filter(|default_string| default_string != "NULL")
-                .and_then(|default_string| Self::parse_int(&default_string))
-                .filter(|default_int| *default_int != PrismaValue::Int(0) && *default_int != PrismaValue::Int(1))
-                .is_some()
-        };
 
         // Kingbase's MySQL-compatible COLUMNS view may include the precision in DATA_TYPE
         // itself (for example `numeric(10,2)`), whereas MySQL reports the bare type name.
@@ -972,9 +958,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                 (ColumnTypeFamily::Int, Some(KingbaseMySqlType::UnsignedSmallInt))
             }
             "smallint" => (ColumnTypeFamily::Int, Some(KingbaseMySqlType::SmallInt)),
-            "tinyint" if is_tinyint1() && !invalid_bool_default() => {
-                (ColumnTypeFamily::Boolean, Some(KingbaseMySqlType::TinyInt))
-            }
             "tinyint" if UNSIGNEDNESS_RE.is_match(full_data_type) => {
                 (ColumnTypeFamily::Int, Some(KingbaseMySqlType::UnsignedTinyInt))
             }

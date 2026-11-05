@@ -591,6 +591,65 @@ fn oracle_autoincrement_primary_keys_can_be_referenced_by_foreign_keys(api: Test
 }
 
 #[test_connector(tags(KingbaseOracle))]
+fn oracle_modify_nullability_preserves_rows(api: TestApi) {
+    let optional = r#"
+        model NullabilityProbe {
+            id Int @id
+            value String? @default("kept") @db.VarChar2(32)
+            status NullabilityStatus?
+            @@index([value])
+        }
+        enum NullabilityStatus {
+            READY
+            DONE
+        }
+    "#;
+    let required = optional
+        .replace("String?", "String")
+        .replace("NullabilityStatus?", "NullabilityStatus");
+    api.schema_push_w_datasource(optional).send().assert_green();
+    api.raw_cmd(r#"INSERT INTO "NullabilityProbe" (id, value, status) VALUES (1, 'original', 'READY')"#);
+
+    api.schema_push_w_datasource(&required)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.assert_schema().assert_table("NullabilityProbe", |table| {
+        table
+            .assert_column("value", |column| column.assert_is_required())
+            .assert_column("status", |column| column.assert_is_required())
+            .assert_index_on_columns(&["value"], |index| index.assert_is_not_unique())
+    });
+    api.raw_cmd(r#"INSERT INTO "NullabilityProbe" (id, status) VALUES (2, 'DONE')"#);
+    api.query_raw(r#"SELECT value FROM "NullabilityProbe" WHERE id=2"#, &[])
+        .assert_single_row(|row| row.assert_text_value("value", "kept"));
+    api.schema_push_w_datasource(&required)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+
+    api.schema_push_w_datasource(optional)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.assert_schema().assert_table("NullabilityProbe", |table| {
+        table
+            .assert_column("value", |column| column.assert_is_nullable())
+            .assert_column("status", |column| column.assert_is_nullable())
+            .assert_index_on_columns(&["value"], |index| index.assert_is_not_unique())
+    });
+    api.query_raw(r#"SELECT value FROM "NullabilityProbe" WHERE id=1"#, &[])
+        .assert_single_row(|row| row.assert_text_value("value", "original"));
+    api.raw_cmd(r#"INSERT INTO "NullabilityProbe" (id, value, status) VALUES (3, NULL, NULL)"#);
+    api.query_raw(r#"SELECT value, status FROM "NullabilityProbe" WHERE id=3"#, &[])
+        .assert_single_row(|row| row.assert_null_value("value").assert_null_value("status"));
+    api.schema_push_w_datasource(optional)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+}
+
+#[test_connector(tags(KingbaseOracle))]
 fn oracle_column_type_default_and_arity_changes_are_migrated(api: TestApi) {
     let initial_schema = r#"
         model Task {
