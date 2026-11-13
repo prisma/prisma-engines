@@ -16,20 +16,22 @@ pub struct Mysql<'a> {
     /// The table a deleting or updating query is acting on.
     target_table: Option<Table<'a>>,
     escape_identifiers: bool,
+    hooks: MysqlVisitorHooks,
+}
+
+/// Optional SQL rendering overrides for callers that reuse the MySQL visitor.
+/// Native MySQL uses the default hooks and retains its own rendering behavior.
+#[derive(Clone, Copy, Default)]
+pub(super) struct MysqlVisitorHooks {
+    pub json_build_obj_expr: Option<for<'a> fn(&mut Mysql<'a>, Expression<'a>) -> visitor::Result>,
+    pub raw_json: Option<for<'a> fn(&mut Mysql<'a>, &serde_json::Value) -> visitor::Result>,
 }
 
 impl<'a> Mysql<'a> {
-    #[cfg(feature = "kingbase-mysql")]
-    pub(super) fn build_template_for_kingbase<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
-    where
-        Q: Into<Query<'a>>,
-    {
-        Self::build_template_with_identifier_escaping(query, true)
-    }
-
-    fn build_template_with_identifier_escaping<Q>(
+    pub(super) fn build_template_with_hooks<Q>(
         query: Q,
         escape_identifiers: bool,
+        hooks: MysqlVisitorHooks,
     ) -> crate::Result<QueryTemplate<Value<'a>>>
     where
         Q: Into<Query<'a>>,
@@ -42,6 +44,7 @@ impl<'a> Mysql<'a> {
             }),
             target_table: get_target_table(&query),
             escape_identifiers,
+            hooks,
         };
         Mysql::visit_query(&mut this, query)?;
         Ok(this.query_template)
@@ -128,6 +131,10 @@ impl<'a> Mysql<'a> {
     }
 
     fn visit_json_build_obj_expr(&mut self, expr: Expression<'a>) -> crate::Result<()> {
+        if let Some(render) = self.hooks.json_build_obj_expr {
+            return render(self, expr);
+        }
+
         match expr.kind() {
             // Convert bytes data to base64
             ExpressionKind::Column(col) => match (col.type_family.as_ref(), col.native_type.as_deref()) {
@@ -177,7 +184,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     where
         Q: Into<Query<'a>>,
     {
-        Self::build_template_with_identifier_escaping(query, false)
+        Self::build_template_with_hooks(query, false, MysqlVisitorHooks::default())
     }
 
     fn surround_with_backticks(&mut self, part: &str) -> visitor::Result {
@@ -228,8 +235,12 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
             ValueType::Json(j) => match j {
                 Some(j) => {
-                    let s = serde_json::to_string(&j)?;
-                    Some(self.write(format!("CONVERT('{s}', JSON)")))
+                    if let Some(render) = self.hooks.raw_json {
+                        Some(render(self, j))
+                    } else {
+                        let s = serde_json::to_string(&j)?;
+                        Some(self.write(format!("CONVERT('{s}', JSON)")))
+                    }
                 }
                 None => None,
             },

@@ -1,13 +1,13 @@
 use crate::{
-    ast::{OpaqueType, Query, Value, ValueType},
+    ast::{Expression, ExpressionKind, OpaqueType, Query, TypeFamily, Value, ValueType},
     error::{Error, ErrorKind},
-    visitor::Mysql,
+    visitor::{self, Mysql, Visitor, mysql::MysqlVisitorHooks},
 };
 use query_template::{Fragment, PlaceholderFormat, QueryTemplate};
 
 /// A MySQL-compatible SQL visitor for KingbaseES.
 ///
-/// It reuses MySQL SQL generation and adapts full-text search to Kingbase.
+/// It reuses MySQL SQL generation with local type conversion and full-text adaptations.
 pub struct KingbaseMysql;
 
 impl KingbaseMysql {
@@ -15,7 +15,14 @@ impl KingbaseMysql {
     where
         Q: Into<Query<'a>>,
     {
-        let template = Mysql::build_template_for_kingbase(query)?;
+        let template = Mysql::build_template_with_hooks(
+            query,
+            true,
+            MysqlVisitorHooks {
+                json_build_obj_expr: Some(visit_json_build_obj_expr),
+                raw_json: Some(visit_raw_json),
+            },
+        )?;
         let QueryTemplate {
             fragments,
             parameters,
@@ -42,6 +49,34 @@ impl KingbaseMysql {
         let params = template.parameters;
         Ok((sql, params))
     }
+}
+
+/// Render native values inside JSON using the casts accepted by KES MySQL.
+fn visit_json_build_obj_expr<'a>(visitor: &mut Mysql<'a>, expr: Expression<'a>) -> visitor::Result {
+    if let ExpressionKind::Column(column) = expr.kind() {
+        match (column.type_family.as_ref(), column.native_type.as_deref()) {
+            (
+                Some(TypeFamily::Text(_)),
+                Some("LONGBLOB" | "BLOB" | "MEDIUMBLOB" | "SMALLBLOB" | "TINYBLOB" | "VARBINARY" | "BINARY" | "BIT"),
+            ) => {
+                return visitor.surround_with("to_base64(CAST(", " AS VARBINARY))", |visitor| {
+                    visitor.visit_expression(expr)
+                });
+            }
+            // Keep values as strings in JSON to preserve numeric precision.
+            (_, Some("FLOAT")) | (Some(TypeFamily::Int), Some("BIGINT" | "UNSIGNEDBIGINT")) => {
+                return visitor.surround_with("CAST(", " AS CHAR)", |visitor| visitor.visit_expression(expr));
+            }
+            _ => {}
+        }
+    }
+
+    visitor.visit_expression(expr)
+}
+
+fn visit_raw_json(visitor: &mut Mysql<'_>, value: &serde_json::Value) -> visitor::Result {
+    let json = serde_json::to_string(value)?.replace('\'', "''");
+    visitor.write(format!("CAST('{json}' AS JSON)"))
 }
 
 /// Rewrites MySQL MATCH SQL to Kingbase full-text functions while preserving
@@ -420,10 +455,72 @@ mod tests {
     use super::KingbaseMysql;
     use crate::Value;
     use crate::ast::{
-        Aliasable, Column, Comparable, Expression, JsonPath, OpaqueType, Select, Table, ValueType, json_extract,
-        json_unquote, native_uuid, text_search, text_search_relevance,
+        Aliasable, Column, Comparable, Expression, IntoRaw, JsonPath, OpaqueType, Select, Table, ValueType,
+        json_extract, json_unquote, native_uuid, text_search, text_search_relevance,
     };
     use crate::visitor::{Mysql, Visitor};
+
+    #[test]
+    fn raw_json_literals_use_cast_and_preserve_quotes() {
+        for value in [serde_json::json!([]), serde_json::json!({"text": "O'Reilly"})] {
+            let literal = serde_json::to_string(&value).unwrap();
+            let query = Select::default().value(Value::json(value).raw());
+            let (sql, params) = KingbaseMysql::build(query.clone()).unwrap();
+            assert_eq!(sql, format!("SELECT CAST('{}' AS JSON)", literal.replace('\'', "''")));
+            assert!(params.is_empty());
+            let (sql, params) = Mysql::build(query).unwrap();
+            assert_eq!(sql, format!("SELECT CONVERT('{literal}', JSON)"));
+            assert!(params.is_empty());
+        }
+    }
+
+    #[test]
+    fn json_build_object_casts_binary_types_without_losing_bit_width() {
+        for native_type in [
+            "BIT",
+            "BINARY",
+            "VARBINARY",
+            "TINYBLOB",
+            "SMALLBLOB",
+            "MEDIUMBLOB",
+            "BLOB",
+            "LONGBLOB",
+        ] {
+            let column = Column::from("value")
+                .native_column_type(Some(native_type))
+                .type_family(crate::ast::TypeFamily::Text(None));
+            let query = Select::default().value(crate::ast::json_build_object(vec![("value".into(), column.into())]));
+            let (sql, params) = KingbaseMysql::build(query.clone()).unwrap();
+            assert_eq!(
+                sql,
+                "SELECT JSON_OBJECT('value', to_base64(CAST(`value` AS VARBINARY)))"
+            );
+            assert!(params.is_empty());
+            let (sql, params) = Mysql::build(query).unwrap();
+            assert_eq!(sql, "SELECT JSON_OBJECT('value', to_base64(`value`))");
+            assert!(params.is_empty());
+        }
+    }
+
+    #[test]
+    fn json_build_object_casts_float_and_bigint_with_native_syntax() {
+        for (native_type, family) in [
+            ("FLOAT", crate::ast::TypeFamily::Float),
+            ("BIGINT", crate::ast::TypeFamily::Int),
+            ("UNSIGNEDBIGINT", crate::ast::TypeFamily::Int),
+        ] {
+            let column = Column::from("value")
+                .native_column_type(Some(native_type))
+                .type_family(family);
+            let query = Select::default().value(crate::ast::json_build_object(vec![("value".into(), column.into())]));
+            let (sql, params) = KingbaseMysql::build(query.clone()).unwrap();
+            assert_eq!(sql, "SELECT JSON_OBJECT('value', CAST(`value` AS CHAR))");
+            assert!(params.is_empty());
+            let (sql, params) = Mysql::build(query).unwrap();
+            assert_eq!(sql, "SELECT JSON_OBJECT('value', CONVERT(`value`, CHAR))");
+            assert!(params.is_empty());
+        }
+    }
 
     #[test]
     fn identifier_escaping_is_scoped_to_kingbase_without_changing_values() {
