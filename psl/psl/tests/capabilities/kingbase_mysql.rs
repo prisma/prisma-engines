@@ -160,3 +160,30 @@ fn composite_types_are_not_supported() {
 
     expected.assert_eq(&err);
 }
+
+#[test]
+fn fulltext_search_does_not_require_an_index() {
+    use psl::datamodel_connector::ConnectorCapability;
+
+    let capabilities = psl::builtin_connectors::KINGBASE_MYSQL.capabilities();
+    assert!(capabilities.contains(ConnectorCapability::NativeFullTextSearch));
+    assert!(capabilities.contains(ConnectorCapability::NativeFullTextSearchWithoutIndex));
+    assert!(capabilities.contains(ConnectorCapability::FullTextIndex));
+    assert!(!capabilities.contains(ConnectorCapability::NativeFullTextSearchWithIndex));
+
+    assert_valid(
+        r#"
+        datasource db {
+          provider = "kingbase-mysql"
+        }
+
+        model Article {
+          id    Int    @id
+          title String
+          body  String @db.Text
+
+          @@fulltext([title, body])
+        }
+    "#,
+    );
+}

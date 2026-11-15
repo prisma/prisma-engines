@@ -144,6 +144,31 @@ impl<'a> KingbaseOracle<'a> {
         }
     }
 
+    /// JSON string filters without a path still need an unquoted scalar.
+    fn visit_string_match_operand(&mut self, expression: Expression<'a>) -> visitor::Result {
+        let is_json = expression.is_json_value()
+            || expression
+                .as_column()
+                .and_then(|column| column.native_type.as_deref())
+                .is_some_and(|native_type| matches!(native_type, "JSON" | "JSONB"));
+        if is_json {
+            self.write("JSON_VALUE(")?;
+            self.visit_expression(expression)?;
+            self.write(", '$' RETURNING CLOB)")
+        } else if let ExpressionKind::Function(function) = expression.kind() {
+            match &function.typ_ {
+                FunctionType::Lower(lower) => {
+                    self.write("LOWER(")?;
+                    self.visit_string_match_operand(*lower.expression.clone())?;
+                    self.write(")")
+                }
+                _ => self.visit_expression(expression),
+            }
+        } else {
+            self.visit_expression(expression)
+        }
+    }
+
     fn upsert_source_query(columns: &[Column<'a>], values: Expression<'a>) -> crate::Result<Query<'a>> {
         let select_from_row = |row: Row<'a>| {
             columns
@@ -420,6 +445,18 @@ impl<'a> Visitor<'a> for KingbaseOracle<'a> {
 
             Ok(())
         })
+    }
+
+    fn visit_like(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+        self.visit_string_match_operand(left)?;
+        self.write(" LIKE ")?;
+        self.visit_expression(right)
+    }
+
+    fn visit_not_like(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+        self.visit_string_match_operand(left)?;
+        self.write(" NOT LIKE ")?;
+        self.visit_expression(right)
     }
 
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
@@ -770,6 +807,83 @@ mod tests {
     use super::KingbaseOracle;
     use crate::{ast::*, visitor::Visitor};
     use query_template::Fragment;
+
+    #[test]
+    fn string_matches_extract_json_roots_and_preserve_bind_parameters() {
+        for native_type in ["JSON", "JSONB"] {
+            for negated in [false, true] {
+                let column = Column::from("payload").native_column_type(Some(native_type));
+                let condition = if negated {
+                    column.not_like("%q'\"\\%")
+                } else {
+                    column.like("%q'\"\\%")
+                };
+                let (sql, params) = KingbaseOracle::build(Select::from_table("documents").so_that(condition)).unwrap();
+                let operator = if negated { "NOT LIKE" } else { "LIKE" };
+                assert_eq!(
+                    format!(
+                        "SELECT \"documents\".* FROM \"documents\" WHERE JSON_VALUE(\"payload\", '$' RETURNING CLOB) {operator} $1"
+                    ),
+                    sql
+                );
+                assert_eq!(vec![Value::text("%q'\"\\%")], params);
+            }
+        }
+    }
+
+    #[test]
+    fn case_insensitive_json_matches_unquote_before_lowering() {
+        for negated in [false, true] {
+            let expression: Expression<'_> = lower(Column::from("payload").native_column_type(Some("JSON"))).into();
+            let pattern = lower(Value::text("%FoO%"));
+            let condition = if negated {
+                expression.not_like(pattern)
+            } else {
+                expression.like(pattern)
+            };
+            let (sql, params) = KingbaseOracle::build(Select::from_table("documents").so_that(condition)).unwrap();
+            let operator = if negated { "NOT LIKE" } else { "LIKE" };
+            assert_eq!(
+                format!(
+                    "SELECT \"documents\".* FROM \"documents\" WHERE LOWER(JSON_VALUE(\"payload\", '$' RETURNING CLOB)) {operator} LOWER($1)"
+                ),
+                sql
+            );
+            assert_eq!(vec![Value::text("%FoO%")], params);
+        }
+    }
+
+    #[test]
+    fn string_matches_preserve_text_columns_and_extracted_json_paths() {
+        let text = Column::from("name").native_column_type(Some("VARCHAR2"));
+        let (sql, params) = KingbaseOracle::build(Select::from_table("documents").so_that(text.like("%foo%"))).unwrap();
+        assert_eq!("SELECT \"documents\".* FROM \"documents\" WHERE \"name\" LIKE $1", sql);
+        assert_eq!(vec![Value::text("%foo%")], params);
+
+        let text = Column::from("name").native_column_type(Some("VARCHAR2"));
+        let (sql, params) = KingbaseOracle::build(
+            Select::from_table("documents").so_that(Expression::from(lower(text)).like(lower(Value::text("%foo%")))),
+        )
+        .unwrap();
+        assert_eq!(
+            "SELECT \"documents\".* FROM \"documents\" WHERE LOWER(\"name\") LIKE LOWER($1)",
+            sql
+        );
+        assert_eq!(vec![Value::text("%foo%")], params);
+
+        let path: Expression<'_> = json_extract(
+            Column::from("payload").native_column_type(Some("JSON")),
+            JsonPath::array(["name"]),
+            true,
+        )
+        .into();
+        let (sql, params) = KingbaseOracle::build(Select::from_table("documents").so_that(path.like("%foo%"))).unwrap();
+        assert_eq!(
+            "SELECT \"documents\".* FROM \"documents\" WHERE jsonb_extract_path_text(CAST(\"payload\" AS JSONB), VARIADIC CAST($1 AS text[])) LIKE $2",
+            sql
+        );
+        assert_eq!(vec![Value::text(r#"{"name"}"#), Value::text("%foo%")], params);
+    }
 
     #[test]
     fn renders_oracle_insert_returning_and_default_values() {
