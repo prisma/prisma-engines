@@ -209,7 +209,7 @@ impl Connector for KingbaseOracleDatamodelConnector {
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
-        native_types::CONSTRUCTORS
+        &native_types::CONSTRUCTORS_WITH_ALIASES
     }
 
     fn parse_native_type(
@@ -219,6 +219,7 @@ impl Connector for KingbaseOracleDatamodelConnector {
         span: Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance> {
+        let name = if name == "Decimal" { "Number" } else { name };
         if name == "Number" && args.get(1).is_some_and(|scale| scale.starts_with('-')) {
             let native_type = NativeTypeInstance::new(Number(Unspecified));
             diagnostics.push_error(self.native_instance_error(&native_type).new_argument_m_out_of_range_error(

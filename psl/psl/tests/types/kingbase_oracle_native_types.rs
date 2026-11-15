@@ -490,3 +490,62 @@ fn oracle_additional_native_types_validate_arguments_and_scalar_mappings() {
         assert!(psl::parse_schema_without_extensions(schema).is_err(), "{field}");
     }
 }
+
+#[test]
+fn decimal_alias_uses_number_arguments_and_canonical_native_type() {
+    let constructor = KINGBASE_ORACLE.find_native_type_constructor("Decimal").unwrap();
+    assert_eq!(constructor.number_of_args, 0);
+    assert_eq!(constructor.number_of_optional_args, 2);
+    for args in [
+        vec![],
+        vec!["10"],
+        vec!["10", "0"],
+        vec!["12", "4"],
+        vec!["2", "3"],
+        vec!["38", "1000"],
+    ] {
+        let declaration = if args.is_empty() {
+            "Decimal".to_owned()
+        } else {
+            format!("Decimal({})", args.join(","))
+        };
+        assert_valid(&format!(
+            "datasource db {{\n provider = \"kingbase-oracle\"\n}}\nmodel Item {{\n id Int @id\n value Decimal @db.{declaration}\n}}"
+        ));
+        let args: Vec<String> = args.into_iter().map(str::to_owned).collect();
+        let mut diagnostics = psl::diagnostics::Diagnostics::new();
+        let alias = KINGBASE_ORACLE
+            .parse_native_type("Decimal", &args, psl::diagnostics::Span::empty(), &mut diagnostics)
+            .unwrap();
+        let number = KINGBASE_ORACLE
+            .parse_native_type("Number", &args, psl::diagnostics::Span::empty(), &mut diagnostics)
+            .unwrap();
+        assert_eq!(alias, number);
+        assert_eq!(KINGBASE_ORACLE.native_type_to_parts(&alias).0, "Number");
+    }
+}
+
+#[test]
+fn decimal_alias_reuses_number_validation_and_rejects_incompatible_fields() {
+    for (native, expected_error) in [
+        ("Decimal(0)", "Precision must be between 1 and 38"),
+        ("Decimal(39)", "Precision must be between 1 and 38"),
+        ("Decimal(0,2)", "Precision must be between 1 and 38"),
+        ("Decimal(39,2)", "Precision must be between 1 and 38"),
+        ("Decimal(10,1001)", "Scale must be between 0 and 1000"),
+        ("Decimal(10,-1)", "Negative NUMBER scale is not supported"),
+        ("Decimal(1,2,3)", "optional arguments"),
+    ] {
+        let error = parse_unwrap_err(&format!(
+            "datasource db {{\n provider = \"kingbase-oracle\"\n}}\nmodel Item {{\n id Int @id\n value Decimal @db.{native}\n}}"
+        ));
+        assert!(error.contains(expected_error), "{native}: {error}");
+    }
+    let error = parse_unwrap_err(
+        "datasource db {\n provider = \"kingbase-oracle\"\n}\nmodel Item {\n id Int @id\n value String @db.Decimal(10,2)\n}",
+    );
+    assert!(
+        error.contains("not compatible with declared field type String"),
+        "{error}"
+    );
+}

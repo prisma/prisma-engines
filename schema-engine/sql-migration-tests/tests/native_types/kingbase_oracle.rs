@@ -99,3 +99,72 @@ fn all_supported_oracle_native_types_can_be_created_and_reintrospected(api: Test
         .assert_green()
         .assert_no_steps();
 }
+
+#[test_connector(tags(KingbaseOracle))]
+fn decimal_alias_roundtrips_without_repeated_migrations(mut api: TestApi) {
+    let schema = r#"
+        model DecimalAlias {
+            id Decimal @id @db.Decimal(10,0)
+            amount Decimal @db.Decimal(10,2)
+            unspecified Decimal @db.Decimal
+            precisionOnly Decimal @db.Decimal(10)
+            subunit Decimal @db.Decimal(2,3)
+        }
+    "#;
+    api.schema_push_w_datasource(schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.raw_cmd(r#"INSERT INTO "DecimalAlias" VALUES (90,1.256,1.25,1.25,0.1234)"#);
+    api.assert_schema().assert_table("DecimalAlias", |table| {
+        table
+            .assert_column("id", |column| {
+                column.assert_native_type("Number(10,0)", KINGBASE_ORACLE)
+            })
+            .assert_column("amount", |column| {
+                column.assert_native_type("Number(10,2)", KINGBASE_ORACLE)
+            })
+            .assert_column("unspecified", |column| {
+                column.assert_native_type("Number", KINGBASE_ORACLE)
+            })
+            .assert_column("precisionOnly", |column| {
+                column.assert_native_type("Number(10,0)", KINGBASE_ORACLE)
+            })
+            .assert_column("subunit", |column| {
+                column.assert_native_type("Number(3,3)", KINGBASE_ORACLE)
+            })
+    });
+    api.schema_push_w_datasource(schema)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+    let canonical = schema.replace("@db.Decimal", "@db.Number");
+    api.schema_push_w_datasource(&canonical)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+    let wider = schema.replace("Decimal(10,2)", "Decimal(12,2)");
+    api.schema_push_w_datasource(&wider)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push_w_datasource(&wider)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+    let row = api
+        .query_raw(
+            r#"SELECT amount,unspecified,"precisionOnly",subunit FROM "DecimalAlias" WHERE id=90"#,
+            &[],
+        )
+        .into_single()
+        .unwrap();
+    for (column, expected) in [
+        ("amount", "1.26"),
+        ("unspecified", "1.25"),
+        ("precisionOnly", "1"),
+        ("subunit", "0.123"),
+    ] {
+        assert_eq!(row.get(column).unwrap().as_numeric(), Some(&expected.parse().unwrap()));
+    }
+}

@@ -200,26 +200,46 @@ fn fulltext_document(columns: &str) -> String {
 }
 
 fn is_fulltext_relevance_expression(sql: &str, match_start: usize, against_end: usize) -> bool {
-    let before_match = &sql[..match_start];
-    let last_order_by = before_match.rfind("ORDER BY ");
-    let last_where = before_match.rfind(" WHERE ");
+    let bytes = sql.as_bytes();
+    let mut relevance = false;
+    let mut scopes = Vec::new();
+    let mut index = 0;
 
-    if last_order_by.is_some_and(|order_by| last_where.is_none_or(|where_clause| order_by > where_clause)) {
-        return true;
+    // Cursor scores are selected in nested queries. Track each scope so an
+    // outer FROM/WHERE or an inner ORDER BY cannot change another query's role.
+    while index < match_start {
+        if let Some(end) = non_code_end(sql, index) {
+            index = end;
+            continue;
+        }
+
+        match bytes[index] {
+            b'(' => scopes.push(relevance),
+            b')' => relevance = scopes.pop().unwrap_or(false),
+            byte if is_identifier_byte(byte) => {
+                let start = index;
+                while index < match_start && is_identifier_byte(bytes[index]) {
+                    index += 1;
+                }
+                match &sql[start..index] {
+                    "SELECT" => relevance = true,
+                    "FROM" | "WHERE" | "HAVING" | "ON" => relevance = false,
+                    "ORDER" if sql[skip_whitespace(sql, index)..].starts_with("BY ") => relevance = true,
+                    _ => {}
+                }
+                continue;
+            }
+            _ => {}
+        }
+        index += 1;
     }
 
-    // `text_search_relevance()` may be selected directly, before the first
-    // FROM clause, rather than only used as an ORDER BY expression.
-    if before_match.rfind(" FROM ").is_none() {
-        return true;
-    }
-
-    // A relevance expression can also be compared in a WHERE clause. A plain
-    // MATCH expression there is the Boolean filter form instead.
-    matches!(
-        sql[against_end + 1..].trim_start().as_bytes().first(),
-        Some(b'>' | b'<' | b'=')
-    )
+    relevance
+        || matches!(
+            sql[against_end + 1..].trim_start().as_bytes().first(),
+            Some(b'>' | b'<' | b'=')
+        )
+        || previous_non_whitespace(bytes, match_start).is_some_and(|pos| matches!(bytes[pos], b'>' | b'<' | b'='))
 }
 
 fn template_sql(fragments: Vec<Fragment>) -> (String, Vec<Fragment>) {
@@ -454,6 +474,7 @@ fn matching_parenthesis(sql: &str, open_paren: usize) -> Option<usize> {
 mod tests {
     use super::KingbaseMysql;
     use crate::Value;
+    use crate::ast::Order;
     use crate::ast::{
         Aliasable, Column, Comparable, Expression, IntoRaw, JsonPath, OpaqueType, Select, Table, ValueType,
         json_extract, json_unquote, native_uuid, text_search, text_search_relevance,
@@ -823,6 +844,57 @@ mod tests {
             let (_, params) =
                 KingbaseMysql::build(Select::from_table("User").so_that(search.clone().matches(query))).unwrap();
             assert_eq!(params, vec![Value::text(query)]);
+        }
+    }
+
+    #[test]
+    fn full_text_cursor_subquery_preserves_scores_and_parameters() {
+        let relevance: Expression = text_search_relevance(&[Column::from("name")], "John").into();
+        let cursor = Select::from_table("User")
+            .value(relevance.clone())
+            .so_that(Column::from("id").equals(7));
+        let query = Select::from_table("User")
+            .column("id")
+            .so_that(relevance.clone().less_than_or_equals(cursor))
+            .order_by((relevance, Some(Order::Desc)));
+        let (sql, params) = KingbaseMysql::build(query).unwrap();
+        let score = "ts_rank(to_tsvector('simple', COALESCE(`name`, '')), to_tsquery('simple', ?))";
+        assert_eq!(
+            sql,
+            format!(
+                "SELECT `id` FROM `User` WHERE {score} <= (SELECT {score} FROM `User` WHERE `id` = ?) ORDER BY {score} DESC"
+            )
+        );
+        assert_eq!(
+            params,
+            vec![
+                Value::text("John"),
+                Value::text("John"),
+                Value::int32(7),
+                Value::text("John")
+            ]
+        );
+    }
+
+    #[test]
+    fn full_text_rewrite_keeps_nested_query_roles_separate() {
+        let source = "MATCH(`name`)AGAINST (? IN BOOLEAN MODE)";
+        let score = "ts_rank(to_tsvector('simple', COALESCE(`name`, '')), to_tsquery('simple', ?))";
+        let filter = "to_tsvector('simple', COALESCE(`name`, '')) @@ to_tsquery('simple', ?)";
+        for query in [
+            "SELECT `id` FROM `User` WHERE SCORE <= (SELECT SCORE FROM `User` WHERE `id` = 1) ORDER BY SCORE DESC",
+            "SELECT (SELECT SCORE FROM `User` WHERE FILTER) FROM `User` WHERE FILTER ORDER BY SCORE DESC",
+            "SELECT `id` FROM `User` WHERE EXISTS (SELECT `id` FROM `User` ORDER BY SCORE) AND FILTER",
+            "SELECT `id` FROM `User` ORDER BY (SELECT SCORE FROM `User` WHERE FILTER), SCORE DESC",
+            "SELECT `id` FROM (SELECT `id` FROM `User` WHERE FILTER) AS `sub` WHERE FILTER ORDER BY SCORE DESC",
+            "SELECT ` WHERE `, ' FROM ', (SELECT SCORE FROM `User` /* WHERE */) FROM `User` WHERE FILTER ORDER BY SCORE",
+            "SELECT `id` FROM `User` WHERE 0 < SCORE AND FILTER",
+        ] {
+            let sql = query.replace("SCORE", source).replace("FILTER", source);
+            let params = vec![Value::text("John"); super::parameter_positions(&sql).len()];
+            let actual = super::rewrite_full_text_search(sql, &params).unwrap();
+            let expected = query.replace("SCORE", score).replace("FILTER", filter);
+            assert_eq!(actual, expected, "{query}");
         }
     }
 

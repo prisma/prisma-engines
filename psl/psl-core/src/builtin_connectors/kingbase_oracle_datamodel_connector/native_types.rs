@@ -74,3 +74,21 @@ crate::native_type_definition! {
     Uuid -> String,
     Xml -> String,
 }
+
+// SQL DECIMAL is reported as NUMBER by the catalog, so keep one internal type
+// for validation, rendering, and migration comparison.
+pub(crate) static CONSTRUCTORS_WITH_ALIASES: std::sync::LazyLock<Vec<NativeTypeConstructor>> =
+    std::sync::LazyLock::new(|| {
+        CONSTRUCTORS
+            .iter()
+            .cloned()
+            .chain(std::iter::once(NativeTypeConstructor {
+                name: "Decimal".into(),
+                number_of_args: 0,
+                number_of_optional_args: 2,
+                allowed_types: std::borrow::Cow::Owned(vec![crate::datamodel_connector::AllowedType::plain(
+                    crate::parser_database::ScalarFieldType::BuiltInScalar(crate::parser_database::ScalarType::Decimal),
+                )]),
+            }))
+            .collect()
+    });
