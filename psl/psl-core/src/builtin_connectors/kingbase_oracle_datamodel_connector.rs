@@ -3,19 +3,19 @@ mod validations;
 
 use std::borrow::Cow;
 
-use enumflags2::{BitFlags, make_bitflags};
+use enumflags2::{make_bitflags, BitFlags};
 use parser_database::{ExtensionTypes, ScalarFieldType};
 
 pub use native_types::{KingbaseOracleNumberArguments, KingbaseOracleType};
 
 use crate::{
-    ValidatedSchema,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode,
+        NativeTypeInstance, RelationMode, StringFilter,
     },
     diagnostics::{Diagnostics, Span},
-    parser_database::{ReferentialAction, ScalarType, walkers},
+    parser_database::{walkers, ReferentialAction, ScalarType},
+    ValidatedSchema,
 };
 
 use KingbaseOracleNumberArguments::*;
@@ -247,6 +247,20 @@ impl Connector for KingbaseOracleDatamodelConnector {
         native_type.downcast_ref::<KingbaseOracleType>().to_parts()
     }
 
+    fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {
+        match native_type_name {
+            Some(name) if name.eq_ignore_ascii_case("uuid") => "Uuid".into(),
+            _ => scalar_type_name.into(),
+        }
+    }
+
+    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
+        match input_object_name {
+            "Uuid" => BitFlags::empty(),
+            _ => BitFlags::all(),
+        }
+    }
+
     fn validate_url(&self, url: &str) -> Result<(), String> {
         if !url.starts_with("kingbase-oracle://") {
             return Err("must start with the protocol `kingbase-oracle://`.".to_owned());
@@ -257,5 +271,24 @@ impl Connector for KingbaseOracleDatamodelConnector {
 
     fn flavour(&self) -> Flavour {
         Flavour::KingbaseOracle
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn uuid_filters_are_distinct_from_strings_and_disable_string_operations() {
+        let connector = KingbaseOracleDatamodelConnector;
+        for native_name in ["Uuid", "uuid", "UUID"] {
+            let name = connector.scalar_filter_name("String".to_owned(), Some(native_name));
+            assert_eq!(name, "Uuid");
+            assert!(connector.string_filters(&name).is_empty());
+        }
+        for native_name in [None, Some("VarChar2"), Some("NVarChar2"), Some("Clob")] {
+            let name = connector.scalar_filter_name("String".to_owned(), native_name);
+            assert_eq!(name, "String");
+            assert_eq!(connector.string_filters(&name), BitFlags::all());
+        }
     }
 }
