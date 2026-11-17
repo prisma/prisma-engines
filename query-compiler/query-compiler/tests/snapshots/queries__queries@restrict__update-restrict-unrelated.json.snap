@@ -1,0 +1,15 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/restrict/update-restrict-unrelated.json
+snapshot_kind: text
+---
+transaction
+   dataMap affectedRows
+   let 0 = query «SELECT "public"."Parent"."id" FROM "public"."Parent" WHERE
+                  "public"."Parent"."id" = $1 OFFSET $2»
+           params [const(BigInt(1)), const(BigInt(0))]
+   in let 0$id = mapField id (get 0)
+      in execute «UPDATE "public"."Parent" SET "name" = $1 WHERE
+                  ("public"."Parent"."id" IN [$2,*] AND 1=1)»
+         params [const(String("updated")), var(0$id as Int)]

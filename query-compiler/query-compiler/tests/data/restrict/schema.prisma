@@ -1,0 +1,20 @@
+datasource db {
+  provider     = "postgresql"
+  relationMode = "prisma"
+}
+
+model Parent {
+  id       Int     @id
+  key      Int
+  name     String
+  children Child[]
+
+  @@unique([id, key])
+}
+
+model Child {
+  id        Int    @id
+  parentId  Int
+  parentKey Int
+  parent    Parent @relation(fields: [parentId, parentKey], references: [id, key], onUpdate: Restrict)
+}

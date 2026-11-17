@@ -10,11 +10,11 @@ use std::{fs, process::Command, sync::Arc};
 
 #[test]
 fn queries() {
-    insta::glob!("data/*.json", |path| {
+    insta::glob!("data/**/*.json", |path| {
         let test_name = path.file_name().unwrap().display();
         println!("running: {test_name}");
 
-        let schema_string = include_str!("data/schema.prisma");
+        let schema_string = fs::read_to_string(path.parent().unwrap().join("schema.prisma")).unwrap();
         let schema = psl::validate_without_extensions(schema_string.into());
 
         assert!(!schema.diagnostics.has_errors(), "{:?}", schema.diagnostics);
@@ -45,7 +45,7 @@ fn queries() {
             .unwrap();
 
         let dot = graph.to_graphviz();
-        let tests_path = path.parent().unwrap().parent().unwrap();
+        let tests_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests");
         let graphs_path = tests_path.join("graphs");
         let dot_path = graphs_path.join(path.file_name().unwrap()).with_extension("dot");
 

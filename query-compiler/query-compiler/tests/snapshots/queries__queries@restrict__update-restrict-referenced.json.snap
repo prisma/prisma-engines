@@ -1,0 +1,26 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/restrict/update-restrict-referenced.json
+snapshot_kind: text
+---
+transaction
+   dataMap affectedRows
+   let 0 = query «SELECT "public"."Parent"."id", "public"."Parent"."key" FROM
+                  "public"."Parent" WHERE "public"."Parent"."id" = $1 OFFSET $2»
+           params [const(BigInt(1)), const(BigInt(0))]
+   in let 0$id = mapField id (get 0);
+          0$key = mapField key (get 0)
+      in let 3 = query «SELECT "public"."Child"."id",
+                        "public"."Child"."parentId",
+                        "public"."Child"."parentKey" FROM "public"."Child" WHERE
+                        (1=1 AND "public"."Child"."parentId" IN [$1,*] AND
+                        "public"."Child"."parentKey" IN [$2,*]) OFFSET $3»
+                 params [var(0$id as Int), var(0$key as Int), const(BigInt(0))]
+         in let 3 = validate (get 3)
+                [ rowCountEq 0
+                ] orRaise "RELATION_VIOLATION"
+            in let 0$id = mapField id (get 0)
+               in execute «UPDATE "public"."Parent" SET "id" = $1 WHERE
+                           ("public"."Parent"."id" IN [$2,*] AND 1=1)»
+                  params [const(BigInt(2)), var(0$id as Int)]

@@ -824,19 +824,22 @@ pub fn emulate_on_update_restrict(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    let noop_node = graph.create_node(Node::Empty);
     let relation_field = relation_field.related_field();
-    let child_model_identifier = relation_field.related_model().shard_aware_primary_identifier();
-    let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
-
     let linking_fields = relation_field.linking_fields();
 
     // Unwraps are safe as in this stage, no node content can be replaced.
     let parent_update_args = extract_update_args(graph.node_content(child_node).unwrap());
-
     let linking_fields_updated = linking_fields
         .into_iter()
         .any(|parent_pk| parent_update_args.get_field_value(&parent_pk.db_name()).is_some());
+
+    if !linking_fields_updated {
+        return Ok(());
+    }
+
+    let noop_node = graph.create_node(Node::Empty);
+    let child_model_identifier = relation_field.related_model().shard_aware_primary_identifier();
+    let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
 
     graph.create_edge(
         &read_node,
@@ -844,12 +847,7 @@ pub fn emulate_on_update_restrict(
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
             RowSink::Discard,
-            // If any linking fields are to be updated and there are already connected children, then fail
-            if linking_fields_updated {
-                Some(DataExpectation::empty_rows(RelationViolation::from(relation_field)))
-            } else {
-                None
-            },
+            Some(DataExpectation::empty_rows(RelationViolation::from(relation_field))),
         ),
     )?;
 
