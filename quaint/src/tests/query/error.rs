@@ -147,6 +147,10 @@ async fn expression_based_unique_index(api: &mut dyn TestApi) -> crate::Result<(
 
 #[test_each_connector]
 async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
+    if api.connector_tag().intersects(Tags::KINGBASE_MYSQL) {
+        api.conn().raw_cmd("SET SQL_MODE = 'STRICT_ALL_TABLES'").await?;
+    }
+
     let table = api.create_temp_table("id1 int not null, id2 int not null").await?;
 
     let res = api.conn().insert(Insert::single_into(&table).into()).await;
@@ -181,6 +185,10 @@ async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
 
 #[test_each_connector(tags("mysql"))]
 async fn int_unsigned_negative_value_out_of_range(api: &mut dyn TestApi) -> crate::Result<()> {
+    if api.connector_tag().intersects(Tags::KINGBASE_MYSQL) {
+        api.conn().raw_cmd("SET SQL_MODE = 'STRICT_ALL_TABLES'").await?;
+    }
+
     let table = api
         .create_temp_table("id int4 auto_increment primary key, big int4 unsigned")
         .await?;
@@ -221,9 +229,18 @@ async fn bigint_unsigned_positive_value_out_of_range(api: &mut dyn TestApi) -> c
     Ok(())
 }
 
-#[test_each_connector(tags("mysql", "mssql", "postgresql"))]
+#[test_each_connector(tags("mysql", "mssql", "postgresql", "kingbase-oracle"))]
 async fn length_mismatch(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_temp_table("value varchar(3)").await?;
+    if api.connector_tag().intersects(Tags::KINGBASE_MYSQL) {
+        api.conn().raw_cmd("SET SQL_MODE = 'STRICT_ALL_TABLES'").await?;
+    }
+
+    let column = if api.connector_tag().contains(Tags::KINGBASE_ORACLE) {
+        "value varchar2(3)"
+    } else {
+        "value varchar(3)"
+    };
+    let table = api.create_temp_table(column).await?;
     let insert = Insert::single_into(&table).value("value", "fooo");
 
     let result = api.conn().insert(insert.into()).await;
@@ -235,7 +252,7 @@ async fn length_mismatch(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[test_each_connector(tags("postgresql", "sqlite"))]
+#[test_each_connector(tags("postgresql", "sqlite", "kingbase-oracle"))]
 async fn foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let parent = api.create_temp_table("id smallint not null primary key").await?;
     let foreign_key = api.foreign_key(&parent, "id", "parent_id");
@@ -289,7 +306,9 @@ async fn ms_my_foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate:
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+// KingbaseES rejects zero datetimes at DDL time, so it cannot reach the
+// MySQL result-decoding behavior tested below.
+#[test_each_connector(tags("mysql"), ignore("kingbase-mysql"))]
 async fn garbage_datetime_values(api: &mut dyn TestApi) -> crate::Result<()> {
     api.conn()
         .raw_cmd("set @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO'")
@@ -463,12 +482,47 @@ async fn sqlite_isolation_error(api: &mut dyn TestApi) -> crate::Result<()> {
 }
 
 // Postgres and MySQL error on Snapshot.
-#[test_each_connector(tags("postgresql", "mysql"))]
+#[test_each_connector(tags("postgresql", "mysql", "kingbase-oracle"))]
 async fn snapshot_isolation_error(api: &mut dyn TestApi) -> crate::Result<()> {
     let res = api.conn().start_transaction(Some(IsolationLevel::Snapshot)).await;
 
     let err = res.err().expect("Postgres/MySQL must fail on isolation SNAPSHOT");
     assert_eq!(err.to_string(), "Invalid isolation level: SNAPSHOT");
+
+    Ok(())
+}
+
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn kingbase_oracle_unsupported_isolation_levels_are_rejected(api: &mut dyn TestApi) -> crate::Result<()> {
+    for isolation_level in [IsolationLevel::ReadUncommitted, IsolationLevel::RepeatableRead] {
+        let err = match api.conn().start_transaction(Some(isolation_level)).await {
+            Ok(_) => panic!("Kingbase Oracle must reject unsupported isolation levels"),
+            Err(err) => err,
+        };
+
+        assert_eq!(err.to_string(), format!("Invalid isolation level: {isolation_level}"));
+    }
+
+    Ok(())
+}
+
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn kingbase_oracle_unsupported_ast_features_are_rejected(api: &mut dyn TestApi) -> crate::Result<()> {
+    let upsert: Insert<'_> = Insert::single_into("items").value("id", 1).value("value", 1).into();
+    let update = Update::table("items").set("id", 2);
+    let err = api
+        .conn()
+        .execute(upsert.on_conflict(OnConflict::Update(update, vec!["id".into()])).into())
+        .await
+        .expect_err("Kingbase Oracle must reject a MERGE upsert that updates its conflict constraint");
+    assert!(err.to_string().contains("updating a conflict constraint"));
+
+    let err = api
+        .conn()
+        .select(Select::default().value(Value::array(vec![Value::int32(1)]).raw()))
+        .await
+        .expect_err("Kingbase Oracle must reject SQL array literals");
+    assert!(err.to_string().contains("array literal"));
 
     Ok(())
 }

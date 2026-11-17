@@ -18,11 +18,15 @@ default = []
 sql = ["quaint"]
 all-native = [
     "postgresql-native",
+    "kingbase-mysql-native",
+    "kingbase-oracle-native",
     "mssql-native",
     "mysql-native",
     "sqlite-native",
 ]
 postgresql-native = ["quaint/postgresql-native"]
+kingbase-mysql-native = ["quaint/kingbase-mysql-native"]
+kingbase-oracle-native = ["quaint/kingbase-oracle-native"]
 mssql-native = ["quaint/mssql-native"]
 mysql-native = ["quaint/mysql-native"]
 sqlite-native = ["quaint/sqlite-native"]

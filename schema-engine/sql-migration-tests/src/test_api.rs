@@ -1,4 +1,4 @@
-pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
+pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion, integer_value};
 pub use expect_test::expect;
 pub use schema_core::{
     json_rpc::types::{
@@ -373,6 +373,10 @@ impl TestApi {
         self.root.is_postgres()
     }
 
+    pub fn is_kingbase_oracle(&self) -> bool {
+        self.tags().contains(Tags::KingbaseOracle)
+    }
+
     /// Returns true only when testing on postgres version 15.
     pub fn is_postgres_15(&self) -> bool {
         self.root.is_postgres_15()
@@ -483,7 +487,11 @@ impl TestApi {
     }
 
     pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {
-        if self.lower_cases_table_names() {
+        if self.lower_cases_table_names()
+            || (self.is_kingbase_oracle()
+                && identifier.is_ascii()
+                && !identifier.bytes().any(|b| b.is_ascii_lowercase()))
+        {
             identifier.to_ascii_lowercase().into()
         } else {
             identifier.into()

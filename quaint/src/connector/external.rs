@@ -55,6 +55,9 @@ pub enum AdapterProvider {
     Mysql,
     #[cfg(feature = "postgresql")]
     Postgres,
+    #[cfg(feature = "kingbase-oracle")]
+    #[cfg_attr(target_arch = "wasm32", serde(rename = "kingbase-oracle"))]
+    KingbaseOracle,
     #[cfg(feature = "sqlite")]
     Sqlite,
     #[cfg(feature = "mssql")]
@@ -69,6 +72,8 @@ impl AdapterProvider {
             Self::Mysql => "mysql",
             #[cfg(feature = "postgresql")]
             Self::Postgres => "postgresql",
+            #[cfg(feature = "kingbase-oracle")]
+            Self::KingbaseOracle => "kingbase-oracle",
             #[cfg(feature = "sqlite")]
             Self::Sqlite => "sqlite",
             #[cfg(feature = "mssql")]
@@ -86,6 +91,8 @@ impl FromStr for AdapterProvider {
             "postgres" => Ok(Self::Postgres),
             #[cfg(feature = "mysql")]
             "mysql" => Ok(Self::Mysql),
+            #[cfg(feature = "kingbase-oracle")]
+            "kingbase-oracle" => Ok(Self::KingbaseOracle),
             #[cfg(feature = "sqlite")]
             "sqlite" => Ok(Self::Sqlite),
             #[cfg(feature = "mssql")]
@@ -102,6 +109,8 @@ impl From<&AdapterProvider> for SqlFamily {
             AdapterProvider::Mysql => SqlFamily::Mysql,
             #[cfg(feature = "postgresql")]
             AdapterProvider::Postgres => SqlFamily::Postgres,
+            #[cfg(feature = "kingbase-oracle")]
+            AdapterProvider::KingbaseOracle => SqlFamily::KingbaseOracle,
             #[cfg(feature = "sqlite")]
             AdapterProvider::Sqlite => SqlFamily::Sqlite,
             #[cfg(feature = "mssql")]
@@ -117,6 +126,7 @@ pub struct ExternalConnectionInfo {
     pub schema_name: Option<String>,
     pub max_bind_values: Option<usize>,
     pub supports_relation_joins: bool,
+    kingbase_mysql: bool,
 }
 
 impl ExternalConnectionInfo {
@@ -131,7 +141,17 @@ impl ExternalConnectionInfo {
             schema_name,
             max_bind_values,
             supports_relation_joins,
+            kingbase_mysql: false,
         }
+    }
+
+    pub fn with_kingbase_mysql(mut self) -> Self {
+        self.kingbase_mysql = true;
+        self
+    }
+
+    pub(crate) fn is_kingbase_mysql(&self) -> bool {
+        self.kingbase_mysql
     }
 }
 
@@ -158,4 +178,17 @@ pub trait ExternalConnectorFactory: Send + Sync {
     fn provider(&self) -> AdapterProvider;
     async fn connect(&self) -> crate::Result<Arc<dyn ExternalConnector>>;
     async fn connect_to_shadow_db(&self) -> Option<crate::Result<Arc<dyn ExternalConnector>>>;
+}
+
+#[cfg(all(test, feature = "kingbase-oracle"))]
+mod tests {
+    use super::{AdapterProvider, SqlFamily};
+
+    #[test]
+    fn kingbase_oracle_adapter_provider_keeps_its_sql_family() {
+        let provider: AdapterProvider = "kingbase-oracle".parse().unwrap();
+
+        assert_eq!(provider.db_system_name(), "kingbase-oracle");
+        assert_eq!(SqlFamily::from(&provider), SqlFamily::KingbaseOracle);
+    }
 }

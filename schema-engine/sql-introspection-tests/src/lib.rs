@@ -1,3 +1,4 @@
+mod oracle_ddl;
 pub mod test_api;
 
 use barrel::Migration;
@@ -9,7 +10,7 @@ pub type TestResult = Result<()>;
 
 pub struct BarrelMigrationExecutor {
     database: Quaint,
-    sql_variant: barrel::backend::SqlVariant,
+    sql_variant: Option<barrel::backend::SqlVariant>,
     schema_name: String,
     tags: BitFlags<Tags>,
 }
@@ -36,7 +37,10 @@ impl BarrelMigrationExecutor {
 
         migration_fn(&mut migration);
 
-        let full_sql = migration.make_from(self.sql_variant);
+        let full_sql = match self.sql_variant {
+            Some(variant) => migration.make_from(variant),
+            None => oracle_ddl::render(&migration),
+        };
 
         if full_sql.is_empty() {
             return Ok(());

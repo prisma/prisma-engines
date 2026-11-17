@@ -299,62 +299,66 @@ fn must_error_if_using_non_id_auto_increment_on_sqlite() {
 
 #[test]
 fn must_error_if_using_multiple_auto_increment_on_mysql() {
-    let dml = indoc! {r#"
-        datasource db1 {
-          provider = "mysql"
-        }
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = formatdoc! {r#"
+            datasource db1 {{
+              provider = "{provider}"
+            }}
 
-        model Model {
-          id      Int @id
-          non_id  Int @default(autoincrement()) @unique
-          non_id2  Int @default(autoincrement()) @unique
-        }
-    "#};
+            model Model {{
+              id      Int @id
+              non_id  Int @default(autoincrement()) @unique
+              non_id2  Int @default(autoincrement()) @unique
+            }}
+        "#};
 
-    let error = parse_unwrap_err(dml);
+        let error = parse_unwrap_err(&dml);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
-        [1;94m   | [0m
-        [1;94m 4 | [0m
-        [1;94m 5 | [0m[1;91mmodel Model {[0m
-        [1;94m 6 | [0m  id      Int @id
-        [1;94m 7 | [0m  non_id  Int @default(autoincrement()) @unique
-        [1;94m 8 | [0m  non_id2  Int @default(autoincrement()) @unique
-        [1;94m 9 | [0m}
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.[0m
+              [1;94m-->[0m  [4mschema.prisma:5[0m
+            [1;94m   | [0m
+            [1;94m 4 | [0m
+            [1;94m 5 | [0m[1;91mmodel Model {[0m
+            [1;94m 6 | [0m  id      Int @id
+            [1;94m 7 | [0m  non_id  Int @default(autoincrement()) @unique
+            [1;94m 8 | [0m  non_id2  Int @default(autoincrement()) @unique
+            [1;94m 9 | [0m}
+            [1;94m   | [0m
+        "#]];
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
 fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
-    let dml = indoc! {r#"
-        datasource db1 {
-          provider = "mysql"
-        }
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = formatdoc! {r#"
+            datasource db1 {{
+              provider = "{provider}"
+            }}
 
-        model Model {
-          id      Int @id
-          non_id  Int @default(autoincrement())
-        }
-    "#};
+            model Model {{
+              id      Int @id
+              non_id  Int @default(autoincrement())
+            }}
+        "#};
 
-    let error = parse_unwrap_err(dml);
+        let error = parse_unwrap_err(&dml);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.[0m
-          [1;94m-->[0m  [4mschema.prisma:7[0m
-        [1;94m   | [0m
-        [1;94m 6 | [0m  id      Int @id
-        [1;94m 7 | [0m  [1;91mnon_id  Int @default(autoincrement())[0m
-        [1;94m 8 | [0m}
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.[0m
+              [1;94m-->[0m  [4mschema.prisma:7[0m
+            [1;94m   | [0m
+            [1;94m 6 | [0m  id      Int @id
+            [1;94m 7 | [0m  [1;91mnon_id  Int @default(autoincrement())[0m
+            [1;94m 8 | [0m}
+            [1;94m   | [0m
+        "#]];
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
@@ -506,33 +510,35 @@ fn dbgenerated_default_errors_must_not_cascade_into_other_errors() {
 
 #[test]
 fn named_default_constraints_should_not_work_on_non_sql_server() {
-    let dml = indoc! { r#"
-        datasource test {
-          provider = "postgres"
-        }
+    for provider in ["postgres", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = formatdoc! { r#"
+            datasource test {{
+              provider = "{provider}"
+            }}
 
-        generator js {
-          provider = "prisma-client"
-        }
+            generator js {{
+              provider = "prisma-client"
+            }}
 
-        model A {
-          id Int @id @default(autoincrement())
-          data String @default("beeb buub", map: "meow")
-        }
-    "#};
+            model A {{
+              id Int @id @default(autoincrement())
+              data String @default("beeb buub", map: "meow")
+            }}
+        "#};
 
-    let error = parse_unwrap_err(dml);
+        let error = parse_unwrap_err(&dml);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": You defined a database name for the default value of a field on the model. This is not supported by the provider.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
-        [1;94m   | [0m
-        [1;94m10 | [0m  id Int @id @default(autoincrement())
-        [1;94m11 | [0m  data String [1;91m@default("beeb buub", map: "meow")[0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@default": You defined a database name for the default value of a field on the model. This is not supported by the provider.[0m
+              [1;94m-->[0m  [4mschema.prisma:11[0m
+            [1;94m   | [0m
+            [1;94m10 | [0m  id Int @id @default(autoincrement())
+            [1;94m11 | [0m  data String [1;91m@default("beeb buub", map: "meow")[0m
+            [1;94m   | [0m
+        "#]];
 
-    expectation.assert_eq(&error)
+        expectation.assert_eq(&error)
+    }
 }
 
 #[test]
@@ -891,28 +897,32 @@ fn must_error_if_using_auto_with_postgres() {
 
 #[test]
 fn must_error_if_using_auto_with_mysql() {
-    let schema = r#"
-        datasource db {
-            provider = "mysql"
-        }
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = format!(
+            r#"
+        datasource db {{
+            provider = "{provider}"
+        }}
 
-        model User {
+        model User {{
             id String @id @default(auto())
-        }
-    "#;
+        }}
+    "#
+        );
 
-    let error = parse_unwrap_err(schema);
+        let error = parse_unwrap_err(&schema);
 
-    let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
-          [1;94m-->[0m  [4mschema.prisma:7[0m
-        [1;94m   | [0m
-        [1;94m 6 | [0m        model User {
-        [1;94m 7 | [0m            id String @id @default([1;91mauto()[0m)
-        [1;94m   | [0m
-    "#]];
+        let expected = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
+              [1;94m-->[0m  [4mschema.prisma:7[0m
+            [1;94m   | [0m
+            [1;94m 6 | [0m        model User {
+            [1;94m 7 | [0m            id String @id @default([1;91mauto()[0m)
+            [1;94m   | [0m
+        "#]];
 
-    expected.assert_eq(&error)
+        expected.assert_eq(&error)
+    }
 }
 
 #[test]
@@ -1135,28 +1145,32 @@ fn nested_scalar_list_defaults_are_disallowed() {
 
 #[test]
 fn scalar_list_default_on_connector_without_scalar_lists() {
-    let schema = r#"
-        datasource db {
-            provider = "sqlserver"
-        }
+    for provider in ["sqlserver", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = format!(
+            r#"
+        datasource db {{
+            provider = "{provider}"
+        }}
 
-        model Pizza {
+        model Pizza {{
             id Int @id
             toppings String[] @default(["reblochon cheese", "potato", "rosmarin", "onions"])
-        }
-    "#;
+        }}
+    "#
+        );
 
-    let expected = expect![[r#"
-        [1;91merror[0m: [1mField "toppings" in model "Pizza" can't be a list. The current connector does not support lists of primitive types.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m            id Int @id
-        [1;94m 8 | [0m            [1;91mtoppings String[] @default(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
-        [1;94m 9 | [0m        }
-        [1;94m   | [0m
-    "#]];
+        let expected = expect![[r#"
+            [1;91merror[0m: [1mField "toppings" in model "Pizza" can't be a list. The current connector does not support lists of primitive types.[0m
+              [1;94m-->[0m  [4mschema.prisma:8[0m
+            [1;94m   | [0m
+            [1;94m 7 | [0m            id Int @id
+            [1;94m 8 | [0m            [1;91mtoppings String[] @default(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
+            [1;94m 9 | [0m        }
+            [1;94m   | [0m
+        "#]];
 
-    expect_error(schema, &expected);
+        expect_error(&schema, &expected);
+    }
 }
 
 #[test]

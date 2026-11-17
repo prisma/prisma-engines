@@ -100,7 +100,7 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         ctx: &Context<'_>,
     ) -> Expression<'static> {
         let virtuals = self.build_json_obj_virtual_selection(rs.virtuals(), parent_alias, ctx);
-        let build_obj_params = json_obj_selections(rs)
+        let build_obj_params = json_obj_selections(rs, ctx)
             .filter_map(|field| match field {
                 SelectedField::Scalar(sf) => Some((
                     Cow::from(sf.name().to_owned()),

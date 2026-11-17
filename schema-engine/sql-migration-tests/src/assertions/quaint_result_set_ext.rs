@@ -1,5 +1,16 @@
 use quaint::{Value, ValueType, connector::ResultRowRef, prelude::ResultSet};
 
+/// Compare logical integer values independently of the wire representation:
+/// Oracle NUMBER columns arrive as Numeric, including Prisma Int columns.
+pub fn integer_value(value: &Value<'_>) -> Option<i64> {
+    use bigdecimal::{BigDecimal, ToPrimitive};
+    value.as_integer().or_else(|| {
+        let numeric = value.as_numeric()?;
+        let integer = numeric.to_i64()?;
+        (numeric == &BigDecimal::from(integer)).then_some(integer)
+    })
+}
+
 pub trait ResultSetExt: Sized {
     fn assert_row_count(self, expected_count: usize) -> Self;
 
@@ -103,7 +114,7 @@ impl RowAssertion<'_> {
     }
 
     pub fn assert_int_value(self, column_name: &str, expected_value: i64) -> Self {
-        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_integer());
+        let actual_value = self.0.get(column_name).and_then(integer_value);
 
         assert!(
             actual_value == Some(expected_value),

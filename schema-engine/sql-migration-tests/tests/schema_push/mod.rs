@@ -164,7 +164,7 @@ fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide
     api.schema_push_w_datasource(dm).send().assert_green();
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, KingbaseMysql))]
 fn alter_constraint_name_push(api: TestApi) {
     let plain_dm = r#"
          model A {
@@ -188,7 +188,7 @@ fn alter_constraint_name_push(api: TestApi) {
      "#;
 
     api.schema_push_w_datasource(plain_dm).send().assert_green();
-    let no_named_pk = api.is_sqlite() || api.is_mysql();
+    let no_named_pk = api.is_sqlite() || api.is_mysql() || api.tags().contains(Tags::KingbaseMysql);
 
     let (singular_id, compound_id) = if no_named_pk {
         ("", "")
@@ -242,7 +242,7 @@ fn alter_constraint_name_push(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Sqlite, Mysql))]
+#[test_connector(exclude(Sqlite, Mysql, KingbaseMysql))]
 fn alter_constraint_name_and_alter_columns_at_same_time_push(api: TestApi) {
     let dm1 = r#"
          model A {
@@ -518,7 +518,7 @@ fn schema_push_with_invalid_schema_filters(api: TestApi) {
     }
     "#;
 
-    let (expected_error_code, table_name) = if api.is_postgres() || api.is_mssql() {
+    let (expected_error_code, table_name) = if api.is_postgres() || api.is_mssql() || api.is_kingbase_oracle() {
         ("P3023", "ExternalTable")
     } else {
         ("P3024", "public.ExternalTable")

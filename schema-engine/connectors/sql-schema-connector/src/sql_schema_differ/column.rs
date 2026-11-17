@@ -121,7 +121,7 @@ fn defaults_match(cols: MigrationPair<TableColumnWalker<'_>>, flavour: &dyn SqlS
         (None, Some(DefaultKind::Now)) => false,
 
         (Some(DefaultKind::DbGenerated(Some(prev))), Some(DefaultKind::DbGenerated(Some(next)))) => {
-            (prev.eq_ignore_ascii_case(next)) && names_match
+            flavour.dbgenerated_defaults_match(cols, prev, next) && names_match
         }
         (_, Some(DefaultKind::DbGenerated(_))) => false,
         (_, Some(DefaultKind::Sequence(_))) => true,

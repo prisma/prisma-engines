@@ -335,7 +335,7 @@ async fn mapped_field_name(api: &mut TestApi) -> TestResult {
 async fn mapped_enum_name(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
-    if sql_family.is_postgres() {
+    if sql_family.is_postgres() || sql_family.is_kingbase_oracle() {
         api.raw_cmd("CREATE TYPE color AS ENUM ( \'black\', \'white\')").await;
     }
 
@@ -344,7 +344,7 @@ async fn mapped_enum_name(api: &mut TestApi) -> TestResult {
             migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
 
-                let typ = if sql_family.is_postgres() {
+                let typ = if sql_family.is_postgres() || sql_family.is_kingbase_oracle() {
                     "color"
                 } else {
                     "ENUM ('black', 'white')"
@@ -359,7 +359,7 @@ async fn mapped_enum_name(api: &mut TestApi) -> TestResult {
         })
         .await?;
 
-    let enum_name = if sql_family.is_postgres() {
+    let enum_name = if sql_family.is_postgres() || sql_family.is_kingbase_oracle() {
         "color"
     } else {
         "User_color"
@@ -724,93 +724,93 @@ async fn custom_virtual_relation_field_names(api: &mut TestApi) -> TestResult {
 async fn custom_model_order(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("A", |t| {
+            migration.create_table("ModelA", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("A_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("ModelA_pkey", types::primary_constraint(vec!["id"]));
             });
-            migration.create_table("B", |t| {
+            migration.create_table("ModelB", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("B_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("ModelB_pkey", types::primary_constraint(vec!["id"]));
             });
-            migration.create_table("J", |t| {
+            migration.create_table("ModelJ", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("J_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("ModelJ_pkey", types::primary_constraint(vec!["id"]));
             });
-            migration.create_table("F", |t| {
+            migration.create_table("ModelF", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("F_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("ModelF_pkey", types::primary_constraint(vec!["id"]));
             });
-            migration.create_table("Z", |t| {
+            migration.create_table("ModelZ", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Z_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("ModelZ_pkey", types::primary_constraint(vec!["id"]));
             });
-            migration.create_table("M", |t| {
+            migration.create_table("ModelM", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("M_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("ModelM_pkey", types::primary_constraint(vec!["id"]));
             });
-            migration.create_table("L", |t| {
+            migration.create_table("ModelL", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("L_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("ModelL_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
 
     let input_dm = indoc! {r#"
-        model B {
+        model ModelB {
             id               Int @id @default(autoincrement())
         }
 
-        model A {
+        model ModelA {
             id               Int @id @default(autoincrement())
         }
 
-        model F {
+        model ModelF {
             id               Int @id @default(autoincrement())
         }
 
-        model C {
+        model ModelC {
             id               Int @id @default(autoincrement())
         }
 
-        model J {
+        model ModelJ {
             id               Int @id @default(autoincrement())
         }
 
-        model Z {
+        model ModelZ {
             id               Int @id @default(autoincrement())
         }
 
-        model K {
+        model ModelK {
             id               Int @id @default(autoincrement())
         }
     "#};
 
     let final_dm = indoc! {r#"
-        model B {
+        model ModelB {
             id               Int @id @default(autoincrement())
         }
 
-        model A {
+        model ModelA {
             id               Int @id @default(autoincrement())
         }
 
-        model F {
+        model ModelF {
             id               Int @id @default(autoincrement())
         }
 
-        model J {
+        model ModelJ {
             id               Int @id @default(autoincrement())
         }
 
-        model Z {
+        model ModelZ {
             id               Int @id @default(autoincrement())
         }
 
-        model L {
+        model ModelL {
             id               Int @id @default(autoincrement())
         }
 
-        model M {
+        model ModelM {
             id               Int @id @default(autoincrement())
         }
     "#};
@@ -1229,36 +1229,36 @@ async fn updated_at(api: &mut TestApi) {
 async fn multiple_many_to_many_on_same_model(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("A", |t| {
+            migration.create_table("ModelA", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("A_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("ModelA_pkey", types::primary_constraint(vec!["id"]));
             });
 
-            migration.create_table("B", |t| {
+            migration.create_table("ModelB", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("B_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("ModelB_pkey", types::primary_constraint(vec!["id"]));
             });
 
-            migration.create_table("_AToB", |t| {
+            migration.create_table("_ModelAToModelB", |t| {
                 t.add_column("A", types::integer().nullable(false));
                 t.add_column("B", types::integer().nullable(false));
 
                 t.add_index("test2", types::index(vec!["A", "B"]).unique(true));
                 t.add_index("test4", types::index(vec!["B"]));
 
-                t.add_foreign_key(&["A"], "A", &["id"]);
-                t.add_foreign_key(&["B"], "B", &["id"]);
+                t.add_foreign_key(&["A"], "ModelA", &["id"]);
+                t.add_foreign_key(&["B"], "ModelB", &["id"]);
             });
 
-            migration.create_table("_AToB2", |t| {
+            migration.create_table("_ModelAToModelB2", |t| {
                 t.add_column("A", types::integer().nullable(false));
                 t.add_column("B", types::integer().nullable(false));
 
                 t.add_index("test", types::index(vec!["A", "B"]).unique(true));
                 t.add_index("test3", types::index(vec!["B"]));
 
-                t.add_foreign_key(&["A"], "A", &["id"]);
-                t.add_foreign_key(&["B"], "B", &["id"]);
+                t.add_foreign_key(&["A"], "ModelA", &["id"]);
+                t.add_foreign_key(&["B"], "ModelB", &["id"]);
             });
 
             migration.create_table("Unrelated", |t| {
@@ -1269,30 +1269,30 @@ async fn multiple_many_to_many_on_same_model(api: &mut TestApi) -> TestResult {
         .await?;
 
     let input_dm = indoc! {r#"
-        model B {
+        model ModelB {
             id              Int @id @default(autoincrement())
-            custom_A        A[]
-            special_A       A[] @relation("AToB2")
+            custom_A        ModelA[]
+            special_A       ModelA[] @relation("ModelAToModelB2")
         }
 
-        model A {
+        model ModelA {
             id              Int @id @default(autoincrement())
-            custom_B        B[]
-            special_B       B[] @relation("AToB2")
+            custom_B        ModelB[]
+            special_B       ModelB[] @relation("ModelAToModelB2")
         }
     "#};
 
     let final_dm = expect![[r#"
-        model B {
-          id        Int @id @default(autoincrement())
-          custom_A  A[] @relation("AToB")
-          special_A A[] @relation("AToB2")
+        model ModelB {
+          id        Int      @id @default(autoincrement())
+          custom_A  ModelA[] @relation("ModelAToModelB")
+          special_A ModelA[] @relation("ModelAToModelB2")
         }
 
-        model A {
-          id        Int @id @default(autoincrement())
-          custom_B  B[] @relation("AToB")
-          special_B B[] @relation("AToB2")
+        model ModelA {
+          id        Int      @id @default(autoincrement())
+          custom_B  ModelB[] @relation("ModelAToModelB")
+          special_B ModelB[] @relation("ModelAToModelB2")
         }
 
         model Unrelated {

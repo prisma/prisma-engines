@@ -709,3 +709,47 @@ fn non_composite_field_in_the_middle_of_the_path() {
 
     expected.assert_eq(&error);
 }
+
+#[test]
+fn composite_type_indexes_require_composite_type_support() {
+    for provider in [crate::Provider::KingbaseMysql, crate::Provider::KingbaseOracle] {
+        let source = with_header(
+            indoc! {r#"
+                type Address {
+                  street String
+                }
+                model User {
+                  id Int @id
+                  address Address
+                  @@index([address.street])
+                }
+            "#},
+            provider,
+            &[],
+        );
+        let expect = match provider {
+            crate::Provider::KingbaseMysql => expect![[r#"
+                [1;91merror[0m: [1mError validating: Composite types are not supported on Kingbase MySQL.[0m
+                  [1;94m-->[0m  [4mschema.prisma:10[0m
+                [1;94m   | [0m
+                [1;94m 9 | [0m
+                [1;94m10 | [0m[1;91mtype Address {[0m
+                [1;94m11 | [0m  street String
+                [1;94m12 | [0m}
+                [1;94m   | [0m
+            "#]],
+            crate::Provider::KingbaseOracle => expect![[r#"
+                [1;91merror[0m: [1mError validating: Composite types are not supported on Kingbase Oracle.[0m
+                  [1;94m-->[0m  [4mschema.prisma:10[0m
+                [1;94m   | [0m
+                [1;94m 9 | [0m
+                [1;94m10 | [0m[1;91mtype Address {[0m
+                [1;94m11 | [0m  street String
+                [1;94m12 | [0m}
+                [1;94m   | [0m
+            "#]],
+            _ => unreachable!(),
+        };
+        expect.assert_eq(&parse_unwrap_err(&source));
+    }
+}

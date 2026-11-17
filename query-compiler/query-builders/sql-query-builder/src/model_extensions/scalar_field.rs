@@ -6,13 +6,14 @@ use crate::{
 use chrono::Utc;
 use prisma_value::{Placeholder as PrismaValuePlaceholder, PrismaValue};
 use quaint::{
-    ast::{EnumName, Value, ValueType},
+    ast::{EnumName, NativeColumnType, Value, ValueType},
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 use query_structure::{ScalarField, TypeIdentifier};
 
 pub(crate) trait ScalarFieldExt {
     fn value<'a>(&self, pv: PrismaValue, ctx: &Context<'_>) -> Value<'a>;
+    fn native_column_type(&self) -> Option<NativeColumnType<'static>>;
     fn type_family(&self) -> TypeFamily;
 }
 
@@ -79,10 +80,12 @@ impl ScalarFieldExt for ScalarField {
             ),
         };
 
-        match self.native_type() {
-            Some(nt) => value.with_native_column_type(Some((nt.name(), parse_scalar_length(self)))),
-            None => value,
-        }
+        value.with_native_column_type(self.native_column_type())
+    }
+
+    fn native_column_type(&self) -> Option<NativeColumnType<'static>> {
+        self.native_type()
+            .map(|nt| (nt.name(), parse_scalar_length(self)).into())
     }
 
     fn type_family(&self) -> TypeFamily {

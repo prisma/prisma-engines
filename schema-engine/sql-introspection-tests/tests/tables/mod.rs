@@ -53,7 +53,9 @@ async fn a_simple_table_with_gql_types(api: &mut TestApi) -> TestResult {
         })
         .await?;
 
-    let float_native = if api.sql_family().is_mssql() {
+    let float_native = if api.sql_family().is_kingbase_oracle() {
+        "@db.BinaryFloat"
+    } else if api.sql_family().is_mssql() {
         "@db.Real"
     } else if api.sql_family().is_mysql() {
         "@db.Float"
@@ -68,7 +70,9 @@ async fn a_simple_table_with_gql_types(api: &mut TestApi) -> TestResult {
         ""
     };
 
-    let text_native = if api.sql_family().is_mssql() || api.sql_family().is_mysql() {
+    let text_native = if api.sql_family().is_kingbase_oracle() {
+        "@db.Clob"
+    } else if api.sql_family().is_mssql() || api.sql_family().is_mysql() {
         "@db.Text"
     } else {
         ""
@@ -275,7 +279,9 @@ async fn a_table_with_default_values(api: &mut TestApi) -> TestResult {
     } else {
         ""
     };
-    let float_string = if api.sql_family().is_mysql() {
+    let float_string = if api.sql_family().is_kingbase_oracle() {
+        "@db.BinaryFloat"
+    } else if api.sql_family().is_mysql() {
         "@db.Float"
     } else if api.sql_family().is_mssql() {
         "@db.Real"
@@ -419,7 +425,9 @@ async fn default_values(api: &mut TestApi) -> TestResult {
     } else {
         ""
     };
-    let varchar_native = if api.sql_family().is_sqlite() {
+    let varchar_native = if api.sql_family().is_kingbase_oracle() {
+        "@db.VarChar2(5)"
+    } else if api.sql_family().is_sqlite() {
         ""
     } else if api.is_cockroach() {
         "@db.String(5)"
@@ -427,7 +435,9 @@ async fn default_values(api: &mut TestApi) -> TestResult {
         "@db.VarChar(5)"
     };
 
-    let float_native = if api.sql_family().is_mssql() {
+    let float_native = if api.sql_family().is_kingbase_oracle() {
+        "@db.BinaryFloat"
+    } else if api.sql_family().is_mssql() {
         "@db.Real"
     } else if api.sql_family().is_mysql() {
         "@db.Float"
@@ -719,7 +729,9 @@ async fn negative_default_values_should_work(api: &mut TestApi) -> TestResult {
         })
         .await?;
 
-    let float_native = if api.sql_family().is_mysql() {
+    let float_native = if api.sql_family().is_kingbase_oracle() {
+        "@db.BinaryFloat"
+    } else if api.sql_family().is_mysql() {
         "@db.Float"
     } else if api.sql_family().is_mssql() {
         "@db.Real"

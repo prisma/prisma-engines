@@ -1,5 +1,8 @@
 mod common;
 
+#[cfg(feature = "kingbase-oracle")]
+pub mod kingbase_oracle;
+
 #[cfg(feature = "mssql")]
 pub mod mssql;
 

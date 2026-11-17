@@ -4,142 +4,192 @@ use crate::common::*;
 
 #[test]
 fn should_set_default_for_all_scalar_types() {
-    let dml = indoc! {r#"
-        datasource test {
-          provider = "postgresql"
-        }
+    for provider in ["postgresql", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = formatdoc! {r#"
+            datasource test {{
+              provider = "{provider}"
+            }}
 
-        generator js {
-          provider = "prisma-client"
-        }
+            generator js {{
+              provider = "prisma-client"
+            }}
 
-        model Model {
-          id Int @id
-          int Int @default(3)
-          float Float @default(3.20)
-          string String @default("String")
-          boolean Boolean @default(false)
-          dateTime DateTime @default("2019-06-17T14:20:57Z")
-          bytes    Bytes @default("aGVsbG8gd29ybGQ=")
-          json     Json  @default("{ \"a\": [\"b\"] }")
-          decimal  Decimal  @default("121.10299000124800000001")
-        }
-    "#};
+            model Model {{
+              id Int @id @default(autoincrement())
+              created DateTime @default(now())
+              int Int @default(3)
+              float Float @default(3.20)
+              string String @default("String")
+              boolean Boolean @default(false)
+              dateTime DateTime @default("2019-06-17T14:20:57Z")
+              bytes    Bytes @default("aGVsbG8gd29ybGQ=")
+              json     Json  @default("{{ \"a\": [\"b\"] }}")
+              decimal  Decimal  @default("121.10299000124800000001")
+            }}
+        "#};
 
-    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
-    let model = datamodel.assert_has_model("Model");
+        let datamodel = psl::parse_schema_without_extensions(&dml).unwrap();
+        let model = datamodel.assert_has_model("Model");
 
-    model
-        .assert_has_scalar_field("int")
-        .assert_scalar_type(ScalarType::Int)
-        .assert_default_value()
-        .assert_int(3);
+        model
+            .assert_has_scalar_field("id")
+            .assert_default_value()
+            .assert_autoincrement();
+        model
+            .assert_has_scalar_field("created")
+            .assert_default_value()
+            .assert_now();
+        assert_eq!(
+            model
+                .assert_has_scalar_field("float")
+                .assert_default_value()
+                .value()
+                .as_numeric_value()
+                .map(|(value, _)| value),
+            Some("3.20")
+        );
+        model
+            .assert_has_scalar_field("int")
+            .assert_scalar_type(ScalarType::Int)
+            .assert_default_value()
+            .assert_int(3);
 
-    model
-        .assert_has_scalar_field("float")
-        .assert_scalar_type(ScalarType::Float);
+        model
+            .assert_has_scalar_field("float")
+            .assert_scalar_type(ScalarType::Float);
 
-    model
-        .assert_has_scalar_field("string")
-        .assert_scalar_type(ScalarType::String)
-        .assert_default_value()
-        .assert_string("String");
+        model
+            .assert_has_scalar_field("string")
+            .assert_scalar_type(ScalarType::String)
+            .assert_default_value()
+            .assert_string("String");
 
-    model
-        .assert_has_scalar_field("boolean")
-        .assert_scalar_type(ScalarType::Boolean)
-        .assert_default_value()
-        .assert_bool(false);
+        model
+            .assert_has_scalar_field("boolean")
+            .assert_scalar_type(ScalarType::Boolean)
+            .assert_default_value()
+            .assert_bool(false);
 
-    model
-        .assert_has_scalar_field("dateTime")
-        .assert_scalar_type(ScalarType::DateTime);
+        model
+            .assert_has_scalar_field("dateTime")
+            .assert_scalar_type(ScalarType::DateTime);
 
-    model
-        .assert_has_scalar_field("bytes")
-        .assert_scalar_type(ScalarType::Bytes)
-        .assert_default_value()
-        .assert_bytes(b"hello world");
+        model
+            .assert_has_scalar_field("bytes")
+            .assert_scalar_type(ScalarType::Bytes)
+            .assert_default_value()
+            .assert_bytes(b"hello world");
 
-    model
-        .assert_has_scalar_field("json")
-        .assert_scalar_type(ScalarType::Json)
-        .assert_default_value()
-        .assert_string(r#"{ "a": ["b"] }"#);
+        model
+            .assert_has_scalar_field("json")
+            .assert_scalar_type(ScalarType::Json)
+            .assert_default_value()
+            .assert_string(r#"{ "a": ["b"] }"#);
 
-    model
-        .assert_has_scalar_field("decimal")
-        .assert_scalar_type(ScalarType::Decimal)
-        .assert_default_value()
-        .assert_decimal(r#"121.10299000124800000001"#);
+        model
+            .assert_has_scalar_field("decimal")
+            .assert_scalar_type(ScalarType::Decimal)
+            .assert_default_value()
+            .assert_decimal(r#"121.10299000124800000001"#);
+    }
 }
 
 #[test]
 fn should_set_default_an_enum_type() {
-    let dml = indoc! {r#"
-        model Model {
-          id Int @id
-          role Role @default(A_VARIANT_WITH_UNDERSCORES)
-        }
+    for provider in [
+        None,
+        Some(crate::Provider::KingbaseMysql),
+        Some(crate::Provider::KingbaseOracle),
+    ] {
+        let dml = indoc! {r#"
+            model Model {
+              id Int @id
+              role Role @default(A_VARIANT_WITH_UNDERSCORES)
+            }
 
-        enum Role {
-          ADMIN
-          MODERATOR
-          A_VARIANT_WITH_UNDERSCORES
-        }
-    "#};
+            enum Role {
+              ADMIN
+              MODERATOR
+              A_VARIANT_WITH_UNDERSCORES
+            }
+        "#};
+        let dml = match provider {
+            Some(provider) => crate::with_header(dml, provider, &[]),
+            None => dml.to_owned(),
+        };
 
-    psl::parse_schema_without_extensions(dml)
-        .unwrap()
-        .assert_has_model("Model")
-        .assert_has_scalar_field("role")
-        .assert_default_value()
-        .assert_constant("A_VARIANT_WITH_UNDERSCORES");
+        psl::parse_schema_without_extensions(&dml)
+            .unwrap()
+            .assert_has_model("Model")
+            .assert_has_scalar_field("role")
+            .assert_default_value()
+            .assert_constant("A_VARIANT_WITH_UNDERSCORES");
+    }
 }
 
 #[test]
 fn should_set_default_on_remapped_enum_type() {
-    let dml = indoc! {r#"
-        model Model {
-          id Int @id
-          role Role @default(A_VARIANT_WITH_UNDERSCORES)
-        }
+    for provider in [
+        None,
+        Some(crate::Provider::KingbaseMysql),
+        Some(crate::Provider::KingbaseOracle),
+    ] {
+        let dml = indoc! {r#"
+            model Model {
+              id Int @id
+              role Role @default(A_VARIANT_WITH_UNDERSCORES)
+            }
 
-        enum Role {
-          ADMIN
-          MODERATOR
-          A_VARIANT_WITH_UNDERSCORES @map("A VARIANT WITH UNDERSCORES")
-        }
-    "#};
+            enum Role {
+              ADMIN
+              MODERATOR
+              A_VARIANT_WITH_UNDERSCORES @map("A VARIANT WITH UNDERSCORES")
+            }
+        "#};
+        let dml = match provider {
+            Some(provider) => crate::with_header(dml, provider, &[]),
+            None => dml.to_owned(),
+        };
 
-    psl::parse_schema_without_extensions(dml)
-        .unwrap()
-        .assert_has_model("Model")
-        .assert_has_scalar_field("role")
-        .assert_default_value()
-        .assert_constant("A_VARIANT_WITH_UNDERSCORES");
+        psl::parse_schema_without_extensions(&dml)
+            .unwrap()
+            .assert_has_model("Model")
+            .assert_has_scalar_field("role")
+            .assert_default_value()
+            .assert_constant("A_VARIANT_WITH_UNDERSCORES");
+    }
 }
 
 #[test]
 fn db_generated_function_must_work_for_enum_fields() {
-    let dml = indoc! {r#"
-        model Model {
-          id Int @id
-          role Role @default(dbgenerated("ADMIN"))
-        }
+    for provider in [
+        None,
+        Some(crate::Provider::KingbaseMysql),
+        Some(crate::Provider::KingbaseOracle),
+    ] {
+        let dml = indoc! {r#"
+            model Model {
+              id Int @id
+              role Role @default(dbgenerated("ADMIN"))
+            }
 
-        enum Role {
-          ADMIN
-          MODERATOR
-        }
-    "#};
+            enum Role {
+              ADMIN
+              MODERATOR
+            }
+        "#};
+        let dml = match provider {
+            Some(provider) => crate::with_header(dml, provider, &[]),
+            None => dml.to_owned(),
+        };
 
-    psl::parse_schema_without_extensions(dml)
-        .unwrap()
-        .assert_has_model("Model")
-        .assert_has_scalar_field("role")
-        .assert_default_value()
-        .assert_dbgenerated("ADMIN");
+        psl::parse_schema_without_extensions(&dml)
+            .unwrap()
+            .assert_has_model("Model")
+            .assert_has_scalar_field("role")
+            .assert_default_value()
+            .assert_dbgenerated("ADMIN");
+    }
 }
 
 #[test]
@@ -294,4 +344,26 @@ fn scalar_list_defaults_with_composite_types() {
     "#};
 
     assert_valid(dml);
+}
+
+#[test]
+fn autoincrement_is_allowed_on_indexed_non_id_fields() {
+    for provider in [crate::Provider::KingbaseMysql, crate::Provider::KingbaseOracle] {
+        let source = crate::with_header(
+            indoc! {r#"
+                model Item {
+                  id Int @id
+                  counter Int @unique @default(autoincrement())
+                }
+            "#},
+            provider,
+            &[],
+        );
+        let schema = parse_schema(&source);
+        schema
+            .assert_has_model("Item")
+            .assert_has_scalar_field("counter")
+            .assert_default_value()
+            .assert_autoincrement();
+    }
 }

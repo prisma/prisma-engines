@@ -3,48 +3,68 @@ use psl::parser_database::ScalarType;
 
 #[test]
 fn parse_basic_model() {
-    let dml = indoc! {r#"
-        model User {
-          id Int @id
-          firstName String
-          lastName String
-        }
-    "#};
+    for provider in [
+        None,
+        Some(crate::Provider::KingbaseMysql),
+        Some(crate::Provider::KingbaseOracle),
+    ] {
+        let dml = indoc! {r#"
+            model User {
+              id Int @id
+              firstName String
+              lastName String
+            }
+        "#};
+        let dml = match provider {
+            Some(provider) => crate::with_header(dml, provider, &[]),
+            None => dml.to_owned(),
+        };
 
-    let schema = psl::parse_schema_without_extensions(dml).unwrap();
-    let user_model = schema.assert_has_model("User");
+        let schema = psl::parse_schema_without_extensions(&dml).unwrap();
+        let user_model = schema.assert_has_model("User");
 
-    user_model
-        .assert_has_scalar_field("firstName")
-        .assert_scalar_type(ScalarType::String);
+        user_model
+            .assert_has_scalar_field("firstName")
+            .assert_scalar_type(ScalarType::String);
 
-    user_model
-        .assert_has_scalar_field("lastName")
-        .assert_scalar_type(ScalarType::String);
+        user_model
+            .assert_has_scalar_field("lastName")
+            .assert_scalar_type(ScalarType::String);
+    }
 }
 
 #[test]
 fn parse_basic_enum() {
-    let dml = indoc! {r#"
-        enum Roles {
-          Admin
-          User
-          USER
-          ADMIN
-          ADMIN_USER
-          Admin_User
-          HHorse99
-        }
-    "#};
+    for provider in [
+        None,
+        Some(crate::Provider::KingbaseMysql),
+        Some(crate::Provider::KingbaseOracle),
+    ] {
+        let dml = indoc! {r#"
+            enum Roles {
+              Admin
+              User
+              USER
+              ADMIN
+              ADMIN_USER
+              Admin_User
+              HHorse99
+            }
+        "#};
+        let dml = match provider {
+            Some(provider) => crate::with_header(dml, provider, &[]),
+            None => dml.to_owned(),
+        };
 
-    let schema = psl::parse_schema_without_extensions(dml).unwrap();
-    let role_enum = schema.db.find_enum("Roles").unwrap();
-    let values: Vec<_> = role_enum.values().map(|v| v.name()).collect();
+        let schema = psl::parse_schema_without_extensions(&dml).unwrap();
+        let role_enum = schema.db.find_enum("Roles").unwrap();
+        let values: Vec<_> = role_enum.values().map(|v| v.name()).collect();
 
-    assert_eq!(
-        values,
-        &["Admin", "User", "USER", "ADMIN", "ADMIN_USER", "Admin_User", "HHorse99"]
-    );
+        assert_eq!(
+            values,
+            &["Admin", "User", "USER", "ADMIN", "ADMIN_USER", "Admin_User", "HHorse99"]
+        );
+    }
 }
 
 #[test]

@@ -30,7 +30,14 @@ pub fn create_record(
                 .try_into()
                 .expect("Create calls can only use PrismaValue write expressions (right now).");
 
-            insert.value(db_name.to_owned(), field.value(value, ctx))
+            let mut value = field.value(value, ctx);
+            if ctx.is_kingbase_mysql() && field.is_autoincrement() {
+                // The Kingbase adapter emulates MySQL's insertId. Carry the
+                // identifier's position as metadata, including for cached plans
+                // whose bound value can switch between zero and an explicit ID.
+                value = value.with_native_column_type(Some("PRISMA_MYSQL_AUTOINCREMENT_ID"));
+            }
+            insert.value(db_name.to_owned(), value)
         });
 
     Insert::from(insert)

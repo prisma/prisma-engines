@@ -1,10 +1,10 @@
 {
-  "name": "@prisma/query-compiler-wasm",
-  "version": "0.0.0",
+  "name": "@prisma-kb/query-compiler-wasm",
+  "version": "7.10.0-kb.5",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/prisma/prisma-engines",
+    "url": "https://github.com/lifeng5210/prisma-engines.git",
     "directory": "query-compiler/query-compiler-wasm"
   }
 }

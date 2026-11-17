@@ -1,51 +1,56 @@
-# @prisma/prisma-schema-wasm
+# @prisma-kb/prisma-schema-wasm
 
-[![Publish pipeline](https://github.com/prisma/prisma-engines/actions/workflows/publish-prisma-schema-wasm.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/publish-prisma-schema-wasm.yml)
-[![npm package](https://img.shields.io/npm/v/@prisma/prisma-schema-wasm/latest)](https://www.npmjs.com/package/@prisma/prisma-schema-wasm)
-[![install size](https://packagephobia.com/badge?p=@prisma/prisma-schema-wasm)](https://packagephobia.com/result?p=@prisma/prisma-schema-wasm)
+Wasm build of Prisma's schema parser, validator, formatter, and language-tools
+APIs for the Prisma Kingbase distribution. It supports the Kingbase MySQL and
+Kingbase Oracle providers implemented in this fork.
 
-This directory only contains build logic to package the `prisma-fmt` engine
-into a Node package as a Wasm module. All the functionality is implemented in
-other parts of prisma-engines.
+This is a community-maintained package, not an official Prisma release. Its
+public API follows Prisma's internal schema-Wasm API and can change between
+releases.
 
-The published NPM package is internal to Prisma. Its API will break without prior warning.
-
-## Example
+## Install
 
 ```bash
-node -e "const prismaSchema = require('@prisma/prisma-schema-wasm'); console.log(prismaSchema.version())"
+npm install @prisma-kb/prisma-schema-wasm
 ```
 
-## Components
+## Verify the module loads
 
-- The GitHub Actions workflow that publishes the NPM package: https://github.com/prisma/prisma-engines/blob/main/.github/workflows/publish-prisma-schema-wasm.yml
-    - It is triggered from the https://github.com/prisma/engines-wrapper publish action.
-- The [Rust source code](https://github.com/prisma/prisma-engines/tree/main/prisma-schema-wasm/src) for the wasm module
-- The [nix build definition](https://github.com/prisma/prisma-engines/blob/main/prisma-schema-wasm/default.nix)
-    - It gives us a fully reproducible, thoroughly described build process and environment. The alternative would be a bash script with installs through `rustup`, `cargo install` and `apt`, with underspecified system dependencies and best-effort version pinning.
-    - You can read more about nix on [nix.dev](https://nix.dev/) and the [official website](https://nixos.org/).
-
-## Local Dev with Language-Tools
-When implementing features for `language-tools` in `prisma-engines`, to sync with your local dev environment for the `language-server`, one can do the following:
-
-### On first setup
+```bash
+node -e "const schema = require('@prisma-kb/prisma-schema-wasm'); console.log(typeof schema.format)"
 ```
-# Install the latest Rust version with `rustup`
-# or update the latest Rust version with `rustup`
-rustup update
+
+The command prints `function` when Node can load the generated Wasm module.
+
+## Source and license
+
+Source code and Kingbase-specific changes are maintained at
+<https://github.com/lifeng5210/prisma-engines>. The package is distributed
+under the Apache-2.0 license, consistent with its Prisma Engines source base.
+
+## Local build
+
+Use the Rust toolchain pinned in `rust-toolchain.toml`. From the repository root:
+
+```sh
 rustup target add wasm32-unknown-unknown
-cargo update -p wasm-bindgen
-# Check the version defined in `prisma-schema-wasm/cargo.toml` for `wasm-bindgen` and replace `version` below:
-cargo install -f wasm-bindgen-cli@version
 ```
 
-### On Changes
+Install `wasm-bindgen-cli` at the version of `wasm-bindgen` resolved in
+`Cargo.lock`, using `cargo install --locked wasm-bindgen-cli --version <matching-version>`
+with `<matching-version>` replaced by that version. The packaging step also
+requires `jq`.
 
-```bash
-./prisma-schema-wasm/scripts/update-schema-wasm.sh
+Build the Node.js package from the repository root:
+
+```sh
+make build-schema-wasm
 ```
 
-This script has the following expectations:
-- `language-tools` is in the same dir as `prisma-engines`
-  - i.e. `dir/{prisma-engines,language-tools}`
-- it's run in the `prisma-engines` root folder
+The package is written to `target/prisma-schema-wasm`. `PROFILE` selects the
+Cargo build profile (default: `dev`), and `SCHEMA_WASM_VERSION` sets the package
+version (default: `0.0.0`).
+
+For language-server development, install this built package into the
+language-server project that consumes the schema APIs. The installation path
+and dependency name must match that project's package configuration.

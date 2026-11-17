@@ -5,7 +5,6 @@ The schema-engine CLI binary.
 ## Usage
 
 ```
-schema-engine-cli d24a48807efc126453d67d38031205cffb90a268
 When no subcommand is specified, the schema engine will default to starting as a JSON-RPC server over stdio
 
 USAGE:
@@ -17,9 +16,9 @@ FLAGS:
 
 OPTIONS:
     -d, --datamodels <FILE>...                 List of paths to the Prisma schema files
-        --datasource <JSON>                    Optional JSON string to override the `datasource` block's URLs in the
-                                               schema. This is derived from a Prisma Config file with `engines:
-                                               'classic'`
+        --datasource <JSON>                    JSON connection configuration for the schema engine.
+                                               The Prisma CLI obtains these URLs from `prisma.config.ts`
+                                               datasource configuration.
     -e, --extension-types <extension-types>
 
 SUBCOMMANDS:
@@ -27,10 +26,14 @@ SUBCOMMANDS:
     help    Prints this message or the help of the given subcommand(s)
 ```
 
+Prisma Config supplies `datasource.url` and, when configured,
+`datasource.shadowDatabaseUrl`. JSON passed through `--datasource` uses `url`
+and `shadowDatabaseUrl` keys. Keep database URLs in `prisma.config.ts`; the
+PSL datasource block selects the provider.
+
 ### `cli` subcommand
 
 ```
-schema-engine-cli 0.1.0
 Doesn't start a server, but allows running specific commands against Prisma
 
 USAGE:

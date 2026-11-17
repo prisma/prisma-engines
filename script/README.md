@@ -4,7 +4,7 @@ Inspired by https://github.com/github/scripts-to-rule-them-all
 
 > If your scripts are normalized by name across all of your projects, your contributors only need to know the pattern, not a deep knowledge of the application. This means they can jump into a project and make contributions without first learning how to bootstrap the project or how to get its tests to run.
 
-If instead you are a user of the [nix](https://nixos.org/manual/nix/stable/) package manager, you might find interesting packages and in the [nix](../nix/) directory.
+If you use the [Nix](https://nixos.org/manual/nix/stable/) package manager, the repository environment is defined in [shell.nix](../shell.nix).
 
 ### The scripts
 

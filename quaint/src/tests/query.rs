@@ -1,7 +1,7 @@
 mod error;
 
 use super::test_api::*;
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
 use crate::ast::JsonPath;
 use crate::{
     connector::{IsolationLevel, Queryable, TransactionCapable},
@@ -28,6 +28,55 @@ async fn aliased_value(api: &mut dyn TestApi) -> crate::Result<()> {
     let res = api.conn().select(select).await?.into_single()?;
 
     assert_eq!(Value::text("foo"), res["bar"]);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn oracle_listagg_preserves_unordered_aggregation(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api
+        .create_temp_table("group_id int, label varchar(5000), number_value int")
+        .await?;
+    let long_text = "a".repeat(4100) + "TAIL";
+
+    for (group, label, number) in [
+        (1, Value::text("b"), Value::int32(2)),
+        (1, Value::text("a"), Value::int32(1)),
+        (1, Value::text("b"), Value::int32(2)),
+        (1, Value::null_text(), Value::null_int32()),
+        (2, Value::null_text(), Value::null_int32()),
+        (3, Value::text(long_text.clone()), Value::null_int32()),
+    ] {
+        let insert = Insert::single_into(&table)
+            .value("group_id", group)
+            .value("label", label)
+            .value("number_value", number);
+        api.conn().execute(insert.into()).await?;
+    }
+
+    let query = |group| {
+        Select::from_table(&table)
+            .value(aggregate_to_string(Column::from("label")).alias("labels"))
+            .value(aggregate_to_string(Column::from("number_value")).alias("numbers"))
+            .so_that("group_id".equals(group))
+    };
+    let row = api.conn().select(query(1)).await?.into_single()?;
+    // No ordering was requested. Preserve duplicates and ignore NULL inputs.
+    let mut labels: Vec<_> = row["labels"].as_str().unwrap().split(',').collect();
+    labels.sort_unstable();
+    assert_eq!(labels, ["a", "b", "b"]);
+    let mut numbers: Vec<_> = row["numbers"].as_str().unwrap().split(',').collect();
+    numbers.sort_unstable();
+    assert_eq!(numbers, ["1", "2", "2"]);
+
+    for group in [2, 99] {
+        let row = api.conn().select(query(group)).await?.into_single()?;
+        assert_eq!(row["labels"], Value::null_text());
+        assert_eq!(row["numbers"], Value::null_text());
+    }
+
+    let row = api.conn().select(query(3)).await?.into_single()?;
+    assert_eq!(row["labels"], Value::text(long_text));
 
     Ok(())
 }
@@ -112,6 +161,19 @@ async fn transactions_with_isolation_works(api: &mut dyn TestApi) -> crate::Resu
         .await?
         .commit()
         .await?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn kingbase_oracle_transactions_with_supported_isolation_levels(api: &mut dyn TestApi) -> crate::Result<()> {
+    for isolation_level in [IsolationLevel::ReadCommitted, IsolationLevel::Serializable] {
+        api.conn()
+            .start_transaction(Some(isolation_level))
+            .await?
+            .commit()
+            .await?;
+    }
 
     Ok(())
 }
@@ -696,8 +758,13 @@ async fn single_default_value_insert(api: &mut dyn TestApi) -> crate::Result<()>
     Ok(())
 }
 
-#[cfg(any(feature = "mssql", feature = "postgresql", feature = "sqlite"))]
-#[test_each_connector(tags("mssql", "postgresql", "sqlite"))]
+#[cfg(any(
+    feature = "mssql",
+    feature = "postgresql",
+    feature = "sqlite",
+    feature = "kingbase-oracle-native"
+))]
+#[test_each_connector(tags("mssql", "postgresql", "sqlite", "kingbase-oracle"))]
 async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.get_name();
 
@@ -729,8 +796,8 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "sqlite"))]
-#[test_each_connector(tags("postgresql", "sqlite"))]
+#[cfg(any(feature = "postgresql", feature = "sqlite", feature = "kingbase-oracle-native"))]
+#[test_each_connector(tags("postgresql", "sqlite", "kingbase-oracle"))]
 async fn returning_update(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.get_name();
 
@@ -767,6 +834,36 @@ async fn returning_update(api: &mut dyn TestApi) -> crate::Result<()> {
     let row = res.get(0).unwrap();
     assert_eq!(Some(1), row["id"].as_i32());
     assert_eq!(Some("Updated"), row["name"].as_str());
+
+    Ok(())
+}
+
+#[cfg(any(feature = "postgresql", feature = "sqlite", feature = "kingbase-oracle-native"))]
+#[test_each_connector(tags("postgresql", "sqlite", "kingbase-oracle"))]
+async fn returning_delete(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_temp_table("id int primary key, name varchar(255)").await?;
+    api.conn()
+        .insert(
+            Insert::single_into(&table)
+                .value("id", 1)
+                .value("name", "Naukio")
+                .into(),
+        )
+        .await?;
+
+    let result = api
+        .conn()
+        .query(
+            Delete::from_table(&table)
+                .so_that("id".equals(1))
+                .returning(vec!["id", "name"])
+                .into(),
+        )
+        .await?
+        .into_single()?;
+
+    assert_eq!(result["id"].as_i32(), Some(1));
+    assert_eq!(result["name"].as_str(), Some("Naukio"));
 
     Ok(())
 }
@@ -903,7 +1000,7 @@ async fn multiple_resultset_should_return_the_last_one(api: &mut dyn TestApi) ->
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("mssql", "postgresql", "mysql", "sqlite", "kingbase-oracle"))]
 async fn single_insert_conflict_do_nothing_single_unique(api: &mut dyn TestApi) -> crate::Result<()> {
     let constraint = api.unique_constraint("id");
 
@@ -943,7 +1040,7 @@ async fn single_insert_conflict_do_nothing_single_unique(api: &mut dyn TestApi) 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("mssql", "postgresql", "mysql", "sqlite", "kingbase-oracle"))]
 async fn single_insert_conflict_do_nothing_single_unique_with_default(api: &mut dyn TestApi) -> crate::Result<()> {
     let constraint = api.unique_constraint("id");
 
@@ -979,7 +1076,7 @@ async fn single_insert_conflict_do_nothing_single_unique_with_default(api: &mut 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("mssql", "postgresql", "mysql", "sqlite", "kingbase-oracle"))]
 async fn single_insert_conflict_do_nothing_single_unique_with_autogen_default(
     api: &mut dyn TestApi,
 ) -> crate::Result<()> {
@@ -1045,7 +1142,7 @@ async fn single_insert_conflict_do_nothing_with_returning(api: &mut dyn TestApi)
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("mssql", "postgresql", "mysql", "sqlite", "kingbase-oracle"))]
 async fn single_insert_conflict_do_nothing_two_uniques(api: &mut dyn TestApi) -> crate::Result<()> {
     let id_constraint = api.unique_constraint("id");
     let name_constraint = api.unique_constraint("name");
@@ -1092,7 +1189,7 @@ async fn single_insert_conflict_do_nothing_two_uniques(api: &mut dyn TestApi) ->
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("mssql", "postgresql", "mysql", "sqlite", "kingbase-oracle"))]
 async fn single_insert_conflict_do_nothing_two_uniques_with_default(api: &mut dyn TestApi) -> crate::Result<()> {
     let id_constraint = api.unique_constraint("id");
     let name_constraint = api.unique_constraint("name");
@@ -1134,7 +1231,7 @@ async fn single_insert_conflict_do_nothing_two_uniques_with_default(api: &mut dy
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("mssql", "postgresql", "mysql", "sqlite", "kingbase-oracle"))]
 async fn single_insert_conflict_do_nothing_compound_unique(api: &mut dyn TestApi) -> crate::Result<()> {
     let table_name = api.create_temp_table("id int, name varchar(255)").await?;
     api.create_index(&table_name, "id asc, name asc").await?;
@@ -1175,7 +1272,7 @@ async fn single_insert_conflict_do_nothing_compound_unique(api: &mut dyn TestApi
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("mssql", "postgresql", "mysql", "sqlite", "kingbase-oracle"))]
 async fn single_insert_conflict_do_nothing_compound_unique_with_default(api: &mut dyn TestApi) -> crate::Result<()> {
     let table_name = api
         .create_temp_table("id int, name varchar(255) default 'Musti'")
@@ -1212,7 +1309,7 @@ async fn single_insert_conflict_do_nothing_compound_unique_with_default(api: &mu
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("mssql", "postgresql", "mysql", "sqlite", "kingbase-oracle"))]
 async fn single_insert_conflict_do_nothing_unique_with_autogen(api: &mut dyn TestApi) -> crate::Result<()> {
     let table_name = api
         .create_temp_table(&format!("{}, name varchar(100)", api.autogen_id("id")))
@@ -1250,7 +1347,7 @@ async fn single_insert_conflict_do_nothing_unique_with_autogen(api: &mut dyn Tes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("mssql", "postgresql", "mysql", "sqlite", "kingbase-oracle"))]
 async fn single_insert_conflict_do_nothing_compound_unique_with_autogen_default(
     api: &mut dyn TestApi,
 ) -> crate::Result<()> {
@@ -1337,7 +1434,9 @@ async fn deletes(api: &mut dyn TestApi) -> crate::Result<()> {
 
 // TODO: Figure out why it doesn't work on MariaDB
 // Error { kind: QueryError(Server(ServerError { code: 1115, message: "Unknown character set: 'gb18030'", state: "42000" })), original_code: Some("1115"), original_message: Some("Unknown character set: 'gb18030'") }
-#[test_each_connector(tags("mysql"), ignore("mysql_mariadb"))]
+// KingbaseES has one database-wide encoding, so it cannot represent MySQL's
+// per-column `CHARACTER SET gb18030` definition.
+#[test_each_connector(tags("mysql"), ignore("mysql_mariadb", "kingbase-mysql"))]
 async fn text_columns_with_non_utf8_encodings_can_be_queried(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
         .create_temp_table("id integer auto_increment primary key, value varchar(100) character set gb18030")
@@ -1379,6 +1478,8 @@ async fn filtering_by_json_values_does_not_work_but_does_not_crash(api: &mut dyn
     let select = Select::from_table(&table).so_that("nested".equals("{\"isTrue\": false}"));
     let result = api.conn().query(select.into()).await?;
 
+    // A text binding does not request JSON structural equality on either
+    // native MySQL or KES. JSON-valued comparisons have separate coverage.
     assert!(result.is_empty());
 
     Ok(())
@@ -1412,8 +1513,64 @@ async fn newdecimal_conversion_is_handled_correctly(api: &mut dyn TestApi) -> cr
     let select = Select::default().value(sum(Value::int32(1)).alias("theone"));
     let result = api.conn().select(select).await?;
 
-    assert_eq!(Value::numeric("1.0".parse().unwrap()), result.into_single().unwrap()[0]);
+    let expected = if api.connector_tag().contains(Tags::KINGBASE_MYSQL) {
+        Value::int64(1)
+    } else {
+        Value::numeric("1.0".parse().unwrap())
+    };
+    assert_eq!(expected, result.into_single().unwrap()[0]);
 
+    if api.connector_tag().contains(Tags::KINGBASE_MYSQL) {
+        // Typed preparation and AST execution preserve native aggregate types.
+        // Raw untyped SUM(?) independently remains the server's SUM(text).
+        for (parameter, expected_typed, expected_ast, expected_untyped) in [
+            (Value::int32(1), Value::int64(1), Value::int64(1), Value::double(1.0)),
+            (
+                Value::int64(2),
+                Value::numeric("2".parse().unwrap()),
+                Value::numeric("2".parse().unwrap()),
+                Value::double(2.0),
+            ),
+            (
+                Value::float(1.5),
+                Value::float(1.5),
+                Value::double(1.5),
+                Value::double(1.5),
+            ),
+            (
+                Value::double(1.5),
+                Value::double(1.5),
+                Value::double(1.5),
+                Value::double(1.5),
+            ),
+            (
+                Value::numeric("1.5".parse().unwrap()),
+                Value::numeric("1.5".parse().unwrap()),
+                Value::numeric("1.5".parse().unwrap()),
+                Value::double(1.5),
+            ),
+            (
+                Value::numeric("12345678901234567890.1234567890123456789".parse().unwrap()),
+                Value::numeric("12345678901234567890.1234567890123456789".parse().unwrap()),
+                Value::numeric("12345678901234567890.1234567890123456789".parse().unwrap()),
+                Value::double(1.2345678901234567e19),
+            ),
+        ] {
+            let direct = api
+                .conn()
+                .query_raw_typed("SELECT SUM(?)", std::slice::from_ref(&parameter))
+                .await?;
+            assert_eq!(expected_typed, direct.into_single().unwrap()[0]);
+            let direct_untyped = api
+                .conn()
+                .query_raw("SELECT SUM(?)", std::slice::from_ref(&parameter))
+                .await?;
+            assert_eq!(expected_untyped, direct_untyped.into_single().unwrap()[0]);
+            let select = Select::default().value(sum(parameter).alias("total"));
+            let actual = api.conn().select(select).await?;
+            assert_eq!(expected_ast, actual.into_single().unwrap()[0]);
+        }
+    }
     Ok(())
 }
 
@@ -1440,10 +1597,11 @@ async fn unsigned_integers_are_handled(api: &mut dyn TestApi) -> crate::Result<(
     Ok(())
 }
 
-#[test_each_connector(tags("mysql", "postgresql"))]
+#[test_each_connector(tags("mysql", "postgresql", "kingbase-oracle"))]
 async fn json_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
     let json_type = match api.system() {
         "postgres" => "jsonb",
+        "kingbase_oracle" => "json",
         _ => "json",
     };
 
@@ -1673,22 +1831,25 @@ async fn op_test_div_one_level(api: &mut dyn TestApi) -> crate::Result<()> {
     let row = api.conn().select(q).await?.into_single()?;
 
     match api.system() {
-        "mssql" | "postgres" => assert_eq!(Some(2.0), row[0].as_f32()),
+        "mssql" | "postgres" | "kingbase_oracle" => assert_eq!(Some(2.0), row[0].as_f32()),
         _ => assert_eq!(Some(2.0), row[0].as_f64()),
     }
 
     Ok(())
 }
 
-#[test_each_connector(tags("postgresql"))]
+#[test_each_connector(tags("postgresql", "kingbase-oracle"))]
 async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
     let type_name = api.get_name();
     let create_type = format!("CREATE TYPE {type_name} AS ENUM ('A', 'B')");
     api.conn().raw_cmd(&create_type).await?;
 
-    let table = api
-        .create_temp_table(&format!("id SERIAL PRIMARY KEY, value {type_name}"))
-        .await?;
+    let id = if api.connector_tag().contains(Tags::KINGBASE_ORACLE) {
+        api.autogen_id("id")
+    } else {
+        "id SERIAL PRIMARY KEY".to_owned()
+    };
+    let table = api.create_temp_table(&format!("{id}, value {type_name}")).await?;
 
     api.conn()
         .insert(
@@ -1727,6 +1888,9 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
 
     let row = res.get(2).unwrap();
     assert_eq!(Some(&Value::null_enum()), row.at(0));
+
+    api.delete_table(&table).await?;
+    api.conn().raw_cmd(&format!("DROP TYPE {type_name}")).await?;
 
     Ok(())
 }
@@ -1783,6 +1947,8 @@ async fn single_common_table_expression(api: &mut dyn TestApi) -> crate::Result<
 
     if api.connector_tag().intersects(Tags::POSTGRES) {
         assert_eq!(Some(&Value::text("1")), row.at(0));
+    } else if api.connector_tag().intersects(Tags::KINGBASE_ORACLE) {
+        assert_eq!(Some(&Value::numeric(1.into())), row.at(0));
     } else if api.connector_tag().intersects(Tags::SQLITE) {
         // NOTE: with explicit values, SQLite does not pass the specific declaration type, so is assumed int64
         assert_eq!(Some(&Value::int64(1)), row.at(0));
@@ -1818,6 +1984,9 @@ async fn multiple_common_table_expressions(api: &mut dyn TestApi) -> crate::Resu
     if api.connector_tag().intersects(Tags::POSTGRES) {
         assert_eq!(Some(&Value::text("1")), row.at(0));
         assert_eq!(Some(&Value::text("2")), row.at(1));
+    } else if api.connector_tag().intersects(Tags::KINGBASE_ORACLE) {
+        assert_eq!(Some(&Value::numeric(1.into())), row.at(0));
+        assert_eq!(Some(&Value::numeric(2.into())), row.at(1));
     } else if api.connector_tag().intersects(Tags::SQLITE) {
         // NOTE: with explicit values, SQLite does not pass the specific declaration type, so is assumed int64
         assert_eq!(Some(&Value::int64(1)), row.at(0));
@@ -2171,7 +2340,109 @@ async fn json_extract_path_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(feature = "postgresql")]
+#[cfg(feature = "mysql")]
+#[test_each_connector(tags("mysql"))]
+async fn json_extract_text_parameters(api: &mut dyn TestApi) -> crate::Result<()> {
+    for (document, path, expected) in [
+        ("{\"a\":2}", "$.a", Some(serde_json::json!(2))),
+        ("{\"a\":null}", "$.a", Some(serde_json::Value::Null)),
+        ("{}", "$.a", None),
+        ("{\"汉字\":\"你好\"}", "$.\"汉字\"", Some(serde_json::json!("你好"))),
+        ("{\"a\\\":{\":\"b\"}", "$.\"a\\\":{\"", Some(serde_json::json!("b"))),
+        ("[1,2]", "$[1]", Some(serde_json::json!(2))),
+    ] {
+        let query = Select::default()
+            .value(json_extract(Value::text(document), JsonPath::string(path), false).alias("extracted"));
+        let result = api.conn().select(query).await?.into_single()?;
+        assert_eq!(value_into_json(&result["extracted"]), expected);
+        assert_eq!(result["extracted"].is_null(), expected.is_none());
+    }
+
+    Ok(())
+}
+
+#[cfg(feature = "mysql")]
+#[test_each_connector(tags("mysql"))]
+async fn json_array_predicates_text_parameters(api: &mut dyn TestApi) -> crate::Result<()> {
+    // This visitor emits WHERE only for SELECTs with a FROM clause.
+    let source = Table::from(Select::default().value(1)).alias("source");
+    let document: Expression = Value::text("[1,2,3]").into();
+    for (predicate, matches) in [
+        (document.clone().json_array_contains(serde_json::json!([2])), true),
+        (document.clone().json_array_contains(serde_json::json!(["2"])), false),
+        (document.clone().json_array_not_contains(serde_json::json!([4])), true),
+        (document.clone().json_array_begins_with(serde_json::json!(1)), true),
+        (document.clone().json_array_begins_with(serde_json::json!(2)), false),
+        (document.clone().json_array_ends_into(serde_json::json!(3)), true),
+        (document.clone().json_array_ends_into(serde_json::json!(1)), false),
+        (document.json_array_not_ends_into(serde_json::json!(1)), true),
+    ] {
+        let query = Select::from_table(source.clone()).value(1).so_that(predicate);
+        let result = api.conn().select(query).await?;
+        assert_eq!(result.len(), usize::from(matches));
+    }
+
+    Ok(())
+}
+
+#[cfg(feature = "mysql")]
+#[test_each_connector(tags("mysql"))]
+async fn json_numeric_comparisons_text_parameters(api: &mut dyn TestApi) -> crate::Result<()> {
+    // Keep MySQL's comparison contract visible. Kingbase executes the same
+    // SQL and scalar bindings; database result differences are not compensated.
+    let source = Table::from(Select::default().value(1)).alias("source");
+    for (document, threshold) in [
+        ("{\"a\":2}", serde_json::json!(1)),
+        ("{\"a\":1.25}", serde_json::json!(1)),
+        ("{\"a\":2}", serde_json::json!(1.5)),
+    ] {
+        let extracted: Expression = json_extract(Value::text(document), JsonPath::string("$.a"), false).into();
+        let scalar: Expression = Value::json(threshold).into();
+        for (predicate, matches) in [
+            (extracted.clone().greater_than(scalar.clone()), true),
+            (extracted.clone().greater_than_or_equals(scalar.clone()), true),
+            (extracted.clone().less_than(scalar.clone()), false),
+            (extracted.clone().less_than_or_equals(scalar.clone()), false),
+            (scalar.clone().greater_than(extracted.clone()), false),
+            (scalar.clone().greater_than_or_equals(extracted.clone()), false),
+            (scalar.clone().less_than(extracted.clone()), true),
+            (scalar.less_than_or_equals(extracted), true),
+        ] {
+            let query = Select::from_table(source.clone()).value(1).so_that(predicate);
+            let result = api.conn().select(query).await?;
+            assert_eq!(result.len(), usize::from(matches), "document: {document}");
+        }
+    }
+
+    Ok(())
+}
+
+#[cfg(feature = "mysql")]
+#[test_each_connector(tags("mysql"))]
+async fn json_numeric_update_and_delete_predicates(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api
+        .create_temp_table("id int4 auto_increment primary key, nested json not null, flag int not null")
+        .await?;
+    let insert = Insert::multi_into(&table, ["nested", "flag"])
+        .values((serde_json::json!({ "a": 2 }), 0))
+        .values((serde_json::json!({ "a": 0.5 }), 0));
+    api.conn().insert(insert.into()).await?;
+
+    let extracted: Expression = json_extract(col!("nested"), JsonPath::string("$.a"), false).into();
+    let update = Update::table(&table)
+        .set("flag", 1)
+        .so_that(extracted.clone().greater_than(Value::json(serde_json::json!(1))));
+    assert_eq!(api.conn().execute(update.into()).await?, 1);
+    let delete = Delete::from_table(&table).so_that(extracted.less_than(Value::json(serde_json::json!(1.5))));
+    assert_eq!(api.conn().execute(delete.into()).await?, 1);
+
+    let row = api.conn().select(Select::from_table(&table)).await?.into_single()?;
+    assert_eq!(row["flag"].as_integer(), Some(1));
+    assert_eq!(value_into_json(&row["nested"]), Some(serde_json::json!({ "a": 2 })));
+    Ok(())
+}
+
+#[cfg(any(feature = "postgresql", feature = "kingbase-oracle-native"))]
 async fn json_extract_array_path_postgres(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_temp_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
@@ -2187,7 +2458,11 @@ async fn json_extract_array_path_postgres(api: &mut dyn TestApi, json_type: &str
 
     // Test object extraction
     let extract: Expression = json_extract(col!("obj"), JsonPath::array(["a", "b"]), false).into();
-    let select = Select::from_table(&table).so_that(extract.equals("\"c\""));
+    let select = if api.connector_tag().intersects(Tags::KINGBASE_ORACLE) {
+        Select::from_table(&table).so_that(extract.equals(serde_json::json!("c")))
+    } else {
+        Select::from_table(&table).so_that(extract.equals("\"c\""))
+    };
     let row = api.conn().select(select).await?.into_single()?;
     assert_eq!(
         Some(serde_json::json!({ "a": { "b": "c" } })),
@@ -2246,7 +2521,13 @@ async fn json_extract_array_path_fun_on_json(api: &mut dyn TestApi) -> crate::Re
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_extract_array_path_fun_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_extract_array_path_postgres(api, "json").await
+}
+
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
 async fn json_array_contains(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_temp_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
@@ -2270,6 +2551,8 @@ async fn json_array_contains(api: &mut dyn TestApi, json_type: &str) -> crate::R
         "postgres" => JsonPath::array(["a", "b"]),
         #[cfg(feature = "mysql")]
         "mysql" => JsonPath::string("$.a.b"),
+        #[cfg(feature = "kingbase-oracle-native")]
+        "kingbase_oracle" => JsonPath::array(["a", "b"]),
         _ => unreachable!(),
     };
     let path: Expression = json_extract(col!("obj"), path.clone(), false).into();
@@ -2349,7 +2632,230 @@ async fn json_array_contains_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_array_contains_fun_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_contains(api, "json").await
+}
+
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_aggregation_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api
+        .create_temp_table("payload JSON, amount NUMERIC(1000,500), large_value BIGINT")
+        .await?;
+    let amount = format!("0.{}", "1234567890".repeat(50));
+    // Keep numeric assignment separate from the JSON conversion under test.
+    api.conn()
+        .raw_cmd(&format!(
+            "INSERT INTO \"{table}\" (payload, amount, large_value) VALUES ('{{\"id\":1}}', CAST('{amount}' AS NUMERIC(1000,500)), {})",
+            i64::MAX
+        ))
+        .await?;
+    let stored = api
+        .conn()
+        .query_raw(&format!("SELECT CAST(amount AS TEXT) AS amount FROM \"{table}\""), &[])
+        .await?
+        .into_single()?;
+    // Compare with the previous conversion independently of R2's numeric
+    // precision limits; both paths must produce exactly the same text.
+    let amount = stored["amount"].as_str().unwrap();
+
+    let metadata = json_build_object(vec![
+        ("mode".into(), Value::text("oracle").into()),
+        (
+            "amount".into(),
+            Column::from("amount").type_family(TypeFamily::Decimal(None)).into(),
+        ),
+        (
+            "large".into(),
+            Column::from("large_value").type_family(TypeFamily::Int).into(),
+        ),
+    ])
+    .alias("metadata");
+    let query = Select::from_table(&table)
+        .value(json_array_agg(Column::from("payload")).alias("items"))
+        .value(metadata.clone())
+        .group_by("amount")
+        .group_by("large_value");
+    let row = api.conn().select(query).await?.into_single()?;
+
+    assert_eq!(row["items"].as_json(), Some(&serde_json::json!([{ "id": 1 }])));
+    assert_eq!(
+        row["metadata"].as_json(),
+        Some(&serde_json::json!({ "mode": "oracle", "amount": amount, "large": i64::MAX.to_string() }))
+    );
+
+    api.conn()
+        .insert(
+            Insert::single_into(&table)
+                .value("payload", serde_json::json!({"id": 2}))
+                .into(),
+        )
+        .await?;
+    let row = api
+        .conn()
+        .select(
+            Select::from_table(&table)
+                .value(metadata)
+                .so_that(Column::from("amount").is_null()),
+        )
+        .await?
+        .into_single()?;
+    assert_eq!(
+        row["metadata"].as_json(),
+        Some(&serde_json::json!({"mode":"oracle", "amount":null, "large":null}))
+    );
+
+    let query = Select::from_table(&table)
+        .value(
+            coalesce::<Expression<'_>, _>(vec![
+                json_array_agg(Column::from("payload")).into(),
+                Value::json(serde_json::json!([])).into(),
+            ])
+            .alias("items"),
+        )
+        .so_that(Column::from("payload").is_null());
+    let row = api.conn().select(query).await?.into_single()?;
+    assert_eq!(row["items"].as_json(), Some(&serde_json::json!([])));
+
+    Ok(())
+}
+
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn oracle_json_query_preserves_values_and_nulls(api: &mut dyn TestApi) -> crate::Result<()> {
+    for value in [
+        serde_json::json!({ "a": 1 }),
+        serde_json::json!([1, 2]),
+        serde_json::json!("hello"),
+        serde_json::json!(42),
+        serde_json::json!(true),
+        serde_json::json!(null),
+        serde_json::json!("a".repeat(5000)),
+    ] {
+        for input in [Value::json(value.clone()), Value::text(value.to_string())] {
+            let query = Select::default().value(json_extract(input, JsonPath::string("$"), false).alias("value"));
+            let row = api.conn().select(query).await?.into_single()?;
+            assert_eq!(row["value"].as_json(), Some(&value));
+        }
+    }
+    for (input, path) in [
+        (Value::null_json(), "$"),
+        (Value::json(serde_json::json!({})), "$.missing"),
+    ] {
+        let query = Select::default().value(json_extract(input, JsonPath::string(path), false).alias("value"));
+        let row = api.conn().select(query).await?.into_single()?;
+        assert!(row["value"].is_null());
+    }
+    let query = Select::default().value(
+        json_extract(
+            Value::json(serde_json::json!({"name":"hello"})),
+            JsonPath::string("$.name"),
+            true,
+        )
+        .alias("value"),
+    );
+    let row = api.conn().select(query).await?.into_single()?;
+    assert_eq!(row["value"].as_str(), Some("hello"));
+    Ok(())
+}
+
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_type_filtering_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_temp_table("id INT, payload JSON").await?;
+    let insert = Insert::multi_into(&table, ["id", "payload"])
+        .values((1, serde_json::json!({ "name": "Kingbase" })))
+        .values((2, serde_json::json!(["Kingbase"])))
+        .values((3, serde_json::json!(42)))
+        .values((4, serde_json::json!(true)))
+        .values((5, serde_json::json!("Kingbase")))
+        .values((6, serde_json::json!(null)))
+        .values((Value::int32(7), Value::null_json()));
+    api.conn().insert(insert.into()).await?;
+
+    for (json_type, id) in [
+        (JsonType::Object, 1),
+        (JsonType::Array, 2),
+        (JsonType::Number, 3),
+        (JsonType::Boolean, 4),
+        (JsonType::String, 5),
+        (JsonType::Null, 6),
+    ] {
+        let row = api
+            .conn()
+            .select(
+                Select::from_table(&table)
+                    .column("id")
+                    .so_that(Column::from("payload").json_type_equals(json_type)),
+            )
+            .await?
+            .into_single()?;
+
+        assert_eq!(row["id"].as_i32(), Some(id));
+    }
+
+    let rows = api
+        .conn()
+        .select(
+            Select::from_table(&table)
+                .column("id")
+                .so_that(Column::from("payload").json_type_not_equals(JsonType::Object))
+                .order_by("id".ascend()),
+        )
+        .await?;
+    assert_eq!(rows.len(), 5);
+
+    // SQL NULL has no JSON type, including when comparing types by field reference.
+    let rows = api
+        .conn()
+        .select(
+            Select::from_table(&table)
+                .column("id")
+                .so_that(Column::from("payload").json_type_equals(Column::from("payload")))
+                .order_by("id".ascend()),
+        )
+        .await?;
+    let ids: Vec<_> = rows.iter().map(|row| row["id"].as_i32().unwrap()).collect();
+    assert_eq!(ids, [1, 2, 3, 4, 5, 6]);
+
+    Ok(())
+}
+
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn oracle_native_values_round_trip_through_ast(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api
+        .create_temp_table("id UUID, enabled BOOLEAN, created_at TIMESTAMP(6) WITH LOCAL TIME ZONE")
+        .await?;
+    let id = uuid::Uuid::parse_str("936DA01F-9ABD-4D9D-80C7-02AF85C822A8").unwrap();
+    let created_at = chrono::DateTime::parse_from_rfc3339("2025-01-02T03:04:05.123456Z")
+        .unwrap()
+        .with_timezone(&chrono::Utc);
+
+    api.conn()
+        .insert(
+            Insert::single_into(&table)
+                .value("id", Value::uuid(id).with_native_column_type(Some("Uuid")))
+                .value("enabled", Value::boolean(true).with_native_column_type(Some("Boolean")))
+                .value(
+                    "created_at",
+                    Value::datetime(created_at).with_native_column_type(Some("TimestampLocalTz")),
+                )
+                .into(),
+        )
+        .await?;
+
+    let row = api.conn().select(Select::from_table(&table)).await?.into_single()?;
+    assert_eq!(row["id"].as_uuid(), Some(id));
+    assert_eq!(row["enabled"].as_bool(), Some(true));
+    assert_eq!(row["created_at"].as_datetime(), Some(created_at));
+
+    Ok(())
+}
+
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
 async fn json_array_not_contains(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_temp_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
@@ -2368,6 +2874,8 @@ async fn json_array_not_contains(api: &mut dyn TestApi, json_type: &str) -> crat
         "postgres" => JsonPath::array(["a", "b"]),
         #[cfg(feature = "mysql")]
         "mysql" => JsonPath::string("$.a.b"),
+        #[cfg(feature = "kingbase-oracle-native")]
+        "kingbase_oracle" => JsonPath::array(["a", "b"]),
         _ => unreachable!(),
     };
     let path: Expression = json_extract(col!("obj"), path.clone(), false).into();
@@ -2407,7 +2915,13 @@ async fn json_array_not_contains_fun(api: &mut dyn TestApi) -> crate::Result<()>
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_array_not_contains_fun_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_contains(api, "json").await
+}
+
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
 async fn json_array_begins_with(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_temp_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
@@ -2431,6 +2945,8 @@ async fn json_array_begins_with(api: &mut dyn TestApi, json_type: &str) -> crate
         "postgres" => JsonPath::array(["a", "b"]),
         #[cfg(feature = "mysql")]
         "mysql" => JsonPath::string("$.a.b"),
+        #[cfg(feature = "kingbase-oracle-native")]
+        "kingbase_oracle" => JsonPath::array(["a", "b"]),
         _ => unreachable!(),
     };
     let path: Expression = json_extract(col!("obj"), path.clone(), false).into();
@@ -2499,7 +3015,13 @@ async fn json_array_begins_with_fun(api: &mut dyn TestApi) -> crate::Result<()> 
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_array_begins_with_fun_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_begins_with(api, "json").await
+}
+
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
 async fn json_array_not_begins_with(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_temp_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
@@ -2518,6 +3040,8 @@ async fn json_array_not_begins_with(api: &mut dyn TestApi, json_type: &str) -> c
         "postgres" => JsonPath::array(["a", "b"]),
         #[cfg(feature = "mysql")]
         "mysql" => JsonPath::string("$.a.b"),
+        #[cfg(feature = "kingbase-oracle-native")]
+        "kingbase_oracle" => JsonPath::array(["a", "b"]),
         _ => unreachable!(),
     };
     let path: Expression = json_extract(col!("obj"), path.clone(), false).into();
@@ -2558,7 +3082,13 @@ async fn json_array_not_begins_with_fun(api: &mut dyn TestApi) -> crate::Result<
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_array_not_begins_with_fun_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_begins_with(api, "json").await
+}
+
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
 async fn json_array_ends_into(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_temp_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
@@ -2582,6 +3112,8 @@ async fn json_array_ends_into(api: &mut dyn TestApi, json_type: &str) -> crate::
         "postgres" => JsonPath::array(["a", "b"]),
         #[cfg(feature = "mysql")]
         "mysql" => JsonPath::string("$.a.b"),
+        #[cfg(feature = "kingbase-oracle-native")]
+        "kingbase_oracle" => JsonPath::array(["a", "b"]),
         _ => unreachable!(),
     };
     let path: Expression = json_extract(col!("obj"), path.clone(), false).into();
@@ -2651,7 +3183,13 @@ async fn json_array_ends_into_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_array_ends_into_fun_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_ends_into(api, "json").await
+}
+
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
 async fn json_array_not_ends_into(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
         .create_temp_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
@@ -2670,6 +3208,8 @@ async fn json_array_not_ends_into(api: &mut dyn TestApi, json_type: &str) -> cra
         "postgres" => JsonPath::array(["a", "b"]),
         #[cfg(feature = "mysql")]
         "mysql" => JsonPath::string("$.a.b"),
+        #[cfg(feature = "kingbase-oracle-native")]
+        "kingbase_oracle" => JsonPath::array(["a", "b"]),
         _ => unreachable!(),
     };
     let path: Expression = json_extract(col!("obj"), path.clone(), false).into();
@@ -2711,6 +3251,12 @@ async fn json_array_not_ends_into_fun(api: &mut dyn TestApi) -> crate::Result<()
     Ok(())
 }
 
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_array_not_ends_into_fun_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_array_not_ends_into(api, "json").await
+}
+
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 async fn json_gt_gte_lt_lte(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
     let table = api
@@ -2730,6 +3276,8 @@ async fn json_gt_gte_lt_lte(api: &mut dyn TestApi, json_type: &str) -> crate::Re
         "postgres" => JsonPath::array(["a", "b"]),
         #[cfg(feature = "mysql")]
         "mysql" => JsonPath::string("$.a.b"),
+        #[cfg(feature = "kingbase-oracle-native")]
+        "kingbase_oracle" => JsonPath::array(["a", "b"]),
         _ => unreachable!(),
     };
     let path: Expression = json_extract(col!("json"), path.clone(), false).into();
@@ -2879,8 +3427,18 @@ async fn json_gt_gte_lt_lte_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(feature = "postgresql")]
-#[test_each_connector(tags("postgresql"))]
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn json_gt_gte_lt_lte_fun_on_kingbase_oracle(api: &mut dyn TestApi) -> crate::Result<()> {
+    json_gt_gte_lt_lte(api, "json").await
+}
+
+#[cfg(any(
+    feature = "postgresql",
+    feature = "kingbase-mysql-native",
+    feature = "kingbase-oracle-native"
+))]
+#[test_each_connector(tags("postgresql", "kingbase-mysql", "kingbase-oracle"))]
 async fn text_search_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
         .create_temp_table("name varchar(255), ingredients varchar(255)")
@@ -2926,11 +3484,50 @@ async fn text_search_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(row["name"], Value::from("Chicken Curry"));
     assert_eq!(row["ingredients"], Value::from("Chicken, Curry, Rice"));
 
+    if api
+        .connector_tag()
+        .intersects(Tags::KINGBASE_MYSQL | Tags::KINGBASE_ORACLE)
+    {
+        for (query, expected) in [
+            ("chicken & curry", vec!["Chicken Curry"]),
+            ("chicken | salad", vec!["Caesar Salad", "Chicken Curry"]),
+            ("chicken & !salad", vec!["Chicken Curry"]),
+            ("chicken <-> curry", vec!["Chicken Curry"]),
+            ("chick:*", vec!["Caesar Salad", "Chicken Curry"]),
+            ("!chicken", vec![]),
+        ] {
+            let search: Expression = text_search(&[col!("name"), col!("ingredients")]).into();
+            let rows = api
+                .conn()
+                .select(Select::from_table(&table).so_that(search.matches(query)))
+                .await?;
+            let mut names: Vec<_> = rows
+                .into_iter()
+                .map(|row| row["name"].as_str().unwrap().to_owned())
+                .collect();
+            names.sort();
+            assert_eq!(names, expected, "{query}");
+        }
+
+        // Malformed native tsquery is rejected by the database, not rewritten.
+        let search: Expression = text_search(&[col!("name")]).into();
+        let error = api
+            .conn()
+            .select(Select::from_table(&table).so_that(search.matches("chicken curry")))
+            .await
+            .unwrap_err();
+        assert_eq!(error.original_code(), Some("42601"));
+    }
+
     Ok(())
 }
 
-#[cfg(feature = "postgresql")]
-#[test_each_connector(tags("postgresql"))]
+#[cfg(any(
+    feature = "postgresql",
+    feature = "kingbase-mysql-native",
+    feature = "kingbase-oracle-native"
+))]
+#[test_each_connector(tags("postgresql", "kingbase-mysql", "kingbase-oracle"))]
 async fn text_search_relevance_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
         .create_temp_table("name varchar(255), ingredients varchar(255)")
@@ -3049,13 +3646,325 @@ async fn generate_swapped_binary_uuid(api: &mut dyn TestApi) -> crate::Result<()
 
 #[cfg(feature = "mysql")]
 #[test_each_connector(tags("mysql"))]
+async fn sum_numeric_parameters(api: &mut dyn TestApi) -> crate::Result<()> {
+    for (parameter, expected) in [
+        (Value::int32(123), Some(123.0)),
+        (Value::int32(i32::MIN), Some(f64::from(i32::MIN))),
+        (Value::int64(2147483648_i64), Some(2147483648.0)),
+        (Value::int64(i64::MAX), Some(i64::MAX as f64)),
+        (Value::float(1.25), Some(1.25)),
+        (Value::float(-1.25), Some(-1.25)),
+        (Value::double(0.1), Some(0.1)),
+        (Value::double(1e-31), Some(1e-31)),
+        (Value::numeric("1.25".parse().unwrap()), Some(1.25)),
+        (Value::null_int32(), None),
+        (Value::null_int64(), None),
+        (Value::null_float(), None),
+        (Value::null_double(), None),
+        (Value::null_numeric(), None),
+    ] {
+        let query = Select::default().value(sum(parameter.clone()).alias("total"));
+        let result = api.conn().select(query).await?;
+        if api.connector_tag().contains(Tags::KINGBASE_MYSQL) {
+            use crate::connector::ColumnType;
+            let (expected_type, expected_value) = match &parameter.typed {
+                ValueType::Int32(Some(value)) => (ColumnType::Int64, Value::int64(i64::from(*value))),
+                ValueType::Int64(Some(value)) => (
+                    ColumnType::Numeric,
+                    Value::numeric(bigdecimal::BigDecimal::from(*value)),
+                ),
+                ValueType::Numeric(Some(value)) => (ColumnType::Numeric, Value::numeric(value.clone())),
+                _ => (
+                    ColumnType::Double,
+                    expected.map_or_else(Value::null_double, Value::double),
+                ),
+            };
+            assert_eq!(result.types[0], expected_type, "{parameter:?}");
+            assert_eq!(result.into_single()?["total"], expected_value, "{parameter:?}");
+            continue;
+        }
+        assert_eq!(result.types[0], crate::connector::ColumnType::Double, "{parameter:?}");
+        let row = result.into_single()?;
+        assert_eq!(row["total"].as_f64(), expected, "{parameter:?}");
+        assert_eq!(row["total"].is_null(), expected.is_none());
+    }
+
+    Ok(())
+}
+
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn oracle_numeric_bindings_match_column_wire_types(api: &mut dyn TestApi) -> crate::Result<()> {
+    for (column_type, parameters, expected) in [
+        (
+            "TINYINT",
+            vec![Value::int32(-128), Value::int64(127_i64)],
+            vec![Value::int32(-128), Value::int32(127)],
+        ),
+        (
+            "SMALLINT",
+            vec![Value::int32(-32768), Value::int64(32767_i64)],
+            vec![Value::int32(-32768), Value::int32(32767)],
+        ),
+        (
+            "INTEGER",
+            vec![Value::int64(i64::from(i32::MIN)), Value::int64(i64::from(i32::MAX))],
+            vec![Value::int32(i32::MIN), Value::int32(i32::MAX)],
+        ),
+        (
+            "BIGINT",
+            vec![Value::int32(-42), Value::int64(i64::MAX)],
+            vec![Value::int64(-42_i64), Value::int64(i64::MAX)],
+        ),
+        (
+            "BINARY_FLOAT",
+            vec![
+                Value::float(0.125),
+                Value::double(0.125),
+                Value::numeric("0.125".parse().unwrap()),
+                Value::int32(42),
+            ],
+            vec![
+                Value::float(0.125),
+                Value::float(0.125),
+                Value::float(0.125),
+                Value::float(42.0),
+            ],
+        ),
+        (
+            "BINARY_DOUBLE",
+            vec![
+                Value::float(0.125),
+                Value::double(0.125),
+                Value::numeric("0.125".parse().unwrap()),
+                Value::int64(42_i64),
+            ],
+            vec![
+                Value::double(0.125),
+                Value::double(0.125),
+                Value::double(0.125),
+                Value::double(42.0),
+            ],
+        ),
+        (
+            "NUMBER",
+            vec![Value::float(0.125), Value::double(0.125)],
+            vec![
+                Value::numeric("0.125".parse().unwrap()),
+                Value::numeric("0.125".parse().unwrap()),
+            ],
+        ),
+    ] {
+        let table = api.create_temp_table(&format!("value {column_type}")).await?;
+        let sql = format!("INSERT INTO \"{table}\" (value) VALUES ($1) RETURNING value");
+        for (parameter, expected) in parameters.into_iter().zip(expected) {
+            for typed in [false, true] {
+                let params = [parameter.clone()];
+                let result = if typed {
+                    api.conn().query_raw_typed(&sql, &params).await?
+                } else {
+                    api.conn().query_raw(&sql, &params).await?
+                };
+                assert_eq!(
+                    result.into_single()?["value"],
+                    expected,
+                    "{column_type} / {parameter:?} / typed={typed}"
+                );
+            }
+        }
+        for parameter in [
+            Value::null_int32(),
+            Value::null_int64(),
+            Value::null_float(),
+            Value::null_double(),
+            Value::null_numeric(),
+        ] {
+            for typed in [false, true] {
+                let params = [parameter.clone()];
+                let result = if typed {
+                    api.conn().query_raw_typed(&sql, &params).await?
+                } else {
+                    api.conn().query_raw(&sql, &params).await?
+                };
+                assert!(
+                    result.into_single()?["value"].is_null(),
+                    "{column_type} / {parameter:?} / typed={typed}"
+                );
+            }
+        }
+    }
+    Ok(())
+}
+
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn oracle_inferred_integer_bindings_reject_overflow(api: &mut dyn TestApi) -> crate::Result<()> {
+    for (column_type, parameter) in [
+        ("TINYINT", Value::int32(128)),
+        ("TINYINT", Value::int64(-129_i64)),
+        ("SMALLINT", Value::int32(32768)),
+        ("SMALLINT", Value::int64(-32769_i64)),
+        ("INTEGER", Value::int64(i64::from(i32::MAX) + 1)),
+        ("INTEGER", Value::int64(i64::from(i32::MIN) - 1)),
+    ] {
+        let table = api.create_temp_table(&format!("value {column_type}")).await?;
+        let error = api
+            .conn()
+            .query_raw(&format!("INSERT INTO \"{table}\" (value) VALUES ($1)"), &[parameter])
+            .await
+            .unwrap_err();
+        let ErrorKind::QueryError(driver_error) = error.kind() else {
+            panic!("Expected a local parameter encoding error, got {error:?}");
+        };
+        let source = driver_error.source().expect("parameter conversion error");
+        assert!(source.to_string().contains("Unable to fit integer value"), "{source}");
+        assert!(
+            api.conn()
+                .query_raw(&format!("SELECT value FROM \"{table}\""), &[])
+                .await?
+                .is_empty()
+        );
+    }
+    Ok(())
+}
+
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn oracle_boolean_bindings_work_without_native_type_metadata(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_temp_table("value BOOLEAN").await?;
+    let sql = format!("INSERT INTO \"{table}\" (value) VALUES ($1) RETURNING value");
+    for parameter in [Value::boolean(true), Value::boolean(false), Value::null_boolean()] {
+        for typed in [false, true] {
+            let params = [parameter.clone()];
+            let result = if typed {
+                api.conn().query_raw_typed(&sql, &params).await?
+            } else {
+                api.conn().query_raw(&sql, &params).await?
+            };
+            assert_eq!(result.into_single()?["value"], parameter, "typed={typed}");
+        }
+    }
+    for value in [true, false] {
+        let select = Select::from_table(table.as_str()).so_that(Column::from("value").equals(value));
+        let result = api.conn().select(select).await?;
+        assert_eq!(result.len(), 2);
+        for row in result {
+            assert_eq!(row["value"], Value::boolean(value));
+        }
+    }
+    Ok(())
+}
+
+#[cfg(feature = "kingbase-oracle-native")]
+#[test_each_connector(tags("kingbase-oracle"))]
+async fn oracle_numeric_parameters_follow_inferred_and_explicit_types(api: &mut dyn TestApi) -> crate::Result<()> {
+    for (parameter, text, typed) in [
+        (Value::int32(-123), "-123", Value::numeric((-123).into())),
+        (
+            Value::int64(i64::MAX),
+            "9223372036854775807",
+            Value::numeric(i64::MAX.into()),
+        ),
+        (
+            Value::float(0.1),
+            "0.10000000149011612",
+            Value::double(f64::from(0.1_f32)),
+        ),
+        (Value::float(1.25), "1.25", Value::double(1.25)),
+        (Value::double(-1.25), "-1.25", Value::double(-1.25)),
+        (
+            Value::numeric("12345678901234567890.123456789".parse().unwrap()),
+            "12345678901234567890.123456789",
+            Value::numeric("12345678901234567890.123456789".parse().unwrap()),
+        ),
+        (
+            Value::numeric("1.25".parse().unwrap()),
+            "1.25",
+            Value::numeric("1.25".parse().unwrap()),
+        ),
+    ] {
+        // An unconstrained placeholder is inferred as TEXT. Keep its full
+        // decimal representation even when SUM itself returns a Double.
+        let row = api
+            .conn()
+            .query_raw("SELECT $1 AS value", &[parameter.clone()])
+            .await?
+            .into_single()?;
+        assert_eq!(row["value"].as_str(), Some(text), "{parameter:?}");
+
+        let row = api
+            .conn()
+            .query_raw("SELECT SUM($1) AS total", &[parameter.clone()])
+            .await?
+            .into_single()?;
+        // R2's text SUM may round floating values. Compare with the same
+        // server-side literal conversion, separately from exact wire text.
+        let literal = api
+            .conn()
+            .query_raw(&format!("SELECT SUM('{text}') AS total"), &[])
+            .await?
+            .into_single()?;
+        assert_eq!(row["total"], literal["total"], "{parameter:?}");
+
+        let row = api
+            .conn()
+            .query_raw_typed("SELECT $1 AS value", &[parameter.clone()])
+            .await?
+            .into_single()?;
+        assert_eq!(row["value"], typed, "{parameter:?}");
+    }
+
+    for parameter in [
+        Value::null_int32(),
+        Value::null_int64(),
+        Value::null_float(),
+        Value::null_double(),
+        Value::null_numeric(),
+    ] {
+        let row = api
+            .conn()
+            .query_raw("SELECT SUM($1) AS total", &[parameter.clone()])
+            .await?
+            .into_single()?;
+        assert!(row["total"].is_null(), "{parameter:?}");
+        let row = api
+            .conn()
+            .query_raw_typed("SELECT $1 AS value", &[parameter.clone()])
+            .await?
+            .into_single()?;
+        assert!(row["value"].is_null(), "{parameter:?}");
+    }
+
+    Ok(())
+}
+
+#[cfg(feature = "mysql")]
+#[test_each_connector(tags("mysql"))]
+async fn sum_float_parameter_precision(api: &mut dyn TestApi) -> crate::Result<()> {
+    // Preserve the exact f64 expansion used by native MySQL. Accidentally
+    // binding this numeric AST parameter as TEXT makes R3 round the SUM.
+    let query = Select::default().value(sum(Value::float(0.1)).alias("total"));
+    let result = api.conn().select(query).await?;
+    assert_eq!(result.types[0], crate::connector::ColumnType::Double);
+    let row = result.into_single()?;
+    assert_eq!(row["total"].as_f64(), Some(f64::from(0.1_f32)));
+
+    Ok(())
+}
+
+#[cfg(feature = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn generate_native_uuid(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::default().value(native_uuid());
     let res = api.conn().select(select).await?.into_single()?;
     let val = res.into_single()?;
 
-    // If it is a text type and has a value, it's a generated string UUID.
-    assert!(matches!(val.typed, ValueType::Text(x) if x.is_some()));
+    let value = val.as_str().expect("UUID() must return text");
+    assert_eq!(value.len(), 36);
+    assert!(uuid::Uuid::parse_str(value).is_ok());
+    for position in [8, 13, 18, 23] {
+        assert_eq!(value.as_bytes()[position], b'-');
+    }
 
     Ok(())
 }
@@ -3432,8 +4341,8 @@ async fn any_in_expression(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
-#[test_each_connector(tags("postgresql", "mysql"))]
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
+#[test_each_connector(tags("postgresql", "mysql", "kingbase-oracle"))]
 async fn json_unquote_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     let json_type = match api.system() {
         "postgres" => "jsonb",
@@ -3456,12 +4365,19 @@ async fn json_unquote_fun(api: &mut dyn TestApi) -> crate::Result<()> {
 
     assert_eq!(res.get(0).unwrap()["unquote"], Value::text("a"));
     assert_eq!(res.get(1).unwrap()["unquote"], Value::text("1"));
-    if api.connector_tag().intersects(Tags::MYSQL_MARIADB) {
+    // Oracle-mode R2 returns compact JSON text for objects and arrays.
+    if api
+        .connector_tag()
+        .intersects(Tags::MYSQL_MARIADB | Tags::KINGBASE_ORACLE)
+    {
         assert_eq!(res.get(2).unwrap()["unquote"], Value::text("{\"a\":\"b\"}"));
     } else {
         assert_eq!(res.get(2).unwrap()["unquote"], Value::text("{\"a\": \"b\"}"));
     }
-    if api.connector_tag().intersects(Tags::MYSQL_MARIADB) {
+    if api
+        .connector_tag()
+        .intersects(Tags::MYSQL_MARIADB | Tags::KINGBASE_ORACLE)
+    {
         assert_eq!(res.get(3).unwrap()["unquote"], Value::text("[\"a\",1]"));
     } else {
         assert_eq!(res.get(3).unwrap()["unquote"], Value::text("[\"a\", 1]"));
@@ -3470,8 +4386,34 @@ async fn json_unquote_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
-#[test_each_connector(tags("postgresql", "mysql"))]
+#[cfg(feature = "mysql")]
+#[test_each_connector(tags("mysql"))]
+async fn json_unquote_text_parameters(api: &mut dyn TestApi) -> crate::Result<()> {
+    // JSON_UNQUOTE accepts ordinary text as well as encoded JSON strings. A
+    // JSONB cast would reject plain text and normalize objects and numbers.
+    for (input, expected) in [
+        (Some("hello"), Some("hello")),
+        (Some(""), Some("")),
+        (Some("\"a\\nb\""), Some("a\nb")),
+        (Some("null"), Some("null")),
+        (Some("1.25e3"), Some("1.25e3")),
+        (Some("{\"b\":2,\"a\":1}"), Some("{\"b\":2,\"a\":1}")),
+        (Some("{\"a\":1,\"a\":2}"), Some("{\"a\":1,\"a\":2}")),
+        (None, None),
+    ] {
+        let input = input.map(Value::text).unwrap_or_else(Value::null_text);
+        let expected = expected.map(Value::text).unwrap_or_else(Value::null_text);
+        let query = Select::default().value(json_unquote(input).alias("unquote"));
+        let result = api.conn().select(query).await?;
+        assert_eq!(result.types[0], crate::connector::ColumnType::Text);
+        assert_eq!(result.get(0).unwrap()["unquote"], expected);
+    }
+
+    Ok(())
+}
+
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
+#[test_each_connector(tags("postgresql", "mysql", "kingbase-oracle"))]
 async fn json_col_equal_json_col(api: &mut dyn TestApi) -> crate::Result<()> {
     let json_type = match api.system() {
         "postgres" => "jsonb",
@@ -3500,9 +4442,14 @@ async fn json_col_equal_json_col(api: &mut dyn TestApi) -> crate::Result<()> {
 
     api.conn().insert(insert.into()).await?;
 
+    // Model queries carry native column types. Oracle needs that metadata
+    // to compare JSON columns through its JSONB operator implementation.
+    let native_type = api.connector_tag().contains(Tags::KINGBASE_ORACLE).then_some("JSON");
+    let left = Column::from("json_1").native_column_type(native_type);
+    let right = Column::from("json_2").native_column_type(native_type);
     let query = Select::from_table(&table)
         .column("id")
-        .so_that(col!("json_1").equals(col!("json_2")));
+        .so_that(left.clone().equals(right.clone()));
     let mut res = api.conn().select(query.clone()).await?.into_iter();
 
     assert_eq!(res.next().unwrap()["id"], Value::int32(1));
@@ -3513,14 +4460,14 @@ async fn json_col_equal_json_col(api: &mut dyn TestApi) -> crate::Result<()> {
         "postgres" => JsonPath::array(["a", "b"]),
         #[cfg(feature = "mysql")]
         "mysql" => JsonPath::string("$.a.b"),
+        #[cfg(feature = "kingbase-oracle-native")]
+        "kingbase_oracle" => JsonPath::array(["a", "b"]),
         _ => unreachable!(),
     };
 
     // Ensures that using JSON_EXTRACT(`json_col`) = `json_col` works to prevents regressions on MySQL flavoured connectors.
-    let expr: Expression<'_> = json_extract(col!("json_1"), path, false).into();
-    let query = Select::from_table(&table)
-        .column("id")
-        .so_that(expr.equals(col!("json_2")));
+    let expr: Expression<'_> = json_extract(left, path, false).into();
+    let query = Select::from_table(&table).column("id").so_that(expr.equals(right));
 
     let mut res = api.conn().select(query.clone()).await?.into_iter();
 

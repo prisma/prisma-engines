@@ -39,6 +39,16 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Return whether a column's type needs to be migrated, and how.
     fn column_type_change(&self, differ: MigrationPair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange>;
 
+    /// Compare two database-generated defaults without changing their SQL.
+    fn dbgenerated_defaults_match(
+        &self,
+        _columns: MigrationPair<TableColumnWalker<'_>>,
+        previous: &str,
+        next: &str,
+    ) -> bool {
+        previous.eq_ignore_ascii_case(next)
+    }
+
     /// Push enum-related steps.
     fn push_enum_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
 
@@ -78,6 +88,16 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Did something connector-specific change in the primary key definition?
     fn primary_key_changed(&self, _tables: MigrationPair<TableWalker<'_>>) -> bool {
         false
+    }
+
+    /// Whether a column type change requires rebuilding an otherwise unchanged
+    /// primary key. Changes to the key columns, their order or lengths are
+    /// handled separately and still require the normal primary key migration.
+    fn primary_key_column_type_change_requires_recreation(
+        &self,
+        _columns: MigrationPair<TableColumnWalker<'_>>,
+    ) -> bool {
+        true
     }
 
     /// Evaluate indexes/constraints that need to be dropped and re-created based on other changes in the schema
