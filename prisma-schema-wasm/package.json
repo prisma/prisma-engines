@@ -1,6 +1,6 @@
 {
   "name": "@prisma-kb/prisma-schema-wasm",
-  "version": null,
+  "version": "7.10.0-kb.5",
   "description": "Wasm schema parser, validator, and formatter for Prisma Kingbase support",
   "main": "src/prisma_schema_build.js",
   "scripts": {
