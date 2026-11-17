@@ -1,0 +1,17 @@
+{
+  "modelName": "Parent",
+  "action": "updateMany",
+  "query": {
+    "arguments": {
+      "where": {
+        "id": 1
+      },
+      "data": {
+        "id": 2
+      }
+    },
+    "selection": {
+      "count": true
+    }
+  }
+}
