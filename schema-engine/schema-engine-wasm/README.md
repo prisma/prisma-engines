@@ -1,6 +1,6 @@
 # @prisma/schema-engine-wasm
 
-[![Publish pipeline](https://github.com/prisma/prisma-engines/actions/workflows/publish-schema-engine-wasm.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/publish-schema-engine-wasm.yml)
+[![Publish pipeline](https://github.com/prisma/prisma-engines/actions/workflows/publish-prisma-schema-engine-wasm.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/publish-prisma-schema-engine-wasm.yml)
 [![npm package](https://img.shields.io/npm/v/@prisma/schema-engine-wasm/latest)](https://www.npmjs.com/package/@prisma/schema-engine-wasm)
 [![install size](https://packagephobia.com/badge?p=@prisma/schema-engine-wasm)](https://packagephobia.com/result?p=@prisma/schema-engine-wasm)
 
@@ -10,19 +10,14 @@ The published npm package is internal to Prisma. Its API will break without prio
 
 ## Setup
 
-Use the Rust toolchain pinned in the repository's `rust-toolchain.toml`.
-Run setup commands from the repository root:
-
-```sh
-rustup target add wasm32-unknown-unknown
 ```
-
-Install `wasm-bindgen-cli` at the version matching the resolved `wasm-bindgen`
-dependency in `Cargo.lock`, using
-`cargo install --locked wasm-bindgen-cli --version <matching-version>`
-with `<matching-version>` replaced by that dependency version.
-Release/profiling optimization also requires the Binaryen `wasm-opt` used by
-`build.sh`; check that script before selecting the build profile.
+# Install the latest Rust version with `rustup`
+# or update the latest Rust version with `rustup`
+rustup update
+rustup target add wasm32-unknown-unknown
+cargo install wasm-bindgen
+cargo install wasm-pack
+```
 
 ## How to Build
 
@@ -34,10 +29,7 @@ where e.g. `OUT_NPM_VERSION="0.0.1"` is the version you want to publish this pac
 
 From the root of the repository:
 
-- `SCHEMA_ENGINE_WASM_VERSION="$OUT_NPM_VERSION" make build-se-wasm`
-
-For the separate PSL/schema-tools package, use
-`SCHEMA_WASM_VERSION="$OUT_NPM_VERSION" make build-schema-wasm`.
+- `SCHEMA_WASM_VERSION=$OUT_NPM_VERSION make build-se-wasm`
 
 By default, the build profile is `dev` in local builds, and `release` in CI builds.
 You can override this by setting the `WASM_BUILD_PROFILE` environment variable.
@@ -47,10 +39,11 @@ See [`./build.sh`](./build.sh) for more details.
 
 ## Example
 
-```bash
-node --experimental-wasm-modules --input-type=module -e "const { version } = await import('@prisma/schema-engine-wasm'); console.log(version())"
-```
+Using Node.js 20.9.0:
 
-The command prints the revision of the installed Wasm build. This package's
-build script currently enables SQLite and PostgreSQL connectors; it is separate
-from the KES-enabled native Schema Engine and the schema-tools Wasm package.
+```bash
+❯ node --experimental-wasm-modules -e "const { version } = await import('@prisma/schema-engine-wasm'); console.log(version())" 
+(node:4977) ExperimentalWarning: Importing WebAssembly modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+4411ab2a4b97a8109bf19c2678742abde9ed60a4
+```
