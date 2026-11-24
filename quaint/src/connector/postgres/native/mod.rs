@@ -99,7 +99,7 @@ pub type PostgreSqlWithTracingCache = PostgreSql<TracingLruCache>;
 
 #[derive(Debug)]
 struct SslAuth {
-    certificate: Hidden<Option<Certificate>>,
+    certificates: Hidden<Vec<Certificate>>,
     identity: Hidden<Option<Identity>>,
     ssl_accept_mode: SslAcceptMode,
 }
@@ -107,7 +107,7 @@ struct SslAuth {
 impl Default for SslAuth {
     fn default() -> Self {
         Self {
-            certificate: Hidden(None),
+            certificates: Hidden(Vec::new()),
             identity: Hidden(None),
             ssl_accept_mode: SslAcceptMode::AcceptInvalidCerts,
         }
@@ -115,8 +115,8 @@ impl Default for SslAuth {
 }
 
 impl SslAuth {
-    fn certificate(&mut self, certificate: Certificate) -> &mut Self {
-        self.certificate = Hidden(Some(certificate));
+    fn certificates(&mut self, certificates: Vec<Certificate>) -> &mut Self {
+        self.certificates = Hidden(certificates);
         self
     }
 
@@ -129,6 +129,159 @@ impl SslAuth {
         self.ssl_accept_mode = mode;
         self
     }
+}
+
+const PEM_DASHES: &[u8] = b"-----";
+
+/// A PEM encapsulation boundary: `-----BEGIN <label>-----` or `-----END <label>-----`.
+#[derive(Debug, PartialEq, Eq)]
+enum PemMarker<'a> {
+    Begin(&'a [u8]),
+    End(&'a [u8]),
+}
+
+/// Parses a trimmed line as a PEM marker. The label follows the `label` rule of RFC 7468:
+/// printable ASCII characters other than `-`, separated by single spaces or hyphens.
+fn parse_pem_marker(line: &[u8]) -> Option<PemMarker<'_>> {
+    let inner = line.strip_prefix(PEM_DASHES)?.strip_suffix(PEM_DASHES)?;
+
+    if let Some(label) = inner.strip_prefix(b"BEGIN ") {
+        is_valid_pem_label(label).then_some(PemMarker::Begin(label))
+    } else if let Some(label) = inner.strip_prefix(b"END ") {
+        is_valid_pem_label(label).then_some(PemMarker::End(label))
+    } else {
+        None
+    }
+}
+
+fn is_valid_pem_label(label: &[u8]) -> bool {
+    let is_label_char = |c: u8| (0x21..=0x7e).contains(&c) && c != b'-';
+    let is_separator = |c: u8| c == b' ' || c == b'-';
+
+    let (Some(&first), Some(&last)) = (label.first(), label.last()) else {
+        return false;
+    };
+
+    is_label_char(first)
+        && is_label_char(last)
+        && label.iter().all(|&c| is_label_char(c) || is_separator(c))
+        && label
+            .windows(2)
+            .all(|pair| !(is_separator(pair[0]) && is_separator(pair[1])))
+}
+
+fn invalid_pem_bundle(reason: &str, line: usize) -> Error {
+    Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
+        message: format!("invalid PEM certificate bundle in sslcert: {reason} (line {line})"),
+    }))
+    .build()
+}
+
+/// Splits PEM text into lines ending in CRLF, LF or CR, the line endings RFC 7468 allows.
+fn pem_lines(pem: &[u8]) -> impl Iterator<Item = &[u8]> {
+    let mut rest = Some(pem);
+
+    std::iter::from_fn(move || {
+        let text = rest?;
+
+        match text.iter().position(|&b| b == b'\n' || b == b'\r') {
+            Some(end) => {
+                let terminator = if text[end..].starts_with(b"\r\n") { 2 } else { 1 };
+                rest = Some(&text[end + terminator..]);
+                Some(&text[..end])
+            }
+            None => {
+                rest = None;
+                Some(text)
+            }
+        }
+    })
+}
+
+/// Parses the contents of the `sslcert` file into the root certificates to trust.
+///
+/// The file may hold several PEM certificates (a CA bundle), and every one of them is returned,
+/// in file order. A file with at most two lines starting with `-----` (a single certificate, or
+/// no PEM at all) is passed to [`Certificate::from_pem`] unchanged, exactly as before bundles
+/// were supported, so its result and errors don't change.
+///
+/// Otherwise the file must be a well-formed sequence of PEM blocks: text between blocks is
+/// ignored, non-certificate blocks (such as keys or CRLs) are skipped, and any malformed,
+/// nested, unterminated or stray marker is an error. Each certificate block is re-encoded in
+/// canonical form and parsed on its own, so the TLS backend only ever sees one certificate at a
+/// time.
+fn parse_root_certificates(pem: &[u8]) -> crate::Result<Vec<Certificate>> {
+    enum State<'a> {
+        Outside,
+        InCertificate(Vec<&'a [u8]>),
+        Skipping(&'a [u8]),
+    }
+
+    let lines = || pem_lines(pem).map(<[u8]>::trim_ascii);
+    let is_dash_line = |line: &[u8]| line.starts_with(PEM_DASHES);
+
+    if lines().filter(|line| is_dash_line(line)).count() <= 2 {
+        return Ok(vec![Certificate::from_pem(pem)?]);
+    }
+
+    let mut certificates = Vec::new();
+    let mut state = State::Outside;
+    let mut line_number = 0;
+
+    for line in lines() {
+        line_number += 1;
+
+        state = match state {
+            State::Outside if is_dash_line(line) => match parse_pem_marker(line) {
+                Some(PemMarker::Begin(b"CERTIFICATE")) => State::InCertificate(Vec::new()),
+                Some(PemMarker::Begin(b"TRUSTED CERTIFICATE" | b"X509 CERTIFICATE")) => {
+                    return Err(invalid_pem_bundle("unsupported certificate PEM label", line_number));
+                }
+                Some(PemMarker::Begin(label)) => State::Skipping(label),
+                Some(PemMarker::End(_)) => return Err(invalid_pem_bundle("stray END marker", line_number)),
+                None => return Err(invalid_pem_bundle("malformed PEM marker", line_number)),
+            },
+            State::Outside => State::Outside,
+            State::InCertificate(body) if is_dash_line(line) => match parse_pem_marker(line) {
+                Some(PemMarker::End(b"CERTIFICATE")) => {
+                    let mut block = b"-----BEGIN CERTIFICATE-----\n".to_vec();
+
+                    for body_line in body {
+                        block.extend_from_slice(body_line);
+                        block.push(b'\n');
+                    }
+
+                    block.extend_from_slice(b"-----END CERTIFICATE-----\n");
+                    certificates.push(Certificate::from_pem(&block)?);
+
+                    State::Outside
+                }
+                _ => return Err(invalid_pem_bundle("nested or mismatched PEM marker", line_number)),
+            },
+            State::InCertificate(mut body) => {
+                if !line.is_empty() {
+                    body.push(line);
+                }
+
+                State::InCertificate(body)
+            }
+            State::Skipping(label) if is_dash_line(line) => match parse_pem_marker(line) {
+                Some(PemMarker::End(end_label)) if end_label == label => State::Outside,
+                _ => return Err(invalid_pem_bundle("nested or mismatched PEM marker", line_number)),
+            },
+            State::Skipping(label) => State::Skipping(label),
+        };
+    }
+
+    if !matches!(state, State::Outside) {
+        return Err(invalid_pem_bundle("missing END marker", line_number));
+    }
+
+    if certificates.is_empty() {
+        return Ok(vec![Certificate::from_pem(pem)?]);
+    }
+
+    Ok(certificates)
 }
 
 impl SslParams {
@@ -144,7 +297,7 @@ impl SslParams {
                 .build()
             })?;
 
-            auth.certificate(Certificate::from_pem(&cert)?);
+            auth.certificates(parse_root_certificates(&cert)?);
         }
 
         if let Some(ref identity_file) = self.identity_file {
@@ -906,30 +1059,31 @@ impl MakeTlsConnectorManager {
     pub async fn get_connector(&self) -> crate::Result<MakeTlsConnector> {
         self.connector
             .get_or_try_init(|| async {
-                let mut tls_builder = TlsConnector::builder();
-
-                {
-                    let ssl_params = self.url.ssl_params();
-                    let auth = ssl_params.to_owned().into_auth().await?;
-
-                    if let Some(certificate) = auth.certificate.0 {
-                        tls_builder.add_root_certificate(certificate);
-                    }
-
-                    tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
-
-                    if let Some(identity) = auth.identity.0 {
-                        tls_builder.identity(identity);
-                    }
-                }
-
-                let tls_connector = MakeTlsConnector::new(tls_builder.build()?);
+                let auth = self.url.ssl_params().to_owned().into_auth().await?;
+                let tls_connector = MakeTlsConnector::new(build_tls_connector(auth)?);
 
                 Ok(tls_connector)
             })
             .await
             .cloned()
     }
+}
+
+/// Builds the TLS connector, trusting every certificate from `sslcert` as a root.
+fn build_tls_connector(auth: SslAuth) -> crate::Result<TlsConnector> {
+    let mut tls_builder = TlsConnector::builder();
+
+    for certificate in auth.certificates.0 {
+        tls_builder.add_root_certificate(certificate);
+    }
+
+    tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
+
+    if let Some(identity) = auth.identity.0 {
+        tls_builder.identity(identity);
+    }
+
+    Ok(tls_builder.build()?)
 }
 
 #[cfg(test)]
@@ -1243,5 +1397,362 @@ mod tests {
         for ident in RESERVED_TYPE_FUNCTION_NAMES {
             assert!(!is_safe_identifier(ident));
         }
+    }
+
+    // Fixtures for the `sslcert` tests. See `test-certs/README.md` for how they were made.
+    const CA_A: &[u8] = include_bytes!("test-certs/ca-a.pem");
+    const CA_B: &[u8] = include_bytes!("test-certs/ca-b.pem");
+    const BUNDLE_B_SECOND: &[u8] = include_bytes!("test-certs/bundle-b-second.pem");
+    const BUNDLE_B_FIRST: &[u8] = include_bytes!("test-certs/bundle-b-first.pem");
+    const BUNDLE_CORRUPT_TAIL: &[u8] = include_bytes!("test-certs/bundle-corrupt-tail.pem");
+    const NOT_A_CERT: &[u8] = include_bytes!("test-certs/not-a-cert.pem");
+    const SERVER_CERT: &[u8] = include_bytes!("test-certs/server.pem");
+    const SERVER_KEY: &[u8] = include_bytes!("test-certs/server-key.pem");
+
+    const END_CERTIFICATE: &str = "-----END CERTIFICATE-----";
+
+    fn fixture_path(name: &str) -> String {
+        format!(
+            "{}/src/connector/postgres/native/test-certs/{name}",
+            env!("CARGO_MANIFEST_DIR")
+        )
+    }
+
+    /// The fixture as a string with LF line endings, whatever the checkout's line endings are.
+    fn pem_str(pem: &[u8]) -> String {
+        std::str::from_utf8(pem).unwrap().replace("\r\n", "\n")
+    }
+
+    fn der(pem: &[u8]) -> Vec<u8> {
+        Certificate::from_pem(pem).unwrap().to_der().unwrap()
+    }
+
+    fn ders(certificates: &[Certificate]) -> Vec<Vec<u8>> {
+        certificates.iter().map(|c| c.to_der().unwrap()).collect()
+    }
+
+    fn tls_error_message(err: &Error) -> &str {
+        match err.kind() {
+            ErrorKind::Native(NativeErrorKind::TlsError { message }) => message,
+            other => panic!("expected a TLS error, got {other:?}"),
+        }
+    }
+
+    fn bundle_error(pem: &[u8]) -> String {
+        match parse_root_certificates(pem) {
+            Ok(certificates) => panic!("expected an error, got {} certificate(s)", certificates.len()),
+            Err(err) => tls_error_message(&err).to_owned(),
+        }
+    }
+
+    /// Asserts that `parse_root_certificates` gives exactly what `Certificate::from_pem` on the
+    /// whole input gave before bundles were supported: the same certificate or the same error.
+    fn assert_same_as_from_pem(pem: &[u8]) {
+        match (parse_root_certificates(pem), Certificate::from_pem(pem)) {
+            (Ok(certificates), Ok(certificate)) => {
+                assert_eq!(ders(&certificates), vec![certificate.to_der().unwrap()]);
+            }
+            (Err(err), Err(expected)) => {
+                assert_eq!(tls_error_message(&err), tls_error_message(&Error::from(expected)));
+            }
+            (actual, expected) => panic!(
+                "different outcome: parse_root_certificates is_ok={}, from_pem is_ok={}",
+                actual.is_ok(),
+                expected.is_ok()
+            ),
+        }
+    }
+
+    #[test]
+    fn sslcert_single_certificate_is_unchanged() {
+        let certificates = parse_root_certificates(CA_B).unwrap();
+        assert_eq!(ders(&certificates), vec![der(CA_B)]);
+        assert_same_as_from_pem(CA_B);
+    }
+
+    #[test]
+    fn sslcert_bundle_gives_every_certificate_in_file_order() {
+        let certificates = parse_root_certificates(BUNDLE_B_SECOND).unwrap();
+        assert_eq!(ders(&certificates), vec![der(CA_A), der(CA_B)]);
+
+        let certificates = parse_root_certificates(BUNDLE_B_FIRST).unwrap();
+        assert_eq!(ders(&certificates), vec![der(CA_B), der(CA_A)]);
+    }
+
+    #[test]
+    fn sslcert_bundle_tolerates_crlf_and_surrounding_whitespace() {
+        let padded: String = pem_str(BUNDLE_B_SECOND)
+            .lines()
+            .map(|line| format!("  {line} \r\n"))
+            .collect();
+
+        let certificates = parse_root_certificates(padded.as_bytes()).unwrap();
+        assert_eq!(ders(&certificates), vec![der(CA_A), der(CA_B)]);
+    }
+
+    #[test]
+    fn sslcert_bundle_with_mixed_line_endings() {
+        // RFC 7468 allows CRLF, LF and CR line endings: one LF certificate, then one CR certificate.
+        let pem = format!("{}{}", pem_str(CA_A), pem_str(CA_B).replace('\n', "\r"));
+
+        let certificates = parse_root_certificates(pem.as_bytes()).unwrap();
+        assert_eq!(ders(&certificates), vec![der(CA_A), der(CA_B)]);
+    }
+
+    #[test]
+    fn sslcert_pem_lines_handles_every_line_ending() {
+        let lines: Vec<&[u8]> = pem_lines(b"a\r\nb\nc\rd").collect();
+        assert_eq!(lines, [&b"a"[..], b"b", b"c", b"d"]);
+
+        let lines: Vec<&[u8]> = pem_lines(b"a\n").collect();
+        assert_eq!(lines, [&b"a"[..], b""]);
+    }
+
+    #[test]
+    fn sslcert_bundle_with_non_utf8_comment() {
+        let mut pem = pem_str(CA_A).into_bytes();
+        pem.extend_from_slice(b"# comment \xff\xfe\n");
+        pem.extend_from_slice(pem_str(CA_B).as_bytes());
+
+        let certificates = parse_root_certificates(&pem).unwrap();
+        assert_eq!(ders(&certificates), vec![der(CA_A), der(CA_B)]);
+    }
+
+    #[test]
+    fn sslcert_non_pem_input_fails_as_before() {
+        assert!(parse_root_certificates(NOT_A_CERT).is_err());
+        assert_same_as_from_pem(NOT_A_CERT);
+    }
+
+    // Not on Windows: there, `Certificate::from_pem(b"")` itself crashes the process (SChannel's
+    // `CryptStringToBinaryA` treats a zero length as a NUL-terminated string). An empty file still
+    // goes to that same call, unchanged by bundle support.
+    #[cfg(not(windows))]
+    #[test]
+    fn sslcert_empty_input_fails_as_before() {
+        assert!(parse_root_certificates(b"").is_err());
+        assert_same_as_from_pem(b"");
+    }
+
+    #[test]
+    fn sslcert_single_certificate_with_trailing_text_is_unchanged() {
+        // The retained fallback: text without any `-----` line after a single certificate
+        // goes to `Certificate::from_pem` on the whole input, as before.
+        let pem = format!("{}MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\n", pem_str(CA_A));
+        assert_same_as_from_pem(pem.as_bytes());
+    }
+
+    #[test]
+    fn sslcert_corrupt_later_certificate_fails() {
+        assert!(parse_root_certificates(BUNDLE_CORRUPT_TAIL).is_err());
+    }
+
+    #[test]
+    fn sslcert_malformed_bundles_fail() {
+        let (a, b) = (pem_str(CA_A), pem_str(CA_B));
+        let a_without_end = a.replace(&format!("{END_CERTIFICATE}\n"), "");
+        let b_without_end = b.replace(&format!("{END_CERTIFICATE}\n"), "");
+
+        let cases = [
+            (format!("{a_without_end}{b}"), "nested or mismatched PEM marker"),
+            (format!("{a}{b_without_end}"), "missing END marker"),
+            (format!("{a}{END_CERTIFICATE}\n{b}"), "stray END marker"),
+            (format!("{a}{END_CERTIFICATE}\n"), "stray END marker"),
+            (
+                format!("{a}{}", b.replace(END_CERTIFICATE, "-----END PRIVATE KEY-----")),
+                "nested or mismatched PEM marker",
+            ),
+            (format!("{a}-----BEGIN CERTIF\n"), "malformed PEM marker"),
+            (format!("{a}-----BEGI\n"), "malformed PEM marker"),
+            (
+                format!("{a}{}", b.replace(" CERTIFICATE-----", " TRUSTED CERTIFICATE-----")),
+                "unsupported certificate PEM label",
+            ),
+            (
+                format!("{a}{}", b.replace(" CERTIFICATE-----", " X509 CERTIFICATE-----")),
+                "unsupported certificate PEM label",
+            ),
+        ];
+
+        for (pem, reason) in cases {
+            let err = bundle_error(pem.as_bytes());
+            assert!(err.contains("invalid PEM certificate bundle in sslcert"), "{err}");
+            assert!(err.contains(reason), "expected {reason:?}, got {err:?}");
+        }
+    }
+
+    #[test]
+    fn sslcert_bundle_skips_other_pem_blocks() {
+        let (a, b) = (pem_str(CA_A), pem_str(CA_B));
+        let key = "-----BEGIN PRIVATE KEY-----\nAAAA\n-----END PRIVATE KEY-----\n";
+        let crl = "-----BEGIN X509 CRL-----\nAAAA\n-----END X509 CRL-----\n";
+
+        for block in [key, crl] {
+            let certificates = parse_root_certificates(format!("{a}{block}{b}").as_bytes()).unwrap();
+            assert_eq!(ders(&certificates), vec![der(CA_A), der(CA_B)]);
+        }
+
+        // A certificate paired with a key still loads the certificate, as before.
+        let certificates = parse_root_certificates(format!("{a}{key}").as_bytes()).unwrap();
+        assert_eq!(ders(&certificates), vec![der(CA_A)]);
+    }
+
+    #[test]
+    fn sslcert_pem_label_grammar() {
+        for label in ["CERTIFICATE", "X509 CRL", "TRUSTED CERTIFICATE", "RSA PRIVATE KEY"] {
+            assert!(is_valid_pem_label(label.as_bytes()), "{label}");
+        }
+
+        for label in ["", "X509  CRL", "X509 CRL ", " X509 CRL", "X509-", "X\u{7f}"] {
+            assert!(!is_valid_pem_label(label.as_bytes()), "{label:?}");
+        }
+
+        assert_eq!(
+            parse_pem_marker(b"-----BEGIN X509 CRL-----"),
+            Some(PemMarker::Begin(b"X509 CRL"))
+        );
+        assert_eq!(
+            parse_pem_marker(b"-----END CERTIFICATE-----"),
+            Some(PemMarker::End(b"CERTIFICATE"))
+        );
+        assert_eq!(parse_pem_marker(b"-----BEGIN CERTIF"), None);
+    }
+
+    fn ssl_params(certificate_file: &str, ssl_accept_mode: SslAcceptMode) -> SslParams {
+        SslParams {
+            certificate_file: Some(certificate_file.to_owned()),
+            identity_file: None,
+            identity_password: Hidden(None),
+            ssl_accept_mode,
+        }
+    }
+
+    #[tokio::test]
+    async fn sslcert_into_auth_reads_every_certificate() {
+        let auth = ssl_params(&fixture_path("bundle-b-second.pem"), SslAcceptMode::Strict)
+            .into_auth()
+            .await
+            .unwrap();
+
+        assert_eq!(ders(&auth.certificates.0), vec![der(CA_A), der(CA_B)]);
+        assert_eq!(auth.ssl_accept_mode, SslAcceptMode::Strict);
+    }
+
+    #[tokio::test]
+    async fn sslcert_into_auth_missing_file() {
+        let err = ssl_params(&fixture_path("does-not-exist.pem"), SslAcceptMode::Strict)
+            .into_auth()
+            .await
+            .unwrap_err();
+
+        let message = tls_error_message(&err);
+        assert!(message.contains("cert file not found"), "{message}");
+    }
+
+    const HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(10);
+
+    /// Runs one TLS handshake between a connector built by `build_tls_connector` and an
+    /// in-process server presenting `server.pem` (signed by CA B), and returns the client's result.
+    fn sslcert_handshake(roots: &[u8], mode: SslAcceptMode, domain: &str) -> Result<(), String> {
+        use std::net::{TcpListener, TcpStream};
+
+        let mut auth = SslAuth::default();
+        auth.accept_mode(mode);
+        auth.certificates(parse_root_certificates(roots).unwrap());
+
+        let connector = build_tls_connector(auth).unwrap();
+        let acceptor = native_tls::TlsAcceptor::new(Identity::from_pkcs8(SERVER_CERT, SERVER_KEY).unwrap()).unwrap();
+
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        listener.set_nonblocking(true).unwrap();
+        let address = listener.local_addr().unwrap();
+
+        // The scope joins the server thread before returning, even if the client side panics.
+        // The accept deadline and the socket timeouts bound that join.
+        let (client, _server) = std::thread::scope(|scope| {
+            let server = scope.spawn(|| -> Result<(), String> {
+                let deadline = std::time::Instant::now() + HANDSHAKE_TIMEOUT;
+
+                let stream = loop {
+                    match listener.accept() {
+                        Ok((stream, _)) => break stream,
+                        Err(err)
+                            if err.kind() == std::io::ErrorKind::WouldBlock && std::time::Instant::now() < deadline =>
+                        {
+                            std::thread::sleep(Duration::from_millis(10));
+                        }
+                        Err(err) => return Err(format!("no client connected: {err}")),
+                    }
+                };
+
+                stream.set_nonblocking(false).map_err(|err| err.to_string())?;
+                stream
+                    .set_read_timeout(Some(HANDSHAKE_TIMEOUT))
+                    .map_err(|err| err.to_string())?;
+                stream
+                    .set_write_timeout(Some(HANDSHAKE_TIMEOUT))
+                    .map_err(|err| err.to_string())?;
+
+                acceptor.accept(stream).map(drop).map_err(|err| err.to_string())
+            });
+
+            let client = (|| -> Result<(), String> {
+                let stream = TcpStream::connect(address).map_err(|err| err.to_string())?;
+                stream
+                    .set_read_timeout(Some(HANDSHAKE_TIMEOUT))
+                    .map_err(|err| err.to_string())?;
+                stream
+                    .set_write_timeout(Some(HANDSHAKE_TIMEOUT))
+                    .map_err(|err| err.to_string())?;
+
+                connector
+                    .connect(domain, stream)
+                    .map(drop)
+                    .map_err(|err| err.to_string())
+            })();
+
+            (client, server.join().expect("the TLS server thread panicked"))
+        });
+
+        client
+    }
+
+    #[test]
+    fn sslcert_handshake_single_ca_strict() {
+        assert_eq!(sslcert_handshake(CA_B, SslAcceptMode::Strict, "localhost"), Ok(()));
+    }
+
+    #[test]
+    fn sslcert_handshake_bundle_with_signing_ca_second_strict() {
+        assert_eq!(
+            sslcert_handshake(BUNDLE_B_SECOND, SslAcceptMode::Strict, "localhost"),
+            Ok(())
+        );
+    }
+
+    #[test]
+    fn sslcert_handshake_bundle_with_signing_ca_first_strict() {
+        assert_eq!(
+            sslcert_handshake(BUNDLE_B_FIRST, SslAcceptMode::Strict, "localhost"),
+            Ok(())
+        );
+    }
+
+    #[test]
+    fn sslcert_handshake_decoy_ca_only_is_refused() {
+        assert!(sslcert_handshake(CA_A, SslAcceptMode::Strict, "localhost").is_err());
+    }
+
+    #[test]
+    fn sslcert_handshake_wrong_host_name_is_refused() {
+        assert!(sslcert_handshake(BUNDLE_B_SECOND, SslAcceptMode::Strict, "wrong.example").is_err());
+    }
+
+    #[test]
+    fn sslcert_handshake_accept_invalid_certs_is_unchanged() {
+        assert_eq!(
+            sslcert_handshake(CA_A, SslAcceptMode::AcceptInvalidCerts, "localhost"),
+            Ok(())
+        );
     }
 }

@@ -69,7 +69,8 @@ impl Quaint {
     /// PostgreSQL:
     ///
     /// - `sslmode` either `disable`, `prefer` or `require`. [Read more](https://docs.rs/tokio-postgres/0.5.0-alpha.1/tokio_postgres/config/enum.SslMode.html)
-    /// - `sslcert` should point to a PEM certificate file.
+    /// - `sslcert` should point to a PEM file with one or more CA certificates; every
+    ///   certificate in it is trusted as a root.
     /// - `sslidentity` should point to a PKCS12 certificate database.
     /// - `sslpassword` the password to open the PKCS12 database.
     /// - `sslaccept` either `strict` or `accept_invalid_certs`. If strict, the
