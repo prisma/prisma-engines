@@ -14,7 +14,10 @@ outside the tests.
 - `bundle-corrupt-tail.pem`: CA A, then a copy of CA B with corrupted base64.
 - `not-a-cert.pem`: plain text.
 
-All certificates are valid for 100 years. They were generated with OpenSSL 3:
+The CA certificates are valid for 100 years. `server.pem` is valid from
+2019-01-01 to 2118-12-31. macOS limits TLS server certificates whose `notBefore`
+is on or after 2019-07-01 to 825 days, and the earlier `notBefore` keeps this
+long-lived fixture accepted there too. They were generated with OpenSSL 3.5:
 
 ```sh
 openssl req -x509 -newkey rsa:2048 -nodes -keyout ca-a.key -out ca-a.pem -days 36500 \
@@ -26,7 +29,7 @@ openssl req -x509 -newkey rsa:2048 -nodes -keyout ca-b.key -out ca-b.pem -days 3
 openssl req -newkey rsa:2048 -nodes -keyout server-key.pem -out server.csr -subj "/CN=localhost"
 printf 'subjectAltName=DNS:localhost\nbasicConstraints=CA:FALSE\nkeyUsage=digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth\n' > ext.cnf
 openssl x509 -req -in server.csr -CA ca-b.pem -CAkey ca-b.key -CAcreateserial \
-  -out server.pem -days 36500 -extfile ext.cnf
+  -out server.pem -not_before 20190101000000Z -not_after 21181231000000Z -extfile ext.cnf
 { cat ca-a.pem; echo "# Test CA B follows"; cat ca-b.pem; } > bundle-b-second.pem
 cat ca-b.pem ca-a.pem > bundle-b-first.pem
 { cat ca-a.pem; sed '5s/.\{8\}/!!!!!!!!/' ca-b.pem; } > bundle-corrupt-tail.pem

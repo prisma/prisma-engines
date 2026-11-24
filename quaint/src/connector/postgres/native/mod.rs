@@ -177,6 +177,27 @@ fn invalid_pem_bundle(reason: &str, line: usize) -> Error {
     .build()
 }
 
+/// Splits PEM text into lines ending in CRLF, LF or CR, the line endings RFC 7468 allows.
+fn pem_lines(pem: &[u8]) -> impl Iterator<Item = &[u8]> {
+    let mut rest = Some(pem);
+
+    std::iter::from_fn(move || {
+        let text = rest?;
+
+        match text.iter().position(|&b| b == b'\n' || b == b'\r') {
+            Some(end) => {
+                let terminator = if text[end..].starts_with(b"\r\n") { 2 } else { 1 };
+                rest = Some(&text[end + terminator..]);
+                Some(&text[..end])
+            }
+            None => {
+                rest = None;
+                Some(text)
+            }
+        }
+    })
+}
+
 /// Parses the contents of the `sslcert` file into the root certificates to trust.
 ///
 /// The file may hold several PEM certificates (a CA bundle), and every one of them is returned,
@@ -196,7 +217,7 @@ fn parse_root_certificates(pem: &[u8]) -> crate::Result<Vec<Certificate>> {
         Skipping(&'a [u8]),
     }
 
-    let lines = || pem.split(|&b| b == b'\n').map(<[u8]>::trim_ascii);
+    let lines = || pem_lines(pem).map(<[u8]>::trim_ascii);
     let is_dash_line = |line: &[u8]| line.starts_with(PEM_DASHES);
 
     if lines().filter(|line| is_dash_line(line)).count() <= 2 {
@@ -1467,6 +1488,24 @@ mod tests {
 
         let certificates = parse_root_certificates(padded.as_bytes()).unwrap();
         assert_eq!(ders(&certificates), vec![der(CA_A), der(CA_B)]);
+    }
+
+    #[test]
+    fn sslcert_bundle_with_mixed_line_endings() {
+        // RFC 7468 allows CRLF, LF and CR line endings: one LF certificate, then one CR certificate.
+        let pem = format!("{}{}", pem_str(CA_A), pem_str(CA_B).replace('\n', "\r"));
+
+        let certificates = parse_root_certificates(pem.as_bytes()).unwrap();
+        assert_eq!(ders(&certificates), vec![der(CA_A), der(CA_B)]);
+    }
+
+    #[test]
+    fn sslcert_pem_lines_handles_every_line_ending() {
+        let lines: Vec<&[u8]> = pem_lines(b"a\r\nb\nc\rd").collect();
+        assert_eq!(lines, [&b"a"[..], b"b", b"c", b"d"]);
+
+        let lines: Vec<&[u8]> = pem_lines(b"a\n").collect();
+        assert_eq!(lines, [&b"a"[..], b""]);
     }
 
     #[test]
