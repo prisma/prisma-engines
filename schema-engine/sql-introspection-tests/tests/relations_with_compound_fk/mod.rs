@@ -11,13 +11,21 @@ use test_macros::test_connector;
 
 #[test_connector(exclude(Sqlite, Mysql, CockroachDb))]
 async fn compound_foreign_keys_for_one_to_one_relations(api: &mut TestApi) -> TestResult {
+    let is_kingbase = api.tags().intersects(Tags::KingbaseMysql | Tags::KingbaseOracle);
+
     api.barrel()
         .execute(move |migration| {
-            migration.create_table("User", |t| {
+            migration.create_table("User", move |t| {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("age", types::integer());
 
-                t.add_index("user_unique", types::index(vec!["id", "age"]).unique(true));
+                if is_kingbase {
+                    // Kingbase requires a UNIQUE constraint (rather than a
+                    // standalone unique index) as the target of a foreign key.
+                    t.add_constraint("user_unique", types::unique_constraint(vec!["id", "age"]));
+                } else {
+                    t.add_index("user_unique", types::index(vec!["id", "age"]).unique(true));
+                }
                 t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
@@ -66,13 +74,19 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &mut TestApi) -> Te
 
 #[test_connector(exclude(Mysql, Mssql, CockroachDb))]
 async fn compound_foreign_keys_for_required_one_to_many_relations(api: &mut TestApi) -> TestResult {
+    let is_kingbase = api.tags().intersects(Tags::KingbaseMysql | Tags::KingbaseOracle);
+
     api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
+        .execute(move |migration| {
+            migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("age", types::integer());
 
-                t.add_index("user_unique", types::index(vec!["id", "age"]).unique(true));
+                if is_kingbase {
+                    t.add_constraint("user_unique", types::unique_constraint(vec!["id", "age"]));
+                } else {
+                    t.add_index("user_unique", types::index(vec!["id", "age"]).unique(true));
+                }
             });
 
             migration.create_table("Post", |t| {

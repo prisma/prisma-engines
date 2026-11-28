@@ -1,0 +1,13 @@
+datasource db {
+  provider = "kingbase-mysql"
+}
+
+generator js {
+  provider = "prisma-client"
+  previewFeatures = ["views"]
+}
+
+view Mountain {
+  id Int
+  val String
+}

@@ -146,13 +146,20 @@ fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(ap
 
     let rows = api.dump_table("Test");
 
+    // Oracle's NUMBER(10,0) is returned as Numeric by the native driver.
+    let (null_age, age) = if api.is_kingbase_oracle() {
+        (Value::null_numeric(), Value::numeric(7.into()))
+    } else {
+        (Value::null_int32(), Value::int32(7))
+    };
+
     assert_eq!(
         rows.into_iter()
             .map(|row| row.into_iter().collect::<Vec<Value>>())
             .collect::<Vec<_>>(),
         &[
-            &[Value::text("abc"), Value::text("george"), Value::null_int32()],
-            &[Value::text("def"), Value::text("X Æ A-12"), Value::int32(7)],
+            &[Value::text("abc"), Value::text("george"), null_age],
+            &[Value::text("def"), Value::text("X Æ A-12"), age],
         ]
     );
 }

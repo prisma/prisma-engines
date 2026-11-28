@@ -2,52 +2,54 @@ use crate::{Provider, common::*, with_header};
 
 #[test]
 fn implicit_many_to_many_relation_fields_with_referential_actions() {
-    let schema = indoc! {r#"
-        datasource db {
-          provider = "sqlite"
-        }
+    for provider in ["sqlite", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = formatdoc! {r#"
+            datasource db {{
+              provider = "{provider}"
+            }}
 
-        model Track {
-          id        String     @id
-          title     String
-          playlists Playlist[] @relation(onDelete: Restrict, onUpdate: Restrict)
-        }
+            model Track {{
+              id        String     @id
+              title     String
+              playlists Playlist[] @relation(onDelete: Restrict, onUpdate: Restrict)
+            }}
 
-        model Playlist {
-          id     String  @id
-          name   String
-          tracks Track[] @relation(onDelete: Restrict, onUpdate: Restrict)
-        }
-    "#};
+            model Playlist {{
+              id     String  @id
+              name   String
+              tracks Track[] @relation(onDelete: Restrict, onUpdate: Restrict)
+            }}
+        "#};
 
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m  name   String
-        [1;94m14 | [0m  tracks Track[] @relation(onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m  name   String
-        [1;94m14 | [0m  tracks Track[] @relation(onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  title     String
-        [1;94m 8 | [0m  playlists Playlist[] @relation(onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  title     String
-        [1;94m 8 | [0m  playlists Playlist[] @relation(onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
-        [1;94m   | [0m
-    "#]];
+        let expect = expect![[r#"
+            [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
+              [1;94m-->[0m  [4mschema.prisma:14[0m
+            [1;94m   | [0m
+            [1;94m13 | [0m  name   String
+            [1;94m14 | [0m  tracks Track[] @relation(onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
+            [1;94m   | [0m
+            [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
+              [1;94m-->[0m  [4mschema.prisma:14[0m
+            [1;94m   | [0m
+            [1;94m13 | [0m  name   String
+            [1;94m14 | [0m  tracks Track[] @relation(onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
+            [1;94m   | [0m
+            [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
+              [1;94m-->[0m  [4mschema.prisma:8[0m
+            [1;94m   | [0m
+            [1;94m 7 | [0m  title     String
+            [1;94m 8 | [0m  playlists Playlist[] @relation(onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
+            [1;94m   | [0m
+            [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
+              [1;94m-->[0m  [4mschema.prisma:8[0m
+            [1;94m   | [0m
+            [1;94m 7 | [0m  title     String
+            [1;94m 8 | [0m  playlists Playlist[] @relation(onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
+            [1;94m   | [0m
+        "#]];
 
-    expect.assert_eq(&parse_unwrap_err(schema));
+        expect.assert_eq(&parse_unwrap_err(&schema));
+    }
 }
 
 #[test]
@@ -454,7 +456,8 @@ fn embedded_many_to_many_must_define_fields_on_both_sides_postgres() {
 
 #[test]
 fn embedded_many_to_many_relations_do_not_work_on_postgresql() {
-    let dml = indoc! {r#"
+    for provider in [Provider::Postgres, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
         model A {
           id    Int      @id
           b_ids Int[]
@@ -468,7 +471,68 @@ fn embedded_many_to_many_relations_do_not_work_on_postgresql() {
         }
     "#};
 
-    let expect = expect![[r#"
+        let expect = match provider {
+            Provider::KingbaseMysql => expect![[r#"
+        [1;91merror[0m: [1mField "b_ids" in model "A" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m  id    Int      @id
+        [1;94m12 | [0m  [1;91mb_ids Int[][0m
+        [1;94m13 | [0m  bs    B[]      @relation(fields: [b_ids], references: [id])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mField "a_ids" in model "B" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m  id    Int      @id
+        [1;94m18 | [0m  [1;91ma_ids Int[][0m
+        [1;94m19 | [0m  as    A[]      @relation(fields: [a_ids], references: [id])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Kingbase MySQL. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Kingbase MySQL. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
+        [1;94m   | [0m
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]      @relation(fields: [a_ids], references: [id])[0m
+        [1;94m20 | [0m}
+        [1;94m   | [0m
+    "#]],
+            Provider::KingbaseOracle => expect![[r#"
+        [1;91merror[0m: [1mField "b_ids" in model "A" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m  id    Int      @id
+        [1;94m12 | [0m  [1;91mb_ids Int[][0m
+        [1;94m13 | [0m  bs    B[]      @relation(fields: [b_ids], references: [id])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mField "a_ids" in model "B" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m  id    Int      @id
+        [1;94m18 | [0m  [1;91ma_ids Int[][0m
+        [1;94m19 | [0m  as    A[]      @relation(fields: [a_ids], references: [id])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Kingbase Oracle. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Kingbase Oracle. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
+        [1;94m   | [0m
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]      @relation(fields: [a_ids], references: [id])[0m
+        [1;94m20 | [0m}
+        [1;94m   | [0m
+    "#]],
+            _ => expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
@@ -483,10 +547,12 @@ fn embedded_many_to_many_relations_do_not_work_on_postgresql() {
         [1;94m19 | [0m  [1;91mas    A[]      @relation(fields: [a_ids], references: [id])[0m
         [1;94m20 | [0m}
         [1;94m   | [0m
-    "#]];
+    "#]],
+        };
 
-    let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&parse_unwrap_err(&dml));
+        let dml = with_header(dml, provider, &[]);
+        expect.assert_eq(&parse_unwrap_err(&dml));
+    }
 }
 
 #[test]

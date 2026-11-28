@@ -18,7 +18,9 @@ bigdecimal.workspace = true
 serde_json.workspace = true
 
 [dev-dependencies]
-quaint = { workspace = true, features = ["mysql", "mssql", "postgresql", "sqlite"] }
+quaint = { workspace = true, features = ["mysql", "mssql", "postgresql", "sqlite", "kingbase-oracle"] }
+psl = { workspace = true, features = ["postgresql", "kingbase-oracle"] }
 
 [features]
 relation_joins = ["query-builder/relation_joins"]
+kingbase-mysql = ["quaint/kingbase-mysql"]

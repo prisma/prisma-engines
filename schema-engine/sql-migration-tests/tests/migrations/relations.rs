@@ -927,7 +927,7 @@ fn on_update_required_default_action(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess, CockroachDb))]
+#[test_connector(exclude(Vitess, CockroachDb, KingbaseMysql))]
 fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -964,7 +964,10 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     if api.is_sqlite() {
         res.assert_green();
     } else {
-        res.assert_warnings(&["A unique constraint covering the columns `[name]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into(), "A unique constraint covering the columns `[email]` on the table `B` will be added. If there are existing duplicate values, this will fail.".into()]);
+        res.assert_warnings(&[
+            format!("A unique constraint covering the columns `[name]` on the table `{}` will be added. If there are existing duplicate values, this will fail.", api.normalize_identifier("A")).into(),
+            format!("A unique constraint covering the columns `[email]` on the table `{}` will be added. If there are existing duplicate values, this will fail.", api.normalize_identifier("B")).into(),
+        ]);
     };
 }
 
@@ -992,7 +995,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
 
     api.schema_push_w_datasource(dm_1).send().assert_green();
     api.assert_schema().assert_table("_ProfileToSkill", |t| {
-        if api.is_postgres() && !api.is_cockroach() {
+        if api.is_postgres() && !api.is_cockroach() || api.is_kingbase_oracle() {
             t.assert_pk(|pk| pk.assert_columns(&["A", "B"]))
         } else {
             t.assert_index_on_columns(&["A", "B"], |idx| idx.assert_is_unique())
@@ -1021,7 +1024,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
 
     api.schema_push_w_datasource(dm_2).send().assert_green();
     api.assert_schema().assert_table("_ProfileToSkill", |table| {
-        if api.is_postgres() && !api.is_cockroach() {
+        if api.is_postgres() && !api.is_cockroach() || api.is_kingbase_oracle() {
             table.assert_pk(|pk| {
                 pk.assert_columns(&["A", "B"])
                     .assert_constraint_name("_ProfileToSkill_AB_pkey")

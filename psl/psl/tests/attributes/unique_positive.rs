@@ -114,21 +114,29 @@ fn multiple_unique_must_work() {
 
 #[test]
 fn multi_field_unique_on_native_type_fields_fields_must_work() {
-    let dml = r#"
-    datasource ds {
-        provider = "mysql"
-    }
+    for (provider, native) in [
+        ("mysql", "VarBinary(40)"),
+        ("kingbase-mysql", "VarBinary(40)"),
+        ("kingbase-oracle", "Blob"),
+    ] {
+        let dml = format!(
+            r#"
+    datasource ds {{
+        provider = "{provider}"
+    }}
 
-    model User {
+    model User {{
         id        Int    @id
         role      Bytes
-        role2     Bytes @ds.VarBinary(40)
+        role2     Bytes @ds.{native}
 
         @@unique([role2, role])
-    }
-    "#;
+    }}
+    "#
+        );
 
-    psl::parse_schema_without_extensions(dml).unwrap();
+        psl::parse_schema_without_extensions(&dml).unwrap();
+    }
 }
 
 #[test]
@@ -192,64 +200,70 @@ fn named_multi_field_unique_must_work() {
 
 #[test]
 fn mapped_multi_field_unique_must_work() {
-    let dml = indoc! {r#"
-        model User {
-          a String
-          b Int
-          @@unique([a,b], map: "dbname")
-        }
-    "#};
+    for provider in [Provider::Postgres, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model User {
+              a String
+              b Int
+              @@unique([a,b], map: "dbname")
+            }
+        "#};
 
-    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
-        .unwrap()
-        .assert_has_model("User")
-        .assert_unique_on_fields(&["a", "b"])
-        .assert_mapped_name("dbname");
+        psl::parse_schema_without_extensions(with_header(dml, provider, &[]))
+            .unwrap()
+            .assert_has_model("User")
+            .assert_unique_on_fields(&["a", "b"])
+            .assert_mapped_name("dbname");
+    }
 }
 
 #[test]
 fn mapped_singular_unique_must_work() {
-    let dml = indoc! {r#"
-        model Model {
-          a String @unique(map: "test")
-        }
+    for provider in [Provider::Postgres, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model Model {
+              a String @unique(map: "test")
+            }
 
-        model Model2 {
-          a String @unique(map: "test2")
-        }
-    "#};
+            model Model2 {
+              a String @unique(map: "test2")
+            }
+        "#};
 
-    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[])).unwrap();
+        let schema = psl::parse_schema_without_extensions(with_header(dml, provider, &[])).unwrap();
 
-    schema
-        .assert_has_model("Model")
-        .assert_unique_on_fields(&["a"])
-        .assert_mapped_name("test");
+        schema
+            .assert_has_model("Model")
+            .assert_unique_on_fields(&["a"])
+            .assert_mapped_name("test");
 
-    schema
-        .assert_has_model("Model2")
-        .assert_unique_on_fields(&["a"])
-        .assert_mapped_name("test2");
+        schema
+            .assert_has_model("Model2")
+            .assert_unique_on_fields(&["a"])
+            .assert_mapped_name("test2");
+    }
 }
 
 #[test]
 fn named_and_mapped_multi_field_unique_must_work() {
-    let dml = indoc! {r#"
-        model Model {
-          a String
-          b Int
+    for provider in [Provider::Postgres, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model Model {
+              a String
+              b Int
 
-          @@unique([a,b], name: "compoundId", map:"dbname")
-        }
-    "#};
+              @@unique([a,b], name: "compoundId", map:"dbname")
+            }
+        "#};
 
-    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[])).unwrap();
+        let schema = psl::parse_schema_without_extensions(with_header(dml, provider, &[])).unwrap();
 
-    schema
-        .assert_has_model("Model")
-        .assert_unique_on_fields(&["a", "b"])
-        .assert_mapped_name("dbname")
-        .assert_name("compoundId");
+        schema
+            .assert_has_model("Model")
+            .assert_unique_on_fields(&["a", "b"])
+            .assert_mapped_name("dbname")
+            .assert_name("compoundId");
+    }
 }
 
 #[test]

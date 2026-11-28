@@ -1,7 +1,7 @@
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveTime};
 use prisma_value::{PrismaValue, PrismaValueType};
-use quaint::ast::OpaqueType;
+use quaint::ast::{NativeColumnType, OpaqueType, TypeDataLength};
 use query_builder::{ArgScalarType, ArgType, Arity, DynamicArgType};
 use query_structure::{FieldArity, FieldTypeInformation, TypeIdentifier};
 
@@ -119,8 +119,8 @@ pub fn prisma_type_to_arg_type(pt: &PrismaValueType) -> ArgType {
     ArgType::new(Arity::Scalar, scalar_type, None)
 }
 
-pub fn quaint_value_to_arg_type(value: &quaint::Value<'_>) -> DynamicArgType {
-    let native_type = value.native_column_type.as_deref().map(|nt| nt.to_owned());
+pub fn quaint_value_to_arg_type(value: &quaint::Value<'_>, is_kingbase_mysql: bool) -> DynamicArgType {
+    let native_type = native_type_to_arg_type_name(value.native_column_type.as_ref(), is_kingbase_mysql);
     let scalar_type = match &value.typed {
         quaint::ValueType::Int32(_) => ArgScalarType::Int,
         quaint::ValueType::Int64(_) => ArgScalarType::BigInt,
@@ -141,7 +141,7 @@ pub fn quaint_value_to_arg_type(value: &quaint::Value<'_>) -> DynamicArgType {
                 .unwrap_or_default()
                 .first()
                 .map(|val| {
-                    let DynamicArgType::Single { r#type } = quaint_value_to_arg_type(val) else {
+                    let DynamicArgType::Single { r#type } = quaint_value_to_arg_type(val, is_kingbase_mysql) else {
                         panic!("array element type must not be a tuple");
                     };
                     assert_eq!(r#type.arity, Arity::Scalar, "array element type must be a scalar type");
@@ -157,14 +157,31 @@ pub fn quaint_value_to_arg_type(value: &quaint::Value<'_>) -> DynamicArgType {
                 r#type: ArgType::new(Arity::List, ArgScalarType::Enum, native_type),
             };
         }
-        quaint::ValueType::Opaque(opaque) => return opaque_type_to_arg_type(opaque.typ(), native_type),
+        quaint::ValueType::Opaque(opaque) => {
+            return opaque_type_to_arg_type(opaque.typ(), native_type, is_kingbase_mysql);
+        }
     };
     DynamicArgType::Single {
         r#type: ArgType::new(Arity::Scalar, scalar_type, native_type),
     }
 }
 
-fn opaque_type_to_arg_type(opaque: &OpaqueType, native_type: Option<String>) -> DynamicArgType {
+// KES BIT uses an explicit bit-length header. Preserve the declared width for
+// the JS adapter without changing native type names for other connectors.
+fn native_type_to_arg_type_name(native_type: Option<&NativeColumnType<'_>>, is_kingbase_mysql: bool) -> Option<String> {
+    native_type.map(|native_type| match native_type.length {
+        Some(TypeDataLength::Constant(width)) if is_kingbase_mysql && native_type.name == "BIT" => {
+            format!("BIT({width})")
+        }
+        _ => native_type.name.to_string(),
+    })
+}
+
+fn opaque_type_to_arg_type(
+    opaque: &OpaqueType,
+    native_type: Option<String>,
+    is_kingbase_mysql: bool,
+) -> DynamicArgType {
     let scalar_type = match opaque {
         OpaqueType::Unknown => ArgScalarType::Unknown,
         OpaqueType::Int32 => ArgScalarType::Int,
@@ -179,7 +196,9 @@ fn opaque_type_to_arg_type(opaque: &OpaqueType, native_type: Option<String>) -> 
         OpaqueType::Json | OpaqueType::Object => ArgScalarType::Json,
         OpaqueType::DateTime | OpaqueType::Date | OpaqueType::Time => ArgScalarType::DateTime,
         OpaqueType::Array(element_type) => {
-            let DynamicArgType::Single { r#type } = opaque_type_to_arg_type(element_type, native_type) else {
+            let DynamicArgType::Single { r#type } =
+                opaque_type_to_arg_type(element_type, native_type, is_kingbase_mysql)
+            else {
                 panic!("array element type must not be a tuple");
             };
             assert_eq!(r#type.arity, Arity::Scalar, "array element type must be a scalar type");
@@ -192,9 +211,11 @@ fn opaque_type_to_arg_type(opaque: &OpaqueType, native_type: Option<String>) -> 
                 elements: elems
                     .iter()
                     .map(|(typ, nt)| {
-                        let DynamicArgType::Single { r#type } =
-                            opaque_type_to_arg_type(typ, nt.as_deref().map(ToOwned::to_owned))
-                        else {
+                        let DynamicArgType::Single { r#type } = opaque_type_to_arg_type(
+                            typ,
+                            native_type_to_arg_type_name(nt.as_ref(), is_kingbase_mysql),
+                            is_kingbase_mysql,
+                        ) else {
                             panic!("tuple element type must not be a tuple");
                         };
                         r#type

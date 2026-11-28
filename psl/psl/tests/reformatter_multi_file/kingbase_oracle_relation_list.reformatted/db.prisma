@@ -1,0 +1,7 @@
+datasource db {
+  provider = "kingbase-oracle"
+}
+
+generator client {
+  provider = "prisma-client"
+}

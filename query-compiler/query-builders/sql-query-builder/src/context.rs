@@ -45,6 +45,14 @@ impl<'a> Context<'a> {
         self.connection_info.sql_family()
     }
 
+    pub fn is_kingbase_mysql(&self) -> bool {
+        self.connection_info.is_kingbase_mysql()
+    }
+
+    pub fn is_kingbase_oracle(&self) -> bool {
+        self.connection_info.is_kingbase_oracle()
+    }
+
     pub fn max_insert_rows(&self) -> Option<usize> {
         self.max_insert_rows
     }

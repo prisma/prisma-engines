@@ -1,5 +1,68 @@
 # Prisma Engines
 
+## KingbaseES（KB）适配
+
+本仓库是 Prisma Engines 的金仓 KingbaseES 社区适配版本，提供 `kingbase-mysql` 和 `kingbase-oracle` 两个 provider。配套 CLI、Client 和 JavaScript 驱动适配器位于 [prisma-v7 的 kingbase 分支](https://github.com/lifeng5210/prisma-v7/tree/kingbase)，应用安装与使用方式见该仓库根 README。
+
+| 数据库模式      | Prisma provider   | 适配验证环境    |
+| --------------- | ----------------- | --------------- |
+| MySQL 兼容模式  | `kingbase-mysql`  | R3 V009R003C018 |
+| Oracle 兼容模式 | `kingbase-oracle` | R2 V009R002C016 |
+
+### 适配范围
+
+- PSL：两个 provider 的模型校验、原生类型和连接器能力声明。
+- SQL 构建与渲染：查询 AST、数据库方言、参数和类型处理。
+- Query Compiler：编译 Prisma 查询，输出由 TypeScript 查询解释器通过驱动适配器执行的查询计划。
+- 原生 Schema Engine：金仓表结构内省、迁移 SQL 生成与执行。
+
+Prisma 7 的数据库 URL 在 `prisma.config.ts` 中配置，PSL datasource 中只指定 provider 等模型配置。原生 Schema Engine 通过 CLI 的 `--datasource` JSON 参数接收连接信息，字段为 `url` 和可选的 `shadowDatabaseUrl`。
+
+### 获取源码与构建
+
+```sh
+git clone --branch kingbase https://github.com/lifeng5210/prisma-engines.git
+cd prisma-engines
+```
+
+使用 `rust-toolchain.toml` 固定的 Rust 工具链。原生构建需要对应平台的编译工具，Linux 需要 OpenSSL；Wasm 打包还需要 `jq` 和与 `Cargo.lock` 中 `wasm-bindgen` 版本匹配的 `wasm-bindgen-cli`。使用 release 或 profiling 配置构建 Wasm 时，还需要构建脚本使用的 Binaryen `wasm-opt`。
+
+Query Compiler Wasm 构建还需要 GNU coreutils 提供的 `numfmt`，用于统计构建产物的压缩体积。请确保 `numfmt` 命令在 `PATH` 中可用。
+
+```sh
+# 原生 Schema Engine
+cargo build --release -p schema-engine-cli
+
+# Wasm 目标
+rustup target add wasm32-unknown-unknown
+
+# PSL、校验和格式化工具的 Wasm 包
+SCHEMA_WASM_VERSION=7.10.0-kb.5 make build-schema-wasm
+
+# Query Compiler Wasm，包含两个 Kingbase provider
+QE_WASM_VERSION=7.10.0-kb.5 make build-qc-wasm
+```
+
+| 构建产物            | 路径或包名                                                                      |
+| ------------------- | ------------------------------------------------------------------------------- |
+| 原生 Schema Engine  | `target/release/schema-engine`                                                  |
+| Schema 工具 Wasm    | `target/prisma-schema-wasm`，包名 `@prisma-kb/prisma-schema-wasm`               |
+| Query Compiler Wasm | `query-compiler/query-compiler-wasm/pkg`，包名 `@prisma-kb/query-compiler-wasm` |
+
+`build-schema-wasm` 默认使用 `PROFILE=dev`，Query Compiler 本地构建默认使用 `WASM_BUILD_PROFILE=dev`。Schema 工具 Wasm 和 Query Compiler Wasm 是不同的包；主仓库应使用配套的 KB 版本。
+
+`schema-engine/schema-engine-wasm` 的构建脚本启用 SQLite 和 PostgreSQL，金仓迁移与内省使用上面的原生 Schema Engine。
+
+### 兼容性与分发
+
+全文检索接受金仓原生 `tsquery` 表达式，不转换 MySQL Boolean Mode 输入。MySQL 兼容模式使用 `simple` 配置并支持 Prisma 管理的 `@@fulltext` 索引；Oracle 兼容模式使用数据库默认配置，不提供 `@@fulltext`。类型转换、聚合和溢出行为遵循数据库原生规则。
+
+KB 发行版的原生引擎由主仓库的 `@prisma-kb/engines` 按 `@prisma-kb/engines-version` 指定的修订下载，默认镜像为 <https://lifeng5210.github.io/prisma-engines-binaries>。Schema 工具和 Query Compiler 通过各自的 KB Wasm 包分发。
+
+下方保留上游 Prisma Engines 文档；KB 分支的 provider、包名、构建和使用方式以本节为准。
+
+---
+
 [![Schema Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/test-schema-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/test-schema-engine.yml)
 [![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml)
 

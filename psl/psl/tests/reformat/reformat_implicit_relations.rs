@@ -39,6 +39,13 @@ fn back_relation_fields_missing_attributes_should_not_add_attributes_multiple_ti
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -68,6 +75,13 @@ fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -82,7 +96,7 @@ fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_b
           id Int @id
           User User[]
         }
-        "#
+    "#
     };
 
     let expected = expect![[r#"
@@ -99,6 +113,13 @@ fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_b
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -117,7 +138,7 @@ fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_o
           id Int @id
           post Post
         }
-        "#
+    "#
     };
 
     let expected = expect![[r#"
@@ -141,6 +162,13 @@ fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_o
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -155,7 +183,7 @@ fn back_relations_must_be_added_even_when_attribute_is_missing_for_one_to_one() 
           id   Int    @id
           User User
         }
-        "#
+    "#
     };
 
     let expected = expect![[r#"
@@ -172,6 +200,13 @@ fn back_relations_must_be_added_even_when_attribute_is_missing_for_one_to_one() 
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -186,7 +221,7 @@ fn back_relations_and_attribute_must_be_added_even_when_attribute_is_missing_for
           id   Int    @id
           User User[]
         }
-        "#
+    "#
     };
 
     let expected = expect![[r#"
@@ -203,6 +238,13 @@ fn back_relations_and_attribute_must_be_added_even_when_attribute_is_missing_for
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -217,7 +259,7 @@ fn relation_attribute_must_not_be_added_for_many_to_many() {
           id   Int    @id
           User User[]
         }
-        "#
+    "#
     };
 
     let expected = expect![[r#"
@@ -233,6 +275,13 @@ fn relation_attribute_must_not_be_added_for_many_to_many() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -248,7 +297,7 @@ fn must_add_relation_attribute_to_an_existing_field() {
           Blog   Blog? @relation(fields: [blogId])
           blogId Int?
         }
-        "#
+    "#
     };
 
     let expected = expect![[r#"
@@ -265,6 +314,13 @@ fn must_add_relation_attribute_to_an_existing_field() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -294,6 +350,13 @@ fn must_add_back_relation_fields_for_given_list_field() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -324,6 +387,13 @@ fn must_add_back_relation_fields_for_given_singular_field() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -346,6 +416,13 @@ fn must_add_back_relation_fields_for_self_relations() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -375,6 +452,13 @@ fn should_camel_case_back_relation_field_name() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -410,6 +494,13 @@ fn add_backrelation_for_unambiguous_self_relations_in_presence_of_unrelated_othe
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -443,6 +534,13 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -473,6 +571,13 @@ fn must_add_referenced_fields_for_one_to_many_relations() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -503,6 +608,13 @@ fn must_add_referenced_fields_for_one_to_many_relations_reverse() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -556,6 +668,13 @@ fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -586,6 +705,13 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -616,6 +742,13 @@ fn forward_relation_field_generation_picks_up_types_of_existing_underlying_scala
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -690,6 +823,13 @@ fn should_add_back_relations_for_more_complex_cases() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -712,6 +852,13 @@ fn should_add_missing_embed_ids_on_self_relations() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -742,6 +889,13 @@ fn should_add_referenced_fields_on_the_correct_side_list() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -771,6 +925,13 @@ fn no_changes_for_many_to_many_relations() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -801,6 +962,13 @@ fn should_add_referenced_fields_on_the_correct_side_tie_breaker() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
@@ -842,43 +1010,86 @@ fn should_not_get_confused_with_complicated_self_relations() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 #[test]
 fn back_relations_must_be_added_even_when_env_vars_are_missing() {
-    let input = indoc! {r#"
-        datasource db {
-          provider = "sqlite"
-        }
+    for provider in ["sqlite", "kingbase-mysql", "kingbase-oracle"] {
+        let input = formatdoc! {r#"
+            datasource db {{
+              provider = "{provider}"
+            }}
 
-        model Blog {
-          id    Int    @id
-          posts Post[]
-        }
+            model Blog {{
+              id    Int    @id
+              posts Post[]
+            }}
 
-        model Post {
-          id Int   @id
-        }
-    "#};
+            model Post {{
+              id Int   @id
+            }}
+        "#};
 
-    let expected = expect![[r#"
-        datasource db {
-          provider = "sqlite"
-        }
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                datasource db {
+                  provider = "kingbase-mysql"
+                }
 
-        model Blog {
-          id    Int    @id
-          posts Post[]
-        }
+                model Blog {
+                  id    Int    @id
+                  posts Post[]
+                }
 
-        model Post {
-          id     Int   @id
-          blog   Blog? @relation(fields: [blogId], references: [id])
-          blogId Int?
-        }
-    "#]];
+                model Post {
+                  id     Int   @id
+                  blog   Blog? @relation(fields: [blogId], references: [id])
+                  blogId Int?
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                datasource db {
+                  provider = "kingbase-oracle"
+                }
 
-    expected.assert_eq(&reformat(input));
+                model Blog {
+                  id    Int    @id
+                  posts Post[]
+                }
+
+                model Post {
+                  id     Int   @id
+                  blog   Blog? @relation(fields: [blogId], references: [id])
+                  blogId Int?
+                }
+            "#]],
+            _ => expect![[r#"
+                datasource db {
+                  provider = "sqlite"
+                }
+
+                model Blog {
+                  id    Int    @id
+                  posts Post[]
+                }
+
+                model Post {
+                  id     Int   @id
+                  blog   Blog? @relation(fields: [blogId], references: [id])
+                  blogId Int?
+                }
+            "#]],
+        };
+
+        expected.assert_eq(&reformat(&input));
+    }
 }
 
 #[test]
@@ -967,12 +1178,20 @@ fn must_add_required_relation_field_if_underlying_scalar_is_required() {
     "#]];
 
     expected.assert_eq(&reformat(input));
+
+    for provider in ["kingbase-mysql", "kingbase-oracle"] {
+        let header = format!("datasource db {{\n  provider = \"{provider}\"\n}}\n\n");
+        let actual = reformat(&format!("{header}{input}"));
+        expected.assert_eq(actual.strip_prefix(&header).unwrap());
+        assert_eq!(reformat(&actual), actual);
+    }
 }
 
 // this crashed
 #[test]
 fn issue_10118() {
-    let schema = r#"
+    for provider in ["postgres", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = r#"
         datasource db {
           provider = "postgres"
         }
@@ -988,25 +1207,67 @@ fn issue_10118() {
           user User   @relation("UserToReferral")
         }
     "#;
+        let schema = match provider {
+            "kingbase-mysql" => schema.replace("\"postgres\"", "\"kingbase-mysql\""),
+            "kingbase-oracle" => schema.replace("\"postgres\"", "\"kingbase-oracle\""),
+            _ => schema.to_owned(),
+        };
 
-    let expected = expect![[r#"
-        datasource db {
-          provider = "postgres"
-        }
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                datasource db {
+                  provider = "kingbase-mysql"
+                }
 
-        model User {
-          id         String    @id @default(cuid()) @db.Char(30)
-          referralId String    @unique @db.Char(30)
-          referral   Referral? @relation("UserToReferral", fields: [referralId], references: [id])
-        }
+                model User {
+                  id         String    @id @default(cuid()) @db.Char(30)
+                  referralId String    @unique @db.Char(30)
+                  referral   Referral? @relation("UserToReferral", fields: [referralId], references: [id])
+                }
 
-        model Referral {
-          id     String @id @default(cuid()) @db.Char(30)
-          user   User   @relation("UserToReferral", fields: [userId], references: [id])
-          userId String @db.Char(30)
-        }
-    "#]];
-    expected.assert_eq(&reformat(schema));
+                model Referral {
+                  id     String @id @default(cuid()) @db.Char(30)
+                  user   User   @relation("UserToReferral", fields: [userId], references: [id])
+                  userId String @db.Char(30)
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                datasource db {
+                  provider = "kingbase-oracle"
+                }
+
+                model User {
+                  id         String    @id @default(cuid()) @db.Char(30)
+                  referralId String    @unique @db.Char(30)
+                  referral   Referral? @relation("UserToReferral", fields: [referralId], references: [id])
+                }
+
+                model Referral {
+                  id     String @id @default(cuid()) @db.Char(30)
+                  user   User   @relation("UserToReferral", fields: [userId], references: [id])
+                  userId String @db.Char(30)
+                }
+            "#]],
+            _ => expect![[r#"
+                datasource db {
+                  provider = "postgres"
+                }
+
+                model User {
+                  id         String    @id @default(cuid()) @db.Char(30)
+                  referralId String    @unique @db.Char(30)
+                  referral   Referral? @relation("UserToReferral", fields: [referralId], references: [id])
+                }
+
+                model Referral {
+                  id     String @id @default(cuid()) @db.Char(30)
+                  user   User   @relation("UserToReferral", fields: [userId], references: [id])
+                  userId String @db.Char(30)
+                }
+            "#]],
+        };
+        expected.assert_eq(&reformat(&schema));
+    }
 }
 
 #[test]
@@ -1060,48 +1321,96 @@ fn mongodb_inline_relations_reformat_as_expected() {
 
 #[test]
 fn reformat_missing_forward_relation_arguments_with_crln() {
-    let schema = r#"
-    generator client {
+    for provider in ["sqlite", "kingbase-mysql", "kingbase-oracle"] {
+        let schema = format!(
+            r#"
+    generator client {{
       provider = "prisma-client"
       output   = "../generated/client"
-    }
+    }}
 
-    datasource db {
-      provider = "sqlite"
-    }
+    datasource db {{
+      provider = "{provider}"
+    }}
 
-    model Post {
+    model Post {{
       id     Int @id
       user   User
-    }
+    }}
 
-    model User {
+    model User {{
       id     Int @id
       posts  Post[]
+    }}
+    "#
+        );
+
+        let expected = match provider {
+            "kingbase-mysql" => expect![[r#"
+                generator client {
+                  provider = "prisma-client"
+                  output   = "../generated/client"
+                }
+
+                datasource db {
+                  provider = "kingbase-mysql"
+                }
+
+                model Post {
+                  id     Int  @id
+                  user   User @relation(fields: [userId], references: [id])
+                  userId Int
+                }
+
+                model User {
+                  id    Int    @id
+                  posts Post[]
+                }
+            "#]],
+            "kingbase-oracle" => expect![[r#"
+                generator client {
+                  provider = "prisma-client"
+                  output   = "../generated/client"
+                }
+
+                datasource db {
+                  provider = "kingbase-oracle"
+                }
+
+                model Post {
+                  id     Int  @id
+                  user   User @relation(fields: [userId], references: [id])
+                  userId Int
+                }
+
+                model User {
+                  id    Int    @id
+                  posts Post[]
+                }
+            "#]],
+            _ => expect![[r#"
+                generator client {
+                  provider = "prisma-client"
+                  output   = "../generated/client"
+                }
+
+                datasource db {
+                  provider = "sqlite"
+                }
+
+                model Post {
+                  id     Int  @id
+                  user   User @relation(fields: [userId], references: [id])
+                  userId Int
+                }
+
+                model User {
+                  id    Int    @id
+                  posts Post[]
+                }
+            "#]],
+        };
+
+        expected.assert_eq(&reformat(&schema.replace('\n', "\r\n")));
     }
-    "#;
-
-    let expected = expect![[r#"
-        generator client {
-          provider = "prisma-client"
-          output   = "../generated/client"
-        }
-
-        datasource db {
-          provider = "sqlite"
-        }
-
-        model Post {
-          id     Int  @id
-          user   User @relation(fields: [userId], references: [id])
-          userId Int
-        }
-
-        model User {
-          id    Int    @id
-          posts Post[]
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(&schema.replace('\n', "\r\n")));
 }

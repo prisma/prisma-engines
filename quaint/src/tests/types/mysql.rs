@@ -15,7 +15,9 @@ test_type!(tinyint(
     Value::int32(i8::MAX)
 ));
 
-test_type!(tinyint1(
+// R3 also reports TINYINT(1) as an integer; its dedicated regression is below.
+#[cfg(feature = "mysql-native")]
+test_type_impl!(tinyint1(
     mysql,
     "tinyint(1)",
     ColumnType::Int32,
@@ -24,6 +26,21 @@ test_type!(tinyint1(
     Value::int32(0)
 ));
 
+#[cfg(feature = "kingbase-mysql-native")]
+test_type!(tinyint1_kingbase_int(
+    kingbase_mysql,
+    "tinyint(1)",
+    ColumnType::Int32,
+    Value::null_int32(),
+    Value::int32(i8::MIN),
+    Value::int32(-1),
+    Value::int32(0),
+    Value::int32(1),
+    Value::int32(2),
+    Value::int32(i8::MAX)
+));
+
+// Kingbase small unsigned cases require R3 native support.
 test_type!(tinyint_unsigned(
     mysql,
     "tinyint(4) unsigned",
@@ -69,13 +86,25 @@ test_type!(mediumint(
     Value::int32(8388607)
 ));
 
-test_type!(mediumint_unsigned(
+#[cfg(feature = "mysql-native")]
+test_type_impl!(mediumint_unsigned(
     mysql,
     "mediumint unsigned",
     ColumnType::Int64,
     Value::null_int64(),
     Value::int64(0),
     Value::int64(16777215)
+));
+
+// R3 exposes unsigned MEDIUMINT as INT4, unlike the native MySQL test above.
+#[cfg(feature = "kingbase-mysql-native")]
+test_type_impl!(mediumint_unsigned_kingbase_mysql(
+    kingbase_mysql,
+    "mediumint unsigned",
+    ColumnType::Int32,
+    Value::null_int32(),
+    Value::int32(0),
+    Value::int32(16777215)
 ));
 
 test_type!(int(
@@ -162,6 +191,14 @@ test_type!(bit1(
     (Value::null_bytes(), Value::null_boolean()),
     (Value::int32(0), Value::boolean(false)),
     (Value::int32(1), Value::boolean(true)),
+));
+
+test_type!(bit8(
+    mysql,
+    "bit(8)",
+    ColumnType::Bytes,
+    Value::null_bytes(),
+    Value::bytes(vec![0b1010_0101])
 ));
 
 test_type!(bit64(
@@ -283,12 +320,30 @@ test_type!(enum(
     Value::enum_variant("pollicle_dogs")
 ));
 
+test_type!(set(
+    mysql,
+    "set('red','blue')",
+    ColumnType::Text,
+    Value::null_text(),
+    Value::text("red"),
+    Value::text("red,blue")
+));
+
 test_type!(json(
     mysql,
     "json",
     ColumnType::Json,
     Value::null_json(),
     Value::json(serde_json::json!({"this": "is", "a": "json", "number": 2}))
+));
+
+#[cfg(feature = "kingbase-mysql-native")]
+test_type!(xml_kingbase_mysql(
+    kingbase_mysql,
+    "XML",
+    ColumnType::Xml,
+    Value::null_xml(),
+    Value::xml("<kingbase>金仓 &amp; XML</kingbase>")
 ));
 
 test_type!(date(
@@ -333,3 +388,40 @@ test_type!(timestamp(mysql, "timestamp", ColumnType::DateTime, {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
+
+#[cfg(feature = "kingbase-mysql-native")]
+#[quaint_test_macros::test_each_connector(tags("kingbase-mysql"))]
+async fn oracle_rowid_is_unavailable_in_mysql_mode(api: &mut dyn TestApi) -> crate::Result<()> {
+    use crate::{ast::Value, connector::Queryable};
+
+    let conn = api.conn();
+    let catalog = conn
+        .query_raw("SELECT oid FROM pg_catalog.pg_type WHERE typname = 'rowid'", &[])
+        .await?;
+    assert!(catalog.is_empty());
+
+    let identifier = Value::text("AAAAAAAAAAABAAAAAAAAAAA");
+    for typed in [false, true] {
+        for (sql, params, code) in [
+            ("SELECT CAST(NULL AS ROWID) AS value", &[][..], "42704"),
+            (
+                "SELECT CAST($1 AS ROWID) AS value",
+                std::slice::from_ref(&identifier),
+                "42704",
+            ),
+            ("SELECT nextrowid() AS value", &[][..], "42883"),
+        ] {
+            let result = if typed {
+                conn.query_raw_typed(sql, params).await
+            } else {
+                conn.query_raw(sql, params).await
+            };
+            let error = result.expect_err("Oracle ROWID must not be advertised as a MySQL native type");
+            assert_eq!(error.original_code(), Some(code), "{sql} / typed={typed}");
+        }
+    }
+
+    let row = conn.query_raw("SELECT 1 AS value", &[]).await?.into_single()?;
+    assert_eq!(row["value"], Value::int32(1));
+    Ok(())
+}

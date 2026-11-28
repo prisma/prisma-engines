@@ -100,26 +100,28 @@ fn partial_index_on_sqlite() {
 
 #[test]
 fn partial_index_not_supported_on_mysql() {
-    let dml = indoc! {r#"
-        model User {
-            id        Int    @id
-            email     String
-            status    String
+    for provider in [Provider::Mysql, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model User {
+                id        Int    @id
+                email     String
+                status    String
 
-            @@unique([email], where: raw("status = 'active'"))
-        }
-    "#};
+                @@unique([email], where: raw("status = 'active'"))
+            }
+        "#};
 
-    let err = parse_unwrap_err(&with_header(dml, Provider::Mysql, &["partialIndexes"]));
-    let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@unique": Partial indexes (with a `where` clause) are not supported by the current connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m    @@unique([email], [1;91mwhere: raw("status = 'active'")[0m)
-        [1;94m   | [0m
-    "#]];
-    expected.assert_eq(&err);
+        let err = parse_unwrap_err(&with_header(dml, provider, &["partialIndexes"]));
+        let expected = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@@unique": Partial indexes (with a `where` clause) are not supported by the current connector.[0m
+              [1;94m-->[0m  [4mschema.prisma:15[0m
+            [1;94m   | [0m
+            [1;94m14 | [0m
+            [1;94m15 | [0m    @@unique([email], [1;91mwhere: raw("status = 'active'")[0m)
+            [1;94m   | [0m
+        "#]];
+        expected.assert_eq(&err);
+    }
 }
 
 #[test]
@@ -396,26 +398,28 @@ fn partial_index_with_object_syntax_on_sqlite() {
 
 #[test]
 fn partial_index_with_object_syntax_not_supported_on_mysql() {
-    let dml = indoc! {r#"
-        model User {
-            id        Int     @id
-            email     String
-            active    Boolean
+    for provider in [Provider::Mysql, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model User {
+                id        Int     @id
+                email     String
+                active    Boolean
 
-            @@unique([email], where: { active: true })
-        }
-    "#};
+                @@unique([email], where: { active: true })
+            }
+        "#};
 
-    let err = parse_unwrap_err(&with_header(dml, Provider::Mysql, &["partialIndexes"]));
-    let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@unique": Partial indexes (with a `where` clause) are not supported by the current connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m    @@unique([email], [1;91mwhere: { active: true }[0m)
-        [1;94m   | [0m
-    "#]];
-    expected.assert_eq(&err);
+        let err = parse_unwrap_err(&with_header(dml, provider, &["partialIndexes"]));
+        let expected = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@@unique": Partial indexes (with a `where` clause) are not supported by the current connector.[0m
+              [1;94m-->[0m  [4mschema.prisma:15[0m
+            [1;94m   | [0m
+            [1;94m14 | [0m
+            [1;94m15 | [0m    @@unique([email], [1;91mwhere: { active: true }[0m)
+            [1;94m   | [0m
+        "#]];
+        expected.assert_eq(&err);
+    }
 }
 
 #[test]

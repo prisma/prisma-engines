@@ -1,0 +1,19 @@
+datasource pg {
+  provider = "kingbase-oracle"
+}
+
+model Blog {
+  id    Int     @id @pg.TinyInt
+  posts Post[]
+}
+
+model Post {
+  id Int   @id @pg.TinyInt
+}
+
+model Post2 {
+  id     Int  @id @pg.TinyInt
+  blogId Int  @pg.TinyInt
+  Blog   Blog @relation(fields: [blogId], references: [id])
+}
+

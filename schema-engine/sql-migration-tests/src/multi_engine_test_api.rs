@@ -58,6 +58,12 @@ impl TestApi {
                 tok(Quaint::new(args.database_url())).unwrap(),
                 args.database_url().to_owned(),
             )
+        } else if tags.contains(Tags::KingbaseOracle) {
+            let (_, cs) = tok(args.create_kingbase_oracle_database());
+            (tok(Quaint::new(&cs)).unwrap(), cs)
+        } else if tags.contains(Tags::KingbaseMysql) {
+            let (_, cs) = tok(args.create_kingbase_mysql_database());
+            (tok(Quaint::new(&cs)).unwrap(), cs)
         } else if tags.contains(Tags::Mysql) {
             let (_, cs) = tok(args.create_mysql_database());
             (tok(Quaint::new(&cs)).unwrap(), cs)
@@ -225,6 +231,12 @@ impl TestApi {
                 }
             }
             ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(params)?,
+            ConnectionInfo::Native(NativeConnectionInfo::KingbaseMysql(_)) => {
+                SqlSchemaConnector::new_kingbase_mysql(params)?
+            }
+            ConnectionInfo::Native(NativeConnectionInfo::KingbaseOracle(_)) => {
+                SqlSchemaConnector::new_kingbase_oracle(params)?
+            }
             ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(params)?,
             ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => SqlSchemaConnector::new_sqlite(params)?,
             ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite { .. }) | ConnectionInfo::External(_) => {

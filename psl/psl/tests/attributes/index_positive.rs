@@ -62,25 +62,29 @@ fn the_name_argument_must_work() {
 
 #[test]
 fn the_map_argument_must_work() {
-    let dml = r#"
-        datasource test {
-            provider = "postgres"
-        }
+    for provider in ["postgres", "kingbase-mysql", "kingbase-oracle"] {
+        let dml = format!(
+            r#"
+        datasource test {{
+            provider = "{provider}"
+        }}
 
-        model User {
+        model User {{
             id        Int    @id
             firstName String
             lastName  String
 
             @@index([firstName,lastName], map: "MyIndexName")
-        }
-    "#;
+        }}
+    "#
+        );
 
-    psl::parse_schema_without_extensions(dml)
-        .unwrap()
-        .assert_has_model("User")
-        .assert_index_on_fields(&["firstName", "lastName"])
-        .assert_mapped_name("MyIndexName");
+        psl::parse_schema_without_extensions(&dml)
+            .unwrap()
+            .assert_has_model("User")
+            .assert_index_on_fields(&["firstName", "lastName"])
+            .assert_mapped_name("MyIndexName");
+    }
 }
 
 #[test]
@@ -185,14 +189,36 @@ fn mysql_allows_index_length_prefix_on_unsupported_field() {
 
 #[test]
 fn mysql_allows_unique_sort_order() {
-    let dml = indoc! {r#"
-        model A {
-          id String @unique(sort: Desc)
-        }
-    "#};
+    for provider in [Provider::Mysql, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              id String @unique(sort: Desc)
+            }
+        "#};
 
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    assert_valid(&schema);
+        let schema = with_header(dml, provider, &[]);
+        assert_valid(&schema);
+
+        let source = with_header(
+            indoc! {r#"
+                model Item {
+                  id Int @id
+                  value Int @unique(sort: Desc, map: "single_unique")
+                  @@index([value(sort: Desc)], map: "single_index")
+                }
+            "#},
+            provider,
+            &[],
+        );
+        let schema = parse_schema(&source);
+        let model = schema.assert_has_model("Item");
+        for index in [
+            model.assert_index_on_fields(&["value"]),
+            model.assert_unique_on_fields(&["value"]),
+        ] {
+            index.assert_field("value").assert_descending();
+        }
+    }
 }
 
 #[test]
@@ -221,16 +247,18 @@ fn sqlserver_allows_unique_sort_order() {
 
 #[test]
 fn mysql_allows_compound_unique_sort_order() {
-    let dml = indoc! {r#"
-        model A {
-          a String
-          b String
-          @@unique([a(sort: Desc), b(sort: Asc)])
-        }
-    "#};
+    for provider in [Provider::Mysql, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              a String
+              b String
+              @@unique([a(sort: Desc), b(sort: Asc)])
+            }
+        "#};
 
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    assert_valid(&schema);
+        let schema = with_header(dml, provider, &[]);
+        assert_valid(&schema);
+    }
 }
 
 #[test]
@@ -263,17 +291,51 @@ fn sqlserver_allows_compound_unique_sort_order() {
 
 #[test]
 fn mysql_allows_index_sort_order() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
+    for provider in [Provider::Mysql, Provider::KingbaseMysql, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              id Int @id
+              a String
 
-          @@index([a(sort: Desc)])
-        }
-    "#};
+              @@index([a(sort: Desc)])
+            }
+        "#};
 
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    assert_valid(&schema);
+        let schema = with_header(dml, provider, &[]);
+        assert_valid(&schema);
+
+        let source = with_header(
+            indoc! {r#"
+                model Item {
+                  id Int @id
+                  first Int
+                  second Int
+                  @@index([first(sort: Desc), second(sort: Asc)], map: "sorted_index", type: BTree)
+                  @@unique([second(sort: Desc), first(sort: Asc)], map: "sorted_unique")
+                }
+            "#},
+            provider,
+            &[],
+        );
+        let schema = parse_schema(&source);
+        let model = schema.assert_has_model("Item");
+        let index = model.assert_index_on_fields(&["first", "second"]);
+        index
+            .assert_mapped_name("sorted_index")
+            .assert_type(psl::parser_database::IndexAlgorithm::BTree);
+        index.assert_field("first").assert_descending();
+        assert_eq!(
+            index.assert_field("second").sort_order(),
+            Some(psl::parser_database::SortOrder::Asc)
+        );
+        let unique = model.assert_unique_on_fields(&["second", "first"]);
+        unique.assert_mapped_name("sorted_unique");
+        unique.assert_field("second").assert_descending();
+        assert_eq!(
+            unique.assert_field("first").sort_order(),
+            Some(psl::parser_database::SortOrder::Asc)
+        );
+    }
 }
 
 #[test]
@@ -293,39 +355,43 @@ fn sqlserver_allows_index_sort_order() {
 
 #[test]
 fn mysql_fulltext_index() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
-          b String
+    for provider in [Provider::Mysql, Provider::KingbaseMysql] {
+        let dml = indoc! {r#"
+            model A {
+              id Int @id
+              a String
+              b String
 
-          @@fulltext([a, b])
-        }
-    "#};
+              @@fulltext([a, b])
+            }
+        "#};
 
-    psl::parse_schema_without_extensions(with_header(dml, Provider::Mysql, &[]))
-        .unwrap()
-        .assert_has_model("A")
-        .assert_fulltext_on_fields(&["a", "b"]);
+        psl::parse_schema_without_extensions(with_header(dml, provider, &[]))
+            .unwrap()
+            .assert_has_model("A")
+            .assert_fulltext_on_fields(&["a", "b"]);
+    }
 }
 
 #[test]
 fn mysql_fulltext_index_map() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
-          b String
+    for provider in [Provider::Mysql, Provider::KingbaseMysql] {
+        let dml = indoc! {r#"
+            model A {
+              id Int @id
+              a String
+              b String
 
-          @@fulltext([a, b], map: "my_text_index")
-        }
-    "#};
+              @@fulltext([a, b], map: "my_text_index")
+            }
+        "#};
 
-    psl::parse_schema_without_extensions(with_header(dml, Provider::Mysql, &[]))
-        .unwrap()
-        .assert_has_model("A")
-        .assert_fulltext_on_fields(&["a", "b"])
-        .assert_mapped_name("my_text_index");
+        psl::parse_schema_without_extensions(with_header(dml, provider, &[]))
+            .unwrap()
+            .assert_has_model("A")
+            .assert_fulltext_on_fields(&["a", "b"])
+            .assert_mapped_name("my_text_index");
+    }
 }
 
 #[test]
@@ -389,22 +455,46 @@ fn fulltext_index_sort_mongodb() {
 
 #[test]
 fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
-    let dml = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String
-          b  String
-          c  String
-          d  String
+    for provider in [Provider::Mysql, Provider::KingbaseMysql] {
+        let dml = indoc! {r#"
+            model A {
+              id Int    @id
+              a  String
+              b  String
+              c  String
+              d  String
 
-          @@fulltext([a, b])
-          @@fulltext([a, b, c, d])
-        }
-    "#};
+              @@fulltext([a, b])
+              @@fulltext([a, b, c, d])
+            }
+        "#};
 
-    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Mysql, &[])).unwrap();
-    let a = schema.assert_has_model("A");
+        let schema = psl::parse_schema_without_extensions(with_header(dml, provider, &[])).unwrap();
+        let a = schema.assert_has_model("A");
 
-    a.assert_fulltext_on_fields(&["a", "b"]);
-    a.assert_fulltext_on_fields(&["a", "b", "c", "d"]);
+        a.assert_fulltext_on_fields(&["a", "b"]);
+        a.assert_fulltext_on_fields(&["a", "b", "c", "d"]);
+
+        let source = with_header(
+            indoc! {r#"
+                model Article {
+                  id Int @id
+                  title String
+                  body String
+                  @@fulltext([title], map: "title_search")
+                  @@fulltext([title, body], map: "article_search")
+                }
+            "#},
+            provider,
+            &[],
+        );
+        let schema = parse_schema(&source);
+        let model = schema.assert_has_model("Article");
+        model
+            .assert_fulltext_on_fields(&["title"])
+            .assert_mapped_name("title_search");
+        model
+            .assert_fulltext_on_fields(&["title", "body"])
+            .assert_mapped_name("article_search");
+    }
 }

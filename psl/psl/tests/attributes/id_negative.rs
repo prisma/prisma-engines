@@ -248,46 +248,48 @@ fn invalid_name_for_compound_id_must_error() {
 
 #[test]
 fn mapped_id_must_error_on_mysql() {
-    let dml = indoc! {r#"
-        datasource test {
-          provider = "mysql"
-        }
+    for provider in ["mysql", "kingbase-mysql"] {
+        let dml = formatdoc! {r#"
+            datasource test {{
+              provider = "{provider}"
+            }}
 
-        model User {
-          name           String
-          identification Int
+            model User {{
+              name           String
+              identification Int
 
-          @@id([name, identification], map: "NotSupportedByProvider")
-        }
+              @@id([name, identification], map: "NotSupportedByProvider")
+            }}
 
-        model User1 {
-          name           String @id(map: "NotSupportedByProvider")
-        }
-    "#};
+            model User1 {{
+              name           String @id(map: "NotSupportedByProvider")
+            }}
+        "#};
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating model "User": You defined a database name for the primary key on the model. This is not supported by the provider.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
-        [1;94m   | [0m
-        [1;94m 4 | [0m
-        [1;94m 5 | [0m[1;91mmodel User {[0m
-        [1;94m 6 | [0m  name           String
-        [1;94m 7 | [0m  identification Int
-        [1;94m 8 | [0m
-        [1;94m 9 | [0m  @@id([name, identification], map: "NotSupportedByProvider")
-        [1;94m10 | [0m}
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError validating model "User1": You defined a database name for the primary key on the model. This is not supported by the provider.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
-        [1;94m   | [0m
-        [1;94m11 | [0m
-        [1;94m12 | [0m[1;91mmodel User1 {[0m
-        [1;94m13 | [0m  name           String @id(map: "NotSupportedByProvider")
-        [1;94m14 | [0m}
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError validating model "User": You defined a database name for the primary key on the model. This is not supported by the provider.[0m
+              [1;94m-->[0m  [4mschema.prisma:5[0m
+            [1;94m   | [0m
+            [1;94m 4 | [0m
+            [1;94m 5 | [0m[1;91mmodel User {[0m
+            [1;94m 6 | [0m  name           String
+            [1;94m 7 | [0m  identification Int
+            [1;94m 8 | [0m
+            [1;94m 9 | [0m  @@id([name, identification], map: "NotSupportedByProvider")
+            [1;94m10 | [0m}
+            [1;94m   | [0m
+            [1;91merror[0m: [1mError validating model "User1": You defined a database name for the primary key on the model. This is not supported by the provider.[0m
+              [1;94m-->[0m  [4mschema.prisma:12[0m
+            [1;94m   | [0m
+            [1;94m11 | [0m
+            [1;94m12 | [0m[1;91mmodel User1 {[0m
+            [1;94m13 | [0m  name           String @id(map: "NotSupportedByProvider")
+            [1;94m14 | [0m}
+            [1;94m   | [0m
+        "#]];
 
-    expect_error(dml, &expectation)
+        expect_error(&dml, &expectation)
+    }
 }
 
 #[test]
@@ -497,53 +499,91 @@ fn primary_key_and_foreign_key_names_cannot_clash() {
 
 #[test]
 fn mysql_does_not_allow_id_sort_argument() {
-    let dml = indoc! {r#"
-        datasource db {
-          provider = "mysql"
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        for sort in ["Desc", "Asc"] {
+            let dml = formatdoc! {r#"
+                datasource db {{
+                  provider = "{provider}"
+                }}
+
+                model A {{
+                  id Int @id(sort: Desc)
+                }}
+            "#};
+            let dml = dml.replace("sort: Desc", &format!("sort: {sort}"));
+
+            let expectation = match sort {
+                "Desc" => expect![[r#"
+                    [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+                      [1;94m-->[0m  [4mschema.prisma:6[0m
+                    [1;94m   | [0m
+                    [1;94m 5 | [0mmodel A {
+                    [1;94m 6 | [0m  id Int [1;91m@id(sort: Desc)[0m
+                    [1;94m   | [0m
+                "#]],
+                "Asc" => expect![[r#"
+                    [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+                      [1;94m-->[0m  [4mschema.prisma:6[0m
+                    [1;94m   | [0m
+                    [1;94m 5 | [0mmodel A {
+                    [1;94m 6 | [0m  id Int [1;91m@id(sort: Asc)[0m
+                    [1;94m   | [0m
+                "#]],
+                _ => unreachable!(),
+            };
+
+            expect_error(&dml, &expectation)
         }
-
-        model A {
-          id Int @id(sort: Desc)
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
-        [1;94m   | [0m
-        [1;94m 5 | [0mmodel A {
-        [1;94m 6 | [0m  id Int [1;91m@id(sort: Desc)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expect_error(dml, &expectation)
+    }
 }
 
 #[test]
 fn mysql_does_not_allow_compound_id_sort_argument() {
-    let dml = indoc! {r#"
-        datasource test {
-          provider = "mysql"
+    for provider in ["mysql", "kingbase-mysql", "kingbase-oracle"] {
+        for sort in ["Desc", "Asc"] {
+            let dml = formatdoc! {r#"
+                datasource test {{
+                  provider = "{provider}"
+                }}
+
+                model A {{
+                  a String @test.VarChar(255)
+                  b String @test.VarChar(255)
+
+                  @@id([a(sort: Asc), b(sort: Desc)])
+                }}
+            "#};
+            let dml = dml.replace("sort: Desc", &format!("sort: {sort}"));
+
+            let dml = if provider == "kingbase-oracle" {
+                dml.replace("@test.VarChar(", "@test.VarChar2(")
+            } else {
+                dml
+            };
+
+            let expectation = match sort {
+                "Desc" => expect![[r#"
+                    [1;91merror[0m: [1mError parsing attribute "@@id": The sort argument is not supported in the primary key with the current connector[0m
+                      [1;94m-->[0m  [4mschema.prisma:9[0m
+                    [1;94m   | [0m
+                    [1;94m 8 | [0m
+                    [1;94m 9 | [0m  [1;91m@@id([a(sort: Asc), b(sort: Desc)])[0m
+                    [1;94m   | [0m
+                "#]],
+                "Asc" => expect![[r#"
+                    [1;91merror[0m: [1mError parsing attribute "@@id": The sort argument is not supported in the primary key with the current connector[0m
+                      [1;94m-->[0m  [4mschema.prisma:9[0m
+                    [1;94m   | [0m
+                    [1;94m 8 | [0m
+                    [1;94m 9 | [0m  [1;91m@@id([a(sort: Asc), b(sort: Asc)])[0m
+                    [1;94m   | [0m
+                "#]],
+                _ => unreachable!(),
+            };
+
+            expect_error(&dml, &expectation)
         }
-
-        model A {
-          a String @test.VarChar(255)
-          b String @test.VarChar(255)
-
-          @@id([a(sort: Asc), b(sort: Desc)])
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@id": The sort argument is not supported in the primary key with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m
-        [1;94m 9 | [0m  [1;91m@@id([a(sort: Asc), b(sort: Desc)])[0m
-        [1;94m   | [0m
-    "#]];
-
-    expect_error(dml, &expectation)
+    }
 }
 
 #[test]
@@ -672,49 +712,53 @@ fn sqlite_does_not_allow_compound_id_sort_argument() {
 
 #[test]
 fn postgresql_does_not_allow_id_length_prefix() {
-    let dml = indoc! {r#"
-        model A {
-          id String @id(length: 10)
-        }
-    "#};
+    for provider in [Provider::Postgres, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              id String @id(length: 10)
+            }
+        "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
+        let schema = with_header(dml, provider, &[]);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
-        [1;94m   | [0m
-        [1;94m10 | [0mmodel A {
-        [1;94m11 | [0m  id String [1;91m@id(length: 10)[0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+              [1;94m-->[0m  [4mschema.prisma:11[0m
+            [1;94m   | [0m
+            [1;94m10 | [0mmodel A {
+            [1;94m11 | [0m  id String [1;91m@id(length: 10)[0m
+            [1;94m   | [0m
+        "#]];
 
-    expect_error(&schema, &expectation)
+        expect_error(&schema, &expectation)
+    }
 }
 
 #[test]
 fn postgresql_does_not_allow_compound_id_length_prefix() {
-    let dml = indoc! {r#"
-        model A {
-          a String
-          b String
+    for provider in [Provider::Postgres, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model A {
+              a String
+              b String
 
-          @@id([a(length: 10), b(length: 20)])
-        }
-    "#};
+              @@id([a(length: 10), b(length: 20)])
+            }
+        "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
+        let schema = with_header(dml, provider, &[]);
 
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@id": The length argument is not supported in the primary key with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m
-        [1;94m14 | [0m  [1;91m@@id([a(length: 10), b(length: 20)])[0m
-        [1;94m   | [0m
-    "#]];
+        let expectation = expect![[r#"
+            [1;91merror[0m: [1mError parsing attribute "@@id": The length argument is not supported in the primary key with the current connector[0m
+              [1;94m-->[0m  [4mschema.prisma:14[0m
+            [1;94m   | [0m
+            [1;94m13 | [0m
+            [1;94m14 | [0m  [1;91m@@id([a(length: 10), b(length: 20)])[0m
+            [1;94m   | [0m
+        "#]];
 
-    expect_error(&schema, &expectation)
+        expect_error(&schema, &expectation)
+    }
 }
 
 #[test]
@@ -1118,4 +1162,82 @@ fn mongodb_no_unique_index_for_id_model_attribute() {
     "#]];
 
     expect_error(schema, &expected)
+}
+
+#[test]
+fn unsupported_native_types_cannot_be_primary_keys() {
+    for (scalar, native) in [("Json", "Json"), ("String", "Xml")] {
+        let source = with_header(
+            &formatdoc! {r#"
+                model Item {{
+                  value {scalar} @test.{native}
+                  @@id([value])
+                }}
+            "#},
+            Provider::KingbaseOracle,
+            &[],
+        );
+        let expect = match native {
+            "Json" => expect![[r#"
+                [1;91merror[0m: [1mNative type `Json` of Kingbase Oracle cannot be used on a field that is `@id` or `@@id`.[0m
+                  [1;94m-->[0m  [4mschema.prisma:12[0m
+                [1;94m   | [0m
+                [1;94m11 | [0m  value Json @test.Json
+                [1;94m12 | [0m  [1;91m@@id([value])[0m
+                [1;94m   | [0m
+            "#]],
+            "Xml" => expect![[r#"
+                [1;91merror[0m: [1mNative type `Xml` of Kingbase Oracle cannot be used on a field that is `@id` or `@@id`.[0m
+                  [1;94m-->[0m  [4mschema.prisma:12[0m
+                [1;94m   | [0m
+                [1;94m11 | [0m  value String @test.Xml
+                [1;94m12 | [0m  [1;91m@@id([value])[0m
+                [1;94m   | [0m
+            "#]],
+            _ => unreachable!(),
+        };
+        expect.assert_eq(&parse_unwrap_err(&source));
+    }
+}
+
+#[test]
+fn primary_key_names_are_limited_to_sixty_three_bytes() {
+    for name in ["a".repeat(63), "\u{754c}".repeat(21)] {
+        let source = with_header(
+            &format!("model Item {{\n id Int @id(map: \"{name}\")\n}}"),
+            Provider::KingbaseOracle,
+            &[],
+        );
+        parse_schema(&source)
+            .assert_has_model("Item")
+            .assert_id_on_fields(&["id"])
+            .assert_mapped_name(&name);
+    }
+    for name in ["a".repeat(64), "\u{754c}".repeat(21) + "a"] {
+        let source = with_header(
+            &format!("model Item {{\n id Int @id(map: \"{name}\")\n}}"),
+            Provider::KingbaseOracle,
+            &[],
+        );
+        let expect = if name.is_ascii() {
+            expect![[r#"
+                [1;91merror[0m: [1mError validating model "Item": The constraint name 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' specified in the `map` argument for the `@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
+                  [1;94m-->[0m  [4mschema.prisma:11[0m
+                [1;94m   | [0m
+                [1;94m10 | [0mmodel Item {
+                [1;94m11 | [0m id Int [1;91m@id(map: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")[0m
+                [1;94m   | [0m
+            "#]]
+        } else {
+            expect![[r#"
+                [1;91merror[0m: [1mError validating model "Item": The constraint name '界界界界界界界界界界界界界界界界界界界界界a' specified in the `map` argument for the `@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
+                  [1;94m-->[0m  [4mschema.prisma:11[0m
+                [1;94m   | [0m
+                [1;94m10 | [0mmodel Item {
+                [1;94m11 | [0m id Int [1;91m@id(map: "界界界界界界界界界界界界界界界界界界界界界a")[0m
+                [1;94m   | [0m
+            "#]]
+        };
+        expect.assert_eq(&parse_unwrap_err(&source));
+    }
 }

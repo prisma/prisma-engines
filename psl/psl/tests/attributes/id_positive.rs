@@ -272,62 +272,68 @@ fn named_multi_field_ids_must_work() {
 
 #[test]
 fn mapped_multi_field_ids_must_work() {
-    let dml = indoc! {r#"
-        model Model {
-          a String
-          b Int
-          @@id([a,b], map: "dbname")
-        }
-    "#};
+    for provider in [Provider::Postgres, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model Model {
+              a String
+              b Int
+              @@id([a,b], map: "dbname")
+            }
+        "#};
 
-    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
-        .unwrap()
-        .assert_has_model("Model")
-        .assert_id_on_fields(&["a", "b"])
-        .assert_mapped_name("dbname");
+        psl::parse_schema_without_extensions(with_header(dml, provider, &[]))
+            .unwrap()
+            .assert_has_model("Model")
+            .assert_id_on_fields(&["a", "b"])
+            .assert_mapped_name("dbname");
+    }
 }
 
 #[test]
 fn mapped_singular_id_must_work() {
-    let dml = indoc! {r#"
-        model Model {
-          a String @id(map: "test")
-        }
+    for provider in [Provider::Postgres, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model Model {
+              a String @id(map: "test")
+            }
 
-        model Model2 {
-          a String @id(map: "test2")
-        }
-    "#};
+            model Model2 {
+              a String @id(map: "test2")
+            }
+        "#};
 
-    let datamodel = psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[])).unwrap();
+        let datamodel = psl::parse_schema_without_extensions(with_header(dml, provider, &[])).unwrap();
 
-    datamodel
-        .assert_has_model("Model")
-        .assert_id_on_fields(&["a"])
-        .assert_mapped_name("test");
+        datamodel
+            .assert_has_model("Model")
+            .assert_id_on_fields(&["a"])
+            .assert_mapped_name("test");
 
-    datamodel
-        .assert_has_model("Model2")
-        .assert_id_on_fields(&["a"])
-        .assert_mapped_name("test2");
+        datamodel
+            .assert_has_model("Model2")
+            .assert_id_on_fields(&["a"])
+            .assert_mapped_name("test2");
+    }
 }
 
 #[test]
 fn named_and_mapped_multi_field_ids_must_work() {
-    let dml = indoc! {r#"
-        model Model {
-          a String
-          b Int
-          @@id([a,b], name: "compoundId", map:"dbname")
-        }
-    "#};
+    for provider in [Provider::Postgres, Provider::KingbaseOracle] {
+        let dml = indoc! {r#"
+            model Model {
+              a String
+              b Int
+              @@id([a,b], name: "compoundId", map:"dbname")
+            }
+        "#};
 
-    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
-        .unwrap()
-        .assert_has_model("Model")
-        .assert_id_on_fields(&["a", "b"])
-        .assert_mapped_name("dbname")
-        .assert_name("compoundId");
+        psl::parse_schema_without_extensions(with_header(dml, provider, &[]))
+            .unwrap()
+            .assert_has_model("Model")
+            .assert_id_on_fields(&["a", "b"])
+            .assert_mapped_name("dbname")
+            .assert_name("compoundId");
+    }
 }
 
 #[test]

@@ -204,7 +204,7 @@ pub(crate) trait JoinSelectBuilder {
                 // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
                 // Note: Ideally, this should live in the MySQL select builder, but it's currently the only implementation difference
                 // between MySQL and Postgres, so we keep it here for now to avoid code duplication.
-                Flavour::Mysql if !rs.args.order_by.is_empty() => Some(i64::MAX),
+                Flavour::Mysql | Flavour::KingbaseMysql if !rs.args.order_by.is_empty() => Some(i64::MAX),
                 _ => None,
             };
 
@@ -621,12 +621,20 @@ fn distinct_selection(rs: &RelationSelection) -> FieldSelection {
     rs.args.distinct.as_ref().cloned().unwrap_or_default()
 }
 
-fn json_obj_selections(rs: &RelationSelection) -> impl Iterator<Item = &SelectedField> + '_ {
-    match rs.args.distinct.as_ref() {
+fn json_obj_selections<'a>(rs: &'a RelationSelection, ctx: &Context<'_>) -> impl Iterator<Item = &'a SelectedField> {
+    let selections = match rs.args.distinct.as_ref() {
         Some(distinct) if rs.args.requires_inmemory_distinct(RelationLoadStrategy::Join) => {
             Either::Left(rs.selections.iter().chain(distinct.selections()).unique())
         }
         _ => Either::Right(rs.selections.iter()),
+    };
+
+    // Linking fields can also be explicitly selected at a deeper relation level.
+    // Oracle JSON_OBJECT rejects duplicate keys instead of accepting the last value.
+    if ctx.is_kingbase_oracle() {
+        Either::Left(selections.unique())
+    } else {
+        Either::Right(selections)
     }
 }
 

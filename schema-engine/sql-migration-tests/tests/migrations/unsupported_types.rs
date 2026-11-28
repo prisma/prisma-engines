@@ -198,13 +198,13 @@ fn adding_and_removing_properties_on_unsupported_should_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(KingbaseMysql))]
 fn using_unsupported_and_ignore_should_work(api: TestApi) {
     let unsupported_type = if api.is_sqlite() {
         "some random string"
     } else if api.is_cockroach() {
         "interval"
-    } else if api.is_postgres() {
+    } else if api.is_postgres() || api.is_kingbase_oracle() {
         "macaddr"
     } else if api.is_mysql() {
         "point"

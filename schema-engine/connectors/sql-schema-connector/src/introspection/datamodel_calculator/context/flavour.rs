@@ -1,5 +1,7 @@
 #![cfg_attr(target_arch = "wasm32", allow(unused_imports))]
 
+#[cfg(feature = "kingbase-oracle")]
+mod kingbase_oracle;
 mod mysql;
 mod postgresql;
 mod sqlite;
@@ -8,6 +10,8 @@ mod sqlserver;
 use sql::{ForeignKeyWalker, IndexColumnWalker, IndexWalker, TableWalker};
 use sql_schema_describer as sql;
 
+#[cfg(feature = "kingbase-oracle")]
+pub(super) use kingbase_oracle::KingbaseOracleIntrospectionFlavour;
 pub(super) use mysql::MysqlIntrospectionFlavour;
 pub(super) use postgresql::PostgresIntrospectionFlavour;
 pub(super) use sqlite::SqliteIntrospectionFlavour;

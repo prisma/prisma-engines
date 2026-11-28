@@ -42,6 +42,8 @@ tags![
     CockroachDb222 = 1 << 20,
     CockroachDb231 = 1 << 21,
     Postgres16 = 1 << 22,
+    KingbaseMysql = 1 << 23,
+    KingbaseOracle = 1 << 24,
 ];
 
 pub fn tags_from_comma_separated_list(input: &str) -> BitFlags<Tags> {
